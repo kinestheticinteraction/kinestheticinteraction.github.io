@@ -1,0 +1,1800 @@
+/*reset all---------------------------*/
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+    vertical-align: bottom;
+    padding: 0px;
+    margin: 0px;
+    /*0612 set, could cause issue!!*/
+    font-weight: normal;
+}
+
+/*font setup all----------------------*/
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+div {
+    font-family: dinpro-light, sans-serif;
+    margin: 0px;
+    /*delete if fix issue1*/
+    /*font-weight: 300; 0830 delete*/
+}
+
+b {
+    font-family: dinpro-medium, sans-serif;
+}
+
+
+#backButton,
+#backButtonEnd {
+    width: 50px;
+    height: 50px;
+    position: fixed;
+    background-color: black;
+    /* 100 + 10 to align with title*/
+    margin-top: 110px;
+    margin-left: -100px;
+    transition-duration: 0.1s;
+}
+
+#backButton:hover {
+    background-color: black;
+    cursor: pointer;
+}
+
+#backButtonEnd {
+    position: relative;
+    //background-color: red;
+    width: 200px;
+    height: auto;
+    margin: 0;
+    left: 50%;
+    margin-left: -100px;
+    margin-top: 200px;
+    color: #fbfbfb;
+    font-size: 16px;
+    font-family: dinpro-medium;
+    text-decoration: underline;
+    text-align: center;
+}
+
+#backButtonEnd:hover {
+    background-color: black;
+    color: #a3a3a3;
+    cursor: pointer;
+}
+
+#title-description > h1,
+#title-description > h2,
+#title-description > h3,
+.issue-detail > h5,
+.feature-detail > h5 {
+    font-family: dinpro-light, Roboto-light, sans-serif;
+}
+
+.issue-detail > h4,
+.feature-detail > h4 {
+    font-family: dinpro-regular, sans-serif;
+}
+
+.highlight > h3 {
+    font-family: mohave-italics, sans-serif;
+}
+
+.driving-question > h3,
+.statement > h3 {
+    font-family: dinpro-light, sans-serif;
+    line-height: 1.2;
+    font-size: 26px;
+    color: #555;
+}
+
+.quote > h3 {
+    font-family: dinpro-light, serif;
+    line-height: 1.1;
+}
+
+/* --- image/video caption --- */
+img + h5,
+.video-demo + h5,
+.slide-container + h5,
+iframe + h5,
+video + h5 {
+    font-style: italic;
+    font-size: 14px;
+    margin-top: 8px;
+    margin-bottom: 20px;
+}
+
+.panel em {
+    font-family: dinpro-regular, serif;
+}
+
+bold {
+    font-family: dinpro-medium;
+}
+
+
+iframe {
+    position: absolute;
+}
+
+
+
+html {
+    margin-top: -10px;
+    min-height: 500px;
+    height: auto;
+    -webkit-font-smoothing: antialiased;
+    /*the following makes typo regular 18 look same as chrome*/
+    -webkit-font-smoothing: subpixel-antialiased;
+    //-webkit-font-smoothing: none;	
+    background-color: #FbFbFb;
+    /*0901*/
+}
+
+.coming-soon {
+    position: relative;
+    left: 50%;
+    margin-left: -100px;
+    width: 200px;
+}
+
+
+p {
+    position: relative;
+    left: 50%;
+    //margin-bottom: 30px;
+    margin-left: -350px;
+    /*0830 -300 to -350*/
+    width: 700px;
+    /*0830 600 to 700*/
+    font-size: 20px;
+    /*0830 14 to 25*/
+    color: #555;
+    /*line-height: 1.2; 0830 delete*/
+    /*word-spacing: 1px; 0830 delete*/
+    /*text-align: left; */
+    //font-family: Dinpro-light, sans-serif;
+    color: #555;
+}
+
+
+p.process-breaker {
+    text-align: center;
+    margin-bottom: 12px;
+    margin-top: 60px;
+}
+
+/* define space around p*/
+/*
+img+p,
+.slide-container+p,
+.video-demo+p,
+video+p{
+    margin-top: 12px;
+    margin-bottom: 30px;
+}
+*/
+
+p {
+    margin-top: 12px;
+    margin-bottom: 30px;
+}
+
+
+/* define general media spacing*/
+img + img,
+video + img,
+iframe + img,
+img + iframe,
+iframe + video,
+video + iframe,
+.video-demo + img,
+img + video,
+.video-demo + video,
+video + .video-demo,
+img + .video-demo,
+.video-demo + .video-demo {
+    margin-top: 24px;
+}
+
+
+//.quote~p{margin-top: -15px;}
+
+.emphasis {
+    //text-decoration: underline;
+    border-bottom: 4px solid #555;
+}
+
+
+/*---navigation---------------------------------*/
+#navigation {
+    z-index: 9;
+    position: relative;
+    width: 700px;
+    /*0830 880 to 700, potentially delete this 0614*/
+    height: 46px;
+    /*0830 60 to 50*/
+    background-color: transparent;
+    /*0830 white to trans*/
+    padding-top: 16px;
+    //overflow: hidden;
+}
+
+
+#navBand {
+    position: absolute;
+    height: 62px;
+    top: 0;
+    padding: 0;
+    opacity: .96;
+    background-color: #fbfbfb;
+}
+
+
+.li-nav {
+    display: inline;
+    margin-left: 72px;
+    padding: 0px;
+    font-size: 14px;
+    letter-spacing: 0px;
+    font-family: Lato-Bold, navigation, sans-serif;
+    /*1229*/
+    letter-spacing: 1.5px;
+}
+
+.li-nav > a:link {
+    color: #fff;
+    text-decoration: none;
+}
+
+/*unvisited link=visited link*/
+.li-nav > a:visited {
+    color: #fff;
+}
+
+/*a:hover {color: silver;}*/
+.li-nav > a:active {
+    color: #fff;
+}
+
+/*being clicked*/
+li > a:link,
+#navBand {
+    transition: .35s ease;
+}
+
+/* paused 2023.3.29
+p > a:link {
+    color: #FFC413;
+    text-decoration: underline
+}
+
+a:visited {
+    color: #FFC413;
+}
+*/
+
+p > bold,
+a > bold,
+.highlight > h3,
+.panel i,
+.panel em {
+    color: #fff;
+}
+
+a:any-link,
+a:visited,
+.li-nav > a:link,
+.li-nav > a:visited,
+.li-nav > a:active,
+h5 > a {
+    color: #fff;
+}
+
+p > a:link {
+    text-decoration: underline;
+}
+
+#indicator-dot {
+    z-index: 10;
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background-color: #fff;
+    //border-radius: 5px;
+    top: 48px;
+    transition: .7s ease;
+    //opacity: 0; /*hide when loading 1022*/
+}
+
+header {
+    position: fixed;
+    z-index: 21;
+}
+
+
+.headroom {
+    will-change: transform;
+    -webkit-transition: transform 200ms linear;
+    transition: transform 200ms linear;
+}
+
+.headroom--pinned {
+    -webkit-transform: translateY(0%);
+    transform: translateY(0%);
+}
+
+.headroom--unpinned {
+    -webkit-transform: translateY(-100%);
+    transform: translateY(-100%);
+}
+
+
+img {
+     /* for all images*/
+    pointer-events: none;
+}
+
+/*---body---------------------------------*/
+body {
+    position: absolute;
+    left: 50%;
+    margin-left: -350px;
+    /*0830 -440 to -350*/
+    width: 700px;
+    /*0830 880 to 700*/
+    min-height: 500px;
+    height: auto;
+    font-size: 22px;
+    color: rgb(117, 117, 117);
+    background-color: lightblue;
+    background-color: #FbFbFb;
+
+    /*0901*/
+}
+
+/*-------------title------------------------*/
+#title-panel {
+    position: relative;
+    height: 650px;
+    background-color: #ffffff;
+    overflow: hidden;
+    left: 50%;
+    margin-bottom: 50px;
+}
+
+/*set 1200px and -600px to structure after adding all*/
+
+
+#title-img {
+    position: relative;
+    left: 50%;
+    width: 1200px;
+    margin-left: -600px;
+    height: auto;
+    -webkit-animation: landing 1.2s;
+    -webkit-animation-timing-function: ease-in-out;
+}
+
+#title-img > img {
+    position: relative;
+    left: 50%;
+}
+
+
+#title-description {
+    position: relative;
+    height: auto;
+    width: 700px;
+    margin-left: -350px;
+    left: 50%;
+    margin-top: 50px;
+    -webkit-animation: float 2.2s;
+    -webkit-animation-timing-function: ease-in-out;
+    -webkit-animation-fill-mode: forwards;
+    color: #fff;
+}
+
+#title-description > h1 {
+    font-size: 52px;
+    line-height: 1.3;
+}
+
+#title-description > h2 {
+    /*0830 reset*/
+    margin-top: 0;
+    margin-left: 0;
+    line-height: 1.2;
+    font-size: 32px;
+}
+
+#title-description > h3 {
+    font-size: 25px;
+}
+
+
+
+
+
+
+/*----------------intro----------------*/
+#intro-panel {
+    position: relative;
+    left: 50%;
+    margin-top: 50px;
+    margin-left: -350px;
+    margin-bottom: 50px;
+    width: 700px;
+    min-height: 150px;
+}
+
+.recognition {
+    margin: 30px 0;
+}
+
+.recognition > p {
+    text-align: center;
+    font-size: 20px;
+}
+
+.recognition a:link {
+    margin-left: 20px;
+    text-decoration: none;
+}
+
+.recognition img {
+    vertical-align: middle;
+    opacity: 1;
+}
+
+#intro-panel .din {
+    font-size: 23px;
+    font-family: DINPro-Light, sans-serif;
+    line-height: 1.15;
+}
+
+
+.snapshot {
+    width: 100%;
+    min-height: 200px;
+    /* why cant the height be auto adjusted?!!!*/
+    height: auto;
+    background-color: #f5f5f5;
+    background-color: #fff;
+    margin-bottom: 10px;
+    border-width: 0px;
+    border-radius: 30px;
+}
+
+.snapshot_projectName {
+    min-height: 100px;
+    height: auto;
+    //background-color: #000;
+    overflow: hidden;
+    margin-top: 200px;
+
+}
+
+.snapshot_projectName > h1 {
+    color: white;
+    color: #3c3c3c;
+    padding: 30px;
+    text-align: center;
+    font-size: 48px;
+}
+
+
+.snapshot_col1,
+.snapshot_col2 {
+    width: 160px;
+    min-height: 200px;
+    height: auto;
+    margin-top: 30px;
+    margin-left: 40px;
+    margin-right: 40px;
+    margin-bottom: 30px;
+    //background-color: #555;
+    float: left;
+    overflow: hidden;
+}
+
+.snapshot_col2 {
+    max-width: 400px;
+    width: auto;
+    margin-left: 0;
+}
+
+.snapshot_col1_role:after,
+.snapshot_col1_collaboration:after,
+.snapshot_col2_duration:after,
+.snapshot_col2_problem,
+.snapshot_col2_impact {
+    font-family: dinpro-medium, sans-serif;
+    content: "ROLE";
+    font-size: 12px;
+    color: #a3a3a3;
+}
+
+.snapshot_col1 > p,
+.snapshot_col2 > p {
+    margin: 0;
+    padding: 0;
+    left: 0;
+    width: auto;
+    font-family: dinpro-regular, sans-serif;
+    color: white;
+    color: #3c3c3c;
+    font-size: 18px;
+}
+
+.snapshot_col2_problem_detail {
+    font-family: dinpro-regular, sans-serif;
+    font-size: 16px;
+    color: #a3a3a3;
+}
+
+.snapshot_col1_collaboration:after {
+    content: "COLLABORATION";
+}
+
+.snapshot_col2_duration:after {
+    content: "DURATION";
+}
+
+
+/*part to part spacing*/
+.snapshot_col1 > p + p,
+.snapshot_col2 > p + p {
+    margin-top: 18px;
+}
+
+
+
+/*----------------Promotion----------------*/
+#promotion-panel {
+    position: relative;
+    min-height: 395px;
+    margin: 50px 0;
+    left: 50%;
+    margin-left: -350px;
+    width: 700px;
+}
+
+
+
+/*----------------Research----------------*/
+#research-panel {
+    position: relative;
+    width: 100%;
+    height: auto;
+}
+
+
+/*move to structure from calor 1005*/
+.issue,
+.feature {
+    position: relative;
+    padding: 40px 0;
+    height: auto;
+    min-height: 120px;
+    /*200 - 40*2padding*/
+    display: block;
+    width: 700px;
+    left: 50%;
+    margin-left: -350px;
+}
+
+.issue-icon,
+.feature-icon {
+    position: relative;
+    width: 257px;
+    float: left;
+}
+
+.issue-detail,
+.feature-detail {
+    position: relative;
+    float: left;
+    margin-top: 10px;
+    width: 440px;
+    ;
+}
+
+.issue-detail > h4,
+.feature-detail > h4 {
+    position: relative;
+    margin: 0px;
+    left: 0px;
+    width: auto;
+    line-height: 1;
+    color: #595959;
+    font-weight: 900;
+    font-size: 26px;
+}
+
+.issue-detail > h5,
+.feature-detail > h5 {
+    position: relative;
+    padding-top: 6px;
+    line-height: 1.1;
+    font-size: 22px;
+}
+
+.statement > h3 {
+    margin-left: -324px;
+    width: 644px;
+    text-align: center;
+}
+
+
+
+img + .project-problem {
+    margin-top: 50px;
+    /*special case*/
+}
+
+.project-problem {
+    position: relative;
+    width: 900px;
+    left: 50%;
+    margin-left: -450px;
+    min-height: 260px;
+    margin-bottom: 50px;
+    //background-color: yellow;
+}
+
+.problem-unit {
+    position: relative;
+    width: 225px;
+    float: left;
+}
+
+.problem-unit-wrap {
+    width: 94%;
+    overflow: hidden;
+    position: relative;
+    left: 50%;
+    margin-left: -47%;
+}
+
+.problem-unit-wrap > img {
+    text-align: center;
+}
+
+.problem-unit-wrap > h4 {
+    font-family: DINPRO-Regular, sans-serif;
+    font-size: 20px;
+    text-align: center;
+    width: 100%;
+    min-height: 40px;
+}
+
+.problem-unit-wrap > p {
+    left: 0;
+    margin-left: 0;
+    font-size: 15px;
+    width: inherit;
+}
+
+.issue-img {
+    position: relative;
+    left: 50%;
+}
+
+
+
+
+/*----------------Ideation----------------*/
+
+
+/*what is this? 121316*/
+/*
+img+.slide-container{
+    margin-top: 60px
+}
+*/
+
+/*----------------prototype----------------*/
+#prototype-panel {
+    position: relative;
+    width: 100%;
+    height: auto;
+}
+
+.video-demo {
+    position: relative;
+    width: 100%;
+    min-height: 394px;
+    //background-color: greenyellow;
+    background-color: #000;
+    overflow: hidden;
+}
+
+
+
+video,
+video + video {
+    margin-top: 20px;
+}
+
+h5 + video {
+    margin-top: 20px;
+}
+
+/*----------------Product----------------*/
+#product-panel {
+    position: relative;
+    width: 100%;
+    height: auto;
+}
+
+
+/*to work with proper space between image and h5*/
+#product-panel > img,
+#market-panel > img {
+    margin-top: 12px;
+    /* cuz p tag has 12px top*/
+    margin-bottom: 0px;
+}
+
+.framerPrototypeContainer {
+    position: relative;
+    min-height: 612px;
+    width: 100%;
+
+    margin-bottom: 50px;
+    background: #fff;
+    padding: 30px 0px;
+    overflow: hidden;
+    max-height: 672px;
+    //background-color: red;
+    overflow: hidden;
+}
+
+.framerInIphoneX {
+    position: absolute;
+    width: 320px;
+    height: 611.94px;
+    /*    background-color: green;*/
+}
+
+.iphoneXMask {
+    position: absolute;
+    width: 320px;
+}
+
+/* ---prototype width = mask width/4.490625---*/
+.framerPrototype {
+    position: relative;
+    left: 50%;
+    width: 250.62px;
+    margin-left: -125.26px;
+    top: 50%;
+    height: 543px;
+    margin-top: -271.5px;
+    float: left;
+    border: none;
+    ;
+}
+
+.framerPrototype.pureJS {
+    -ms-zoom: 0.668;
+    -moz-transform: scale(0.668);
+    -moz-transform-origin: 0 0;
+    -o-transform: scale(0.668);
+    -o-transform-origin: 0 0;
+    -webkit-transform: scale(0.668);
+    -webkit-transform-origin: 0 0;
+    width: 375px;
+    height: 812px;
+    overflow: visible;
+    z-index: 1;
+    -webkit-mask-image: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20preserveAspectRatio%3D%22none%22%20width%3D%221125%22%20height%3D%222436%22%3E%3Cg%20transform%3D%22%22%20x%3D%220%22%20y%3D%220%22%3E%20%3Cpath%20fill%3D'%23000000'%20d%3D'M876%2C26%20L876%2C27%20C876%2C54.7939392%20854.793939%2C90%20806%2C90%20L320%2C90%20C271.206061%2C90%20250%2C54.7939392%20250%2C27%20L250%2C25.9999936%20C250%2C13.1450152%20249.999996%2C1.42108547e-14%20227.000025%2C0%20L130%2C0%20C48.934969%2C0%200%2C48.934969%200%2C130%20L0%2C2306%20C0%2C2387.06503%2048.934969%2C2436%20130%2C2436%20L995%2C2436%20C1076.06503%2C2436%201125%2C2387.06503%201125%2C2306%20L1125%2C130%20C1125%2C48.934969%201076.06503%2C0%20995%2C0%20L899%2C0%20C876%2C0%20876%2C13.1450195%20876%2C26%20Z'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+    -webkit-mask-size: 100% 100%;
+}
+
+.framerWebContainer {
+    background-color: #fff;
+    position: relative;
+    float: left;
+    overflow: hidden;
+    width: 320px;
+    height: 611.94px;
+}
+
+.framerPrototype.framerWeb {
+    margin: 0;
+    left: 0;
+    top: 0;
+    margin-top: -50px;
+    margin-left: -30px;
+    width: 380px;
+    height: 800px;
+}
+
+.framerSupplementContainer {
+    position: relative;
+    float: left;
+    min-width: 400px;
+    min-height: 600px;
+    //background-color: purple;
+    overflow: hidden;
+}
+
+
+.pointerDiv,
+.protoCaptionDiv {
+    position: absolute;
+    width: 100%;
+    //background-color: yellow;
+}
+
+.protoCaptionDiv {
+    margin-top: 200px;
+    padding-left: 20px;
+    height: 460px;
+    font-size: 18px;
+    font-family: dinpro-regular, sans-serif;
+    color: #3c3c3c;
+    //background-color: aqua;
+}
+
+
+.prototypePointer {
+    position: relative;
+    margin-top: 460px;
+    -webkit-animation: pointingLoop 1.2s infinite;
+    animation: pointingLoop 1.2s infinite;
+    -webkit-animation-timing-function: ease-in-out;
+    animation-timing-function: ease-in-out;
+}
+
+@keyframes pointingLoop {
+    0% {
+        margin-left: 0px;
+    }
+
+    50% {
+        margin-left: 10px;
+    }
+
+    100% {
+        margin-left: 0px;
+    }
+}
+
+
+.prototypePointerText {
+    position: relative;
+    margin-top: -20px;
+    color: #3c3c3c;
+    font-family: Dinpro-medium, sans-serif;
+}
+
+/* ======== master style for list of projects ======= */
+.product-title {
+    margin-top: 50px;
+    margin-bottom: 20px;
+}
+
+.product-title > h1,
+.product-title > h2 {
+    //font-family: "TyponineSansRegular", sans-serif;
+    font-family: DINPro-Light, sans-serif;
+    text-align: center;
+}
+
+.product-title > h1 {
+    font-family: DINPro-Regular, sans-serif;
+    font-size: 44px;
+    color: #444;
+    line-height: 1;
+    margin-bottom: 10px;
+}
+
+.product-title > h2 {
+    line-height: 1;
+    font-size: 26px;
+}
+
+.product-wrapper > h3 {
+    font-family: "TyponineSansRegular", sans-serif;
+}
+
+.product-wrapper p {
+    font-size: 23px;
+    font-family: DINPro-Light, sans-serif;
+    line-height: 1.15;
+}
+
+.product-wrapper img {
+    margin-bottom: 30px;
+}
+
+.product-wrapper img + h5,
+img + h5 {
+    //margin-top: -30px;
+}
+
+
+
+/* ======================================= */
+
+
+.band {
+    position: relative;
+    left: 50%;
+    padding: 20px 0;
+    background-color: #fff;
+}
+
+img + .band {
+    margin-top: 50px;
+}
+
+
+.band > img {
+    position: relative;
+    left: 50%;
+    width: 700px;
+    margin-left: -350px;
+    padding: 50px 0;
+}
+
+.market-panel-process {
+    margin: 70px 0;
+}
+
+/* == UI Showcase ============= */
+
+.app-left,
+.app-right {
+    position: relative;
+    left: 50%;
+    margin-left: -350px;
+    margin-bottom: 20px;
+    width: 700px;
+    height: 435px;
+    overflow: hidden;
+}
+
+
+.app-left-ui,
+.app-left-info,
+.app-right-ui,
+.app-right-info {
+    position: relative;
+    float: left;
+    overflow: hidden;
+}
+
+/*override the one in calor*/
+.app-left-ui,
+.app-right-ui {
+    position: relative;
+    margin-top: 12px;
+}
+
+.app-left-ui {
+    margin-left: 70px;
+}
+
+/*reposition app-right content*/
+.app-right > * {
+    position: absolute;
+}
+
+.app-right-ui {
+    left: 450px;
+}
+
+.app-left-info > *,
+.app-right-info > * {
+    width: 350px;
+}
+
+.app-left-ui > img,
+.app-right-ui > img,
+.app-left-ui > video,
+.app-right-ui > video {
+    width: 230px;
+}
+
+/*info can be pushed to next line due to app width*/
+.app-left-info,
+.app-right-info {
+    margin-left: 50px;
+    padding-top: 100px;
+}
+
+.app-left-info > h2,
+.app-right-info > h2 {
+    font-size: 48px;
+    font-family: dinpro-light, sans-serif;
+    letter-spacing: -2px;
+}
+
+.app-left-info > h3,
+.app-right-info > h3 {
+    font-size: 28px;
+    margin-bottom: 10px;
+    line-height: 1.4;
+    font-family: dinpro-light, sans-serif;
+}
+
+.app-left-info > h4,
+.app-right-info > h4 {
+    font-size: 20px;
+    line-height: 1.4;
+    font-family: dinpro-light, sans-serif;
+}
+
+
+/*----------------Comment----------------*/
+h6 > a:link {
+    color: #00aeef;
+    text-decoration: none;
+}
+
+h6 > a:visited {
+    color: #00aeef;
+}
+
+h6 > a:hover {
+    color: silver;
+}
+
+.product-wrapper .comment {
+    margin-top: 35px;
+}
+
+.comment > h6 {
+    width: 500px;
+    height: auto;
+    font-family: "TyponineSansRegular", sans-serif;
+}
+
+
+
+/*Footer-------------------------*/
+
+
+/*change to relative on 0809*/
+footer {
+    position: relative;
+    /*special case, cuz footer is the later element*/
+    margin-top: 300px;
+    width: 100%;
+    height: 20px;
+    font-family: dinpro-regular, sans-serif;
+    font-size: 10pt;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+footer > a:any-link {
+    color: #bbb;
+}
+
+.author {
+    display: inline;
+    float: left;
+}
+
+
+
+.copyright {
+    float: right;
+    display: inline;
+}
+
+.author:after {
+    content: "Designed and Handcrafted by Justeen Lee";
+}
+
+.copyright:after {
+    content: "Crack Smiles :) | © 2023 Justeen Lee | Terms of Use";
+}
+
+
+/*feature-type--------------*/
+.shadow {
+    /*box-shadow: none|h-shadow v-shadow blur spread color |inset|initial|inherit;*/
+    box-shadow: 0px 0px 10px 0px grey;
+}
+
+/*shoud use jquery remove class*/
+.shadow-off,
+#ideation-panel > .shadow-off {
+    box-shadow: 0px;
+}
+
+.panel {
+    margin-bottom: 50px;
+}
+
+.short-caption {
+    margin-top: 36px;
+    text-align: center;
+    font-style: italic;
+    font-size: 18px;
+}
+
+.slide-container {
+    margin-top: 10px;
+}
+
+.driving-question,
+.statement,
+.highlight {
+    position: relative;
+    left: 50%;
+    margin: 80px 0 80px -350px;
+    width: 700px;
+}
+
+.driving-question > h3,
+.statement > h3 {
+    position: relative;
+    left: 50%;
+    margin-left: -252px;
+    width: 505px;
+}
+
+
+.highlight > h3 {
+    position: relative;
+    left: 50%;
+    margin-left: -211px;
+    width: 422px;
+    text-transform: uppercase;
+    text-align: center;
+    font-size: 40px;
+    text-align: center;
+}
+
+.animation-abstract {
+    position: relative;
+    left: 50%;
+    margin-left: -300px;
+    width: 600px;
+    height: 400px;
+}
+
+.quote {
+    position: relative;
+    margin: 80px 0;
+    height: auto;
+    float: none;
+    width: 700px;
+    left: 50%;
+    margin-left: -350px;
+}
+
+.quote > h3 {
+    position: relative;
+    left: 50%;
+    margin-left: -250px;
+    width: 500px;
+    font-style: italic;
+    font-size: 30px;
+    color: #555;
+}
+
+.quote > h4 {
+    position: relative;
+    font-family: Roboto-Light, sans-serif;
+    margin-top: 20px;
+    font-size: 17px;
+    text-align: right;
+}
+
+.long-quote {
+    position: relative;
+}
+
+.long-quote > h3 {
+    width: 530px;
+    margin-left: -250px;
+}
+
+.quote-mark,
+.question-mark,
+.statement-mark,
+.exclamation-mark {
+    position: absolute;
+    margin-left: -25px;
+}
+
+.statement-mark {
+    margin: -20px 0 0 -10px;
+}
+
+.exclamation-mark {
+    margin: 25px 0 0 -10px;
+}
+
+
+/*   720 due to prototype width   */
+@media screen and (max-width: 720px) {
+
+    .prototypePointer {
+        margin-left: 100px;
+        -webkit-animation: pointingLoopUp 1.2s infinite;
+        animation: pointingLoopUp 1.2s infinite;
+        transform: rotate(90deg);
+    }
+
+    @keyframes pointingLoopUp {
+        0% {
+            margin-top: 0px;
+        }
+
+        50% {
+            margin-top: 10px;
+        }
+
+        100% {
+            margin-top: 0px;
+        }
+    }
+
+}
+
+
+/*----------Media Query starts--------------*/
+/* for 680px or less */
+@media screen and (max-width: 680px) {
+    /*	#navigation{width:100%;}*/
+
+    /*    added for headroom*/
+    #header {
+        width: 100%;
+        margin-left: 0;
+        left: 0;
+    }
+
+    #navigation {
+        width: 450px;
+        margin-left: -225px;
+        left: 50%;
+    }
+
+
+    #navigation .li-nav {
+        display: inline;
+        margin-left: 18px;
+        padding: 0px;
+    }
+
+    /*
+    #navigation, #cf{
+        //width: 100%;
+    }
+*/
+
+
+    #indicator-dot {
+        opacity: 0;
+    }
+
+    body {
+        width: 100%;
+        /*for slider, title-panel, band to work*/
+        left: 0;
+        /*reset >680px*/
+        margin-left: 0;
+        /*reset >680px*/
+        padding: 0;
+    }
+
+    #title-panel {
+        height: 700px;
+    }
+
+    #title-description,
+    #title-img-product,
+    #title-description > h2 {
+        position: relative;
+        width: auto;
+        height: auto;
+        left: 0%;
+        /*reset >680px*/
+        margin-left: 0;
+        /*reset >680px*/
+    }
+
+
+    #title-description {
+        padding: 0 12px;
+    }
+
+    /*add padding to all text, images*/
+    #intro-panel,
+    #promotion-panel,
+    #problem-panel,
+    #research-panel,
+    #ideation-panel,
+    #prototype-panel,
+    #product-panel,
+    #market-panel,
+    .quote,
+    .quote > h3,
+    .long-quote > h3,
+    .driving-question > h3 .statement > h3,
+    .comment {
+        padding: 0 12px;
+    }
+
+    .band > img,
+    .market-panel-process > img,
+    .feature > img,
+    #prototype-panel > img {
+        width: 100%;
+        /* 100% for img?*/
+        left: 0%;
+        /*reset >680px*/
+        margin-left: 0px;
+        /*reset >680px*/
+    }
+
+    .quote-mark,
+    .question-mark,
+    .statement-mark,
+    .exclamation-mark {
+        margin-left: 0px;
+        /*reset >680px*/
+    }
+
+    .exclamation-mark {
+        left: 0%;
+        /*reset >680px*/
+    }
+
+    #intro-panel,
+    #promotion-panel,
+    #problem-panel,
+    #research-panel,
+    #ideation-panel,
+    #prototype-panel,
+    #prototype-panel > div,
+    #product-panel,
+    #product-panel > div,
+    #resume-panel,
+    #work-panel,
+    .comment,
+    p,
+    .quote,
+    .quote > h3,
+    .long-quote > h3,
+    .statement,
+    .statement > h3,
+    .driving-question,
+    .driving-question > h3,
+    .highlight,
+    .highlight > h3 {
+        width: auto;
+        /*0121 for padding*/
+        left: 0%;
+        /*reset >680px*/
+        margin-left: 0px;
+        /*reset >680px*/
+    }
+
+    /*reset attr after above*/
+    #product-panel.panel > .band {
+        left: 50%;
+    }
+
+
+    .issue,
+    .issue-icon,
+    .issue-icon > img,
+    .issue-detail,
+    .issue-detail > h4,
+    .issue-detail > h5,
+    .feature-detail,
+    .feature-detail > h4,
+    .feature-detail > h5 {
+        width: auto;
+        left: 0%;
+        /*reset >680px*/
+        margin-left: 0px;
+        /*reset >680px*/
+        text-align: center;
+    }
+
+    .issue {
+        min-height: 220px;
+    }
+
+    .issue-icon {
+        width: 300px;
+        left: 50%;
+        margin-left: -150px;
+    }
+
+    /*=== UI showcase ===*/
+    .app-left,
+    .app-right {
+        margin-bottom: 100px;
+        height: 700px;
+    }
+
+    .app-right > * {
+        position: relative;
+    }
+
+    .app-left,
+    .app-left-ui,
+    .app-left-info,
+    .app-left-info > h2,
+    .app-left-info > h3,
+    .app-left-info > h4,
+    .app-left-info > h5,
+    .app-right,
+    .app-right-ui,
+    .app-right-info,
+    .app-right-info > h2,
+    .app-right-info > h3,
+    .app-right-info > h4,
+    .app-right-info > h5 {
+        width: auto;
+        left: 0;
+        margin-left: 0;
+        padding: 0;
+        overflow: visible;
+        text-align: center;
+    }
+
+    .app-left + .band {
+        height: 800px;
+        padding: 0;
+    }
+
+    .feature-icon,
+    .app-left-ui,
+    .app-right-ui {
+        width: 300px;
+        left: 50%;
+        margin-left: -150px;
+    }
+
+    .feature-detail,
+    .app-left-info,
+    .app-right-info {
+        padding: 0 12px;
+    }
+
+    .app-right-info,
+    .app-left-info {
+        margin-top: 24px;
+    }
+
+    /*=== UI showcase ends ===*/
+
+    img.coming-soon {
+        left: 0%;
+        margin-left: 0px;
+        //width: 150px;
+    }
+
+    footer {
+        width: auto;
+        left: 0;
+        margin: 0;
+        margin-top: 100px;
+        height: auto;
+        max-height: 50px;
+        width: 300px;
+        left: 50%;
+        margin-left: -150px;
+    }
+
+    .author,
+    .copyright {
+        float: none;
+        text-align: center;
+        display: block;
+        line-height: 1.5;
+    }
+}
+
+/* for 480px or less */
+@media screen and (max-width: 480px) {
+    .comment > h6 {
+        width: 320px;
+    }
+
+    /*    added for headroom*/
+    #header {
+        width: 100%;
+        margin-left: 0;
+        left: 0;
+        height: 80px;
+    }
+
+    #navigation {
+        width: 320px;
+        margin-left: -160px;
+        left: 50%;
+    }
+
+    #navBand {
+        height: 80px;
+    }
+
+    #navigation .li-nav {
+        margin: 0px;
+    }
+
+    #link-home {
+        margin-left: 60px;
+    }
+
+    #link-projects,
+    #link-about {
+        margin-left: 10px;
+    }
+
+    #link-resume {
+        margin-left: 103px;
+    }
+
+    #link-resume,
+    #link-about {
+        line-height: 2;
+    }
+
+    footer {
+        //padding-left: 12px;
+        margin-bottom: 20px;
+    }
+}
+
+/*--------------Media Query ends-----------------*/
+
+
+/*--------------animation------------------*/
+@-webkit-keyframes landing {
+    0% {
+        opacity: 0;
+        -webkit-transform: translate(0px, -20px)
+    }
+
+    100% {
+        opacity: 1;
+        -webkit-transform: translate(0px, 0px)
+    }
+}
+
+
+
+@-webkit-keyframes float {
+    0% {
+        opacity: 0;
+        -webkit-transform: translate(20px, 0px);
+    }
+
+    40% {
+        opacity: 0;
+        -webkit-transform: translate(20px, 0px);
+    }
+
+    100% {
+        opacity: 1;
+        -webkit-transform: translate(0px, 0px);
+    }
+}
+
+
+/*---------font setup ----------------------------------*/
+@font-face {
+    font-family: DINPro-Light;
+    src: url('../assets/fontbook/DINPro-Light.otf');
+}
+
+@font-face {
+    font-family: DINPro-Regular;
+    src: url('../assets/fontbook/DINPro-Regular.otf');
+}
+
+@font-face {
+    font-family: DINPro-Medium;
+    src: url('../assets/fontbook/DINPro-Medium.otf');
+}
+
+@font-face {
+    font-family: DINPro-Bold;
+    src: url('../assets/fontbook/DINPro-Bold.otf');
+}
+
+@font-face {
+    font-family: Lato-Black;
+    src: url('../assets/fontbook/Lato-Black.ttf');
+}
+
+@font-face {
+    font-family: Lato-Bold;
+    src: url('../assets/fontbook/Lato-Bold.ttf');
+}
+
+@font-face {
+    font-family: Circular_Air-Light;
+    src: url('../assets/fontbook/Circular_Air-Light.ttf');
+}
+
+@font-face {
+    font-family: Circular_Air-Book;
+    src: url('../assets/fontbook/Circular_Air-Book.ttf');
+}
+
+@font-face {
+    font-family: Circular_Air-Bold;
+    src: url('../assets/fontbook/Circular_Air-Bold.ttf');
+}
+
+@font-face {
+    font-family: futura;
+    src: url('../assets/fontbook/futura.otf');
+}
+
+@font-face {
+    font-family: navigation;
+    src: url('../assets/fontbook/Geomanist-Regular.otf');
+}
+
+@font-face {
+    font-family: mohave-italics;
+    src: url('../assets/fontbook/Mohave Italics.otf');
+}
+
+@font-face {
+    font-family: Roboto-Black;
+    src: url('../assets/fontbook/Roboto-Black.ttf');
+}
+
+@font-face {
+    font-family: Roboto-Bold;
+    src: url('../assets/fontbook/Roboto-Bold.ttf');
+}
+
+@font-face {
+    font-family: Roboto-Light;
+    src: url('../assets/fontbook/Roboto-Light.ttf');
+}
+
+@font-face {
+    font-family: Roboto-Regular;
+    src: url('../assets/fontbook/Roboto-Regular.ttf');
+}
+
+@font-face {
+    font-family: Baskerville;
+    src: url(../assets/fontbook/baskvl.ttf);
+}
+
+@font-face {
+    font-family: "TyponineSansRegular";
+    src: url("../assets/fontbook/TyponineSansRegular.eot");
+    src: url("../assets/fontbook/TyponineSansRegular.eot?#iefix") format("embedded-opentype"),
+        url("../assets/fontbook/TyponineSansRegular.woff") format("woff");
+    font-style: normal;
+    font-weight: normal;
+    font-stretch: normal;
+}
+
+@font-face {
+    font-family: "TyponineSansText";
+    src: url("../assets/fontbook/TyponineSansText.eot");
+    src: url("../assets/fontbook/TyponineSansText.eot?#iefix") format("embedded-opentype"),
+        url("../assets/fontbook/TyponineSansText.woff") format("woff");
+    font-style: normal;
+    font-weight: normal;
+    font-stretch: normal;
+}
+
+
+@font-face {
+    font-family: MYRIADPRO-REGULAR;
+    src: url('../assets/fontbook/MYRIADPRO-REGULAR.OTF');
+}
+
+@font-face {
+    font-family: MYRIADPRO-SEMIBOLD;
+    src: url('../assets/fontbook/MYRIADPRO-SEMIBOLD.OTF');
+}
+
+@font-face {
+    font-family: MYRIADPRO-BOLD;
+    src: url('../assets/fontbook/MYRIADPRO-BOLD.OTF');
+}
+
+@font-face {
+    font-family: issue-title;
+    src: url('../assets/fontbook/FrutigerLTStd-Bold.otf');
+}
