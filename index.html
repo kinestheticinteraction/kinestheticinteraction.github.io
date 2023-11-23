@@ -1,0 +1,619 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Justeen Lee | Interaction Designer</title>
+    <meta name="description" content="I am an Interaction Prototyping Designer who believes products should be meaningful and carry experience loops of delight, surprise and emotion, previously at Pinterest.">
+    <meta name="keywords" content="parallex, shooting star, interactive, interaction, user experience, UX, user interface, UI, portfolio, justeen lee, san francisco, new york, hong kong" />
+    <link rel="shortcut icon" href="assets/favicon.ico" />
+    <link rel="stylesheet" href="css/newstructure.css">
+    <link rel="stylesheet" href="playground/css/playground.css">
+    <script src="js/jquery-1.11.1.min.js"></script>
+    <script src="js/overall.js" defer></script>
+    <!--        <link rel="stylesheet" href="main.css">-->
+    <style>
+        #header {
+            //background-color: yellow;
+            width: 700px;
+            position: absolute;
+            left: 50%;
+            margin-left: -350px;
+        }
+
+    </style>
+    <script>
+        (function(i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function() {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-58728717-1', 'auto');
+        ga('send', 'pageview');
+
+    </script>
+</head>
+
+<body>
+    <header id="header">
+        <ul id="navigation">
+            <li class="li-nav"><a id="link-home" onmouseover="move('index')" onmouseout="move('currentPath')" href="">PLAYGROUND</a></li>
+
+            <li class="li-nav"><a id="link-projects" onmouseover="move('projects')" onmouseout="move('currentPath')" href="projects/projects.html">WORK</a></li>
+
+            <li class="li-nav"><a id="link-resume" onmouseover="move('resume')" onmouseout="move('currentPath')" href="resume/resume.html">RESUME</a></li>
+
+            <li class="li-nav"><a id="link-about" onmouseover="move('about')" onmouseout="move('currentPath')" href="about/about.html">ABOUT</a></li>
+        </ul>
+        <span id="indicator-dot"></span>
+        <div class="band" id="navBand"></div>
+    </header>
+    <div id="morph">
+        <img src="">
+        <video autoplay muted loop src="playground/images/morph-low%20res.mp4" id="morphVideo"></video>
+    </div>
+    <div id="block" class="flash-animation" data-movement="random" onclick="explode(this)"></div>
+    <div id="randomSet">
+        <div class="randomBlock"></div>
+        <div class="randomBlock"></div>
+        <div class="randomBlock"></div>
+        <div class="randomBlock"></div>
+        <div class="randomBlock"></div>
+    </div>
+
+    <svg id="grid"></svg>
+    <!--grid ends-->
+    <svg id="dotGrid"></svg>
+    <!--grid ends-->
+    <!--        <div id="test"></div>-->
+    <section class="allLines" id="lineSection">
+        <!-- 1 unit = 10 pixels-->
+        <div data-value="50"></div>
+        <div data-value="10"></div>
+        <div data-value="20"></div>
+        <div data-value="80"></div>
+        <div data-value="750"></div>
+        <div data-value="400"></div>
+        <div id="search20" class="searchCompletion"></div>
+        <div id="search40" class="searchCompletion"></div>
+        <div id="search60" class="searchCompletion"></div>
+        <div id="search80" class="searchCompletion"></div>
+        <div id="search100" class="searchCompletion"></div>
+    </section>
+
+    <img id="keyboard" src="playground/images/keyboard.png" width="200px">
+
+    <div id="hackerInfo">
+        <h1 id="hackerResultLabel">DECODE TIME</h1>
+        <h2 id="hackerResult"></h2>
+    </div>
+    <button id="refreshButton" type="button" onclick="window.location.reload()">PLAY AGAIN</button>
+
+    <h1 id="personal-title">I’M AN INTERACTION PROTOTYPING DESIGNER</h1><span id="strike"></span>
+    <h2 id="personal-statement">
+        Explore and define new human-technology interactions and experiences between devices, interfaces, and systems. Then prototype them beyond pictures with animations, sensors, and code.
+    </h2>
+
+
+
+</body>
+
+<script>
+    var screenWidth = document.documentElement.clientWidth;
+    console.log(screenWidth);
+    var screenHeight = document.documentElement.clientHeight;
+    document.getElementById("grid").width = screenWidth;
+    var bw = document.getElementsByTagName("body")[0].clientWidth;
+    var bh = document.getElementsByTagName("body")[0].clientHeight;
+    document.getElementById("dotGrid").width = bw + 20;
+    var block = document.getElementById("block");
+    var coordinateArray = [];
+    var foundTargetSet = [];
+    var numTargetFound = 0;
+    var randomBlocks;
+
+    var tip = document.getElementById("keyboard");
+    $("#block").hover(
+        function() {
+            tip.style.display = "block";
+        },
+        function() {
+            tip.style.display = "none";
+        }
+    );
+
+
+
+
+    $(document).mousemove(function(e) {
+        tip.style.left = e.pageX + "px";
+        tip.style.top = e.pageY + "px";
+    });
+
+
+    /*def ===== auto-run function ===*/
+    (function() {
+        document.getElementById("randomSet").style.width = screenWidth;
+        document.getElementById("randomSet").style.height = screenHeight;
+        horizontalPress = Math.floor(Math.random() * 10);
+        verticalPress = Math.floor(Math.random() * 10);
+        mapToDesination(horizontalPress, verticalPress, block);
+        curH = horizontalPress;
+        curV = verticalPress;
+        //console.log("plot cur: "+ curH + " " + curV);
+
+        //generate 5 random blocks
+        var initialBlocksCoord = [];
+        var tempX, tempY;
+        randomBlocks = document.getElementsByClassName("randomBlock");
+        for (var i = 0; i < randomBlocks.length; i++) {
+            //print DOM block data
+            //console.log(randomBlocks[i]);
+            tempX = Math.floor(Math.random() * 19 + 1);
+            tempY = Math.floor(Math.random() * 11 + 1);
+            //console.log("set "+(i+1)+" = "+tempX+","+tempY);
+            if (i == 0) {
+                initialBlocksCoord[0] = tempX;
+                initialBlocksCoord[1] = tempY;
+
+            } else {
+                var foundDuplicate = false;
+                for (var j = 0; j < initialBlocksCoord.length; j += 2) {
+                    if (tempX == initialBlocksCoord[j]) {
+                        if (tempY == initialBlocksCoord[j + 1]) {
+                            foundDuplicate = true;
+                            console.log("found duplicates");
+                        }
+                    }
+                }
+
+                while (foundDuplicate) {
+                    foundDuplicate = false;
+                    tempX = Math.floor(Math.random() * 19 + 1);
+                    tempY = Math.floor(Math.random() * 11 + 1);
+                    //console.log("set "+(i+1)+" alternative = "+tempX+","+tempY);
+                    for (var j = 0; j < initialBlocksCoord.length; j += 2) {
+                        if (tempX == initialBlocksCoord[j]) {
+                            if (tempY == initialBlocksCoord[j + 1]) {
+                                foundDuplicate = true;
+                                console.log("found duplicates again");
+                            }
+                        }
+                    }
+                }
+
+            }
+
+
+            coordinateArray.push(tempX, tempY);
+            randomBlocks[i].setAttribute("data-x", tempX);
+            randomBlocks[i].setAttribute("data-y", tempY);
+
+            //coordinateArray.push(tempX, tempY);
+            //randomBlocks[i].setAttribute("data-x", tempX);
+            //randomBlocks[i].setAttribute("data-y", tempY);
+            mapToDesination(tempX, tempY, randomBlocks[i]);
+        }
+
+        console.log("if you are checking this, you are probably cheating ;) \n-> 5 target coordinates: " + coordinateArray);
+        createGrid();
+        createDotGrid();
+    })();
+
+
+    function createGrid() {
+        var svgNS = "http://www.w3.org/2000/svg";
+        var grid = document.getElementById("grid");
+        var startingX = 50;
+        for (i = 0; i < 19; i++) {
+            //g = document.createElement("svg");
+            //b.appendChild(g);
+            var vertical = document.createElementNS(svgNS, "line");
+            vertical.setAttributeNS(null, "x1", 50 * (i + 1));
+            vertical.setAttributeNS(null, "y1", 0);
+            vertical.setAttributeNS(null, "x2", 50 * (i + 1));
+            vertical.setAttributeNS(null, "y2", screenHeight);
+            vertical.setAttributeNS(null, "class", "vertical");
+            grid.appendChild(vertical);
+
+            var horizontal = document.createElementNS(svgNS, "line");
+            horizontal.setAttributeNS(null, "x1", 0);
+            horizontal.setAttributeNS(null, "y1", 50 * (i + 1));
+            horizontal.setAttributeNS(null, "x2", screenWidth);
+            horizontal.setAttributeNS(null, "y2", 50 * (i + 1));
+            horizontal.setAttributeNS(null, "class", "vertical");
+            grid.appendChild(horizontal);
+        }
+    }
+
+    function createDotGrid() {
+        var svgNS = "http://www.w3.org/2000/svg";
+        var dotGrid = document.getElementById("dotGrid");
+        var startingX = 50;
+        for (var i = 0; i < bw / 50 + 1; i++) {
+            for (var j = 0; j < bh / 50; j++) {
+                var dot = document.createElementNS(svgNS, "rect");
+                if (i == bw / 50) {
+                    dot.setAttributeNS(null, "x", i * 50 - 1);
+                } else {
+                    dot.setAttributeNS(null, "x", i * 50);
+                }
+                dot.setAttributeNS(null, "y", j * 50);
+                dot.setAttributeNS(null, "width", 1);
+                dot.setAttributeNS(null, "height", 1);
+                dot.setAttributeNS(null, "fill", "#fff");
+                dotGrid.appendChild(dot);
+            }
+        }
+    }
+
+    $(window).resize(function() {});
+
+
+    //def=====keyboard interaction=============================
+    document.addEventListener("keydown", keypressed, false);
+    document.addEventListener("keyup", onkeyup, false);
+
+    var horizontalPress, verticalPress, hDestination, vDestination, lastX, lastY;
+    var keyCode;
+    var display = document.getElementById("value");
+
+
+    function mapToDesination(hP, vP, obj) {
+        hDestination = hP / (bw / 50) * bw;
+        vDestination = vP / (bh / 50) * bh;
+        obj.style.left = hDestination + "px";
+        obj.style.top = vDestination + "px";
+        //console.log("mapped to: "+hDestination +" "+vDestination);
+    }
+
+    var thisHitX, thisHitY;
+
+    function keypressed(e) {
+        keyCode = e.keyCode;
+        if (keyCode == 37 || keyCode == 65) {
+            //document.getElementById("key").innerHTML = "right";
+            if (0 < horizontalPress) {
+                horizontalPress--;
+            }
+        } else if (keyCode == 38 || keyCode == 87) {
+            //document.getElementById("key").innerHTML = "up";
+            if (0 < verticalPress) {
+                verticalPress--;
+            }
+        } else if (keyCode == 39 || keyCode == 68) {
+            //document.getElementById("key").innerHTML = "right";
+            if (horizontalPress < bw / 50 - 1) {
+                horizontalPress++;
+            }
+        } else if (keyCode == 40 || keyCode == 83) {
+            //document.getElementById("key").innerHTML = "down";
+            if (verticalPress < screenHeight / 50 - 1) {
+                verticalPress++;
+            }
+        } else if (keyCode == 32) {
+            //space key pressed
+            block.classList.add("flashOnSpace");
+            setTimeout(
+                function() {
+                    block.classList.remove("flashOnSpace");
+                }, 350);
+            animateShift(document.getElementById("block"));
+            //overlap = conquer
+            var overlapped = false;
+            var overlapIndex = 0;
+            var xp;
+            for (xp = 0; xp < coordinateArray.length - 1; xp += 2) {
+                //simply checking if player is at target
+                if (coordinateArray[xp] == horizontalPress) {
+                    if (coordinateArray[xp + 1] == verticalPress) {
+                        overlapped = true;
+                        overlapIndex = xp;
+
+                        thisHitX = coordinateArray[overlapIndex];
+                        thisHitY = coordinateArray[overlapIndex + 1];
+                        console.log("hit 1 target at: " + thisHitX + " " + thisHitY);
+                        //console.log("target #" + overlapIndex/2 + " is hit");
+                    }
+                }
+
+            }
+            //console.log("last found targets: "+foundTargetSet);
+            if (overlapped) {
+                //show expansion animation from hit target
+                newBlockLoop(overlapIndex);
+                var matched = false;
+                updateCompletion(numTargetFound, overlapIndex, matched);
+                matched = false;
+                //console.log("current found targets: "+foundTargetSet);
+            } //if overlapped statement ended
+        }
+        //allowed condition ended
+        //console.log("current: "+horizontalPress +" "+verticalPress);
+        mapToDesination(horizontalPress, verticalPress, block);
+    }
+
+
+    var decodeTimer;
+    var decodeTime = 0;
+    //fill in progress bar
+    function updateCompletion(checkNum, coorIndex, hitBefore) {
+        //console.log(">>>>>>>>start checking and update completion");
+        //console.log("current numTargetFound = "+numTargetFound);
+        for (var i = 0; i < foundTargetSet.length + 1; i += 2) {
+
+            //console.log("current found targets: "+foundTargetSet);
+            //console.log("compare this hit: "+thisHitX+", "+thisHitY+" to " + foundTargetSet[i]+", "+foundTargetSet[i+1]);
+
+            if (foundTargetSet[i] == coordinateArray[coorIndex]) {
+                if (foundTargetSet[i + 1] == coordinateArray[coorIndex + 1]) {
+                    hitBefore = true;
+                    //console.log("this is alreadyyyyyyyy foundddddd!");
+                }
+            }
+        }
+        if (!hitBefore) {
+            //console.log("this is newwwww!");
+            numTargetFound++;
+            switch (numTargetFound) {
+                case 1:
+
+                    //console.log("timer starts");
+                    decodeTimer = setInterval(
+                        function() {
+                            decodeTime += 1;
+                            //console.log("decode time: "+decodeTime);
+                        }, 1000);
+                    document.getElementById("search20").classList.add("completionFlash");
+                    foundTargetSet[checkNum + 0] = coordinateArray[coorIndex];
+                    foundTargetSet[checkNum + 1] = coordinateArray[coorIndex + 1];
+                    break;
+                case 2:
+                    document.getElementById("search40").style.display = "block";
+                    document.getElementById("search40").classList.add("completionFlash");
+                    foundTargetSet[checkNum + 1] = coordinateArray[coorIndex];
+                    foundTargetSet[checkNum + 2] = coordinateArray[coorIndex + 1];
+                    break;
+                case 3:
+                    document.getElementById("search60").style.display = "block";
+                    document.getElementById("search60").classList.add("completionFlash");
+                    foundTargetSet[checkNum + 2] = coordinateArray[coorIndex];
+                    foundTargetSet[checkNum + 3] = coordinateArray[coorIndex + 1];
+                    break;
+                case 4:
+                    document.getElementById("search80").style.display = "block";
+                    document.getElementById("search80").classList.add("completionFlash");
+                    foundTargetSet[checkNum + 3] = coordinateArray[coorIndex];
+                    foundTargetSet[checkNum + 4] = coordinateArray[coorIndex + 1];
+                    break;
+                case 5:
+                    document.getElementById("search100").style.display = "block";
+                    document.getElementById("search100").classList.add("completionFlash");
+                    foundTargetSet[checkNum + 4] = coordinateArray[coorIndex];
+                    foundTargetSet[checkNum + 5] = coordinateArray[coorIndex + 1];
+
+                    clearInterval(decodeTimer);
+                    setTimeout(function() {
+                        blockEcho();
+                    }, 1500);
+
+                    setTimeout(function() {
+                        frontVisualOut();
+                    }, 5000);
+                    setTimeout(function() {
+                        setFrontVisualDisplayNone();
+                    }, 7600);
+                    setTimeout(function() {
+                        document.getElementById("morphVideo").style.opacity = 1;
+                    }, 8000);
+                    setTimeout(function() {
+                        animateShift(document.getElementById("hackerInfo"));
+                    }, 9000);
+                    setTimeout(function() {
+                        showDecodeTime();
+                        document.getElementById("refreshButton").style.display = "block";
+                    }, 9000);
+                    setTimeout(function() {
+                        showPlayAgain();
+                    }, 11000);
+                    break;
+            }
+
+
+            //console.log("after ++, current numTargetFound = "+numTargetFound);
+        }
+    }
+
+
+    function showPlayAgain() {
+        document.getElementById("refreshButton").style.opacity = 1;
+    }
+
+    //pinpoint overlapped randomblock function
+    function findOverlappedBlock() {
+        var targetBlock;
+        for (var i = 0; i < 5; i++) {
+            if (randomBlocks[i].getAttribute("data-x") ==
+                horizontalPress) {
+                if (randomBlocks[i].getAttribute("data-y") ==
+                    verticalPress) {
+                    targetBlock = randomBlocks[i];
+                    console.log("found target: " + targetBlock.getAttribute("data-x") + "," + targetBlock.getAttribute("data-y"));
+                }
+            }
+        }
+        return targetBlock;
+    }
+
+    function timeFormatter(timeInSec) {
+        var seconds = timeInSec % 60;
+        var mins = timeInSec / 60;
+        var secondString;
+        if (seconds == 0) {
+            secondString = "00";
+        } else if (seconds < 10) {
+            secondString = "0" + seconds;
+        } else {
+            secondString = seconds;
+        }
+        if (mins < 10) {
+            return "0" + Math.floor(mins) + ":" + secondString;
+        } else if (mins < 60) {
+            return Math.floor(mins) + ":" + secondString;
+        } else {
+            return "OVER 1 HOUR. MISSION FAILED.";
+        }
+    }
+
+    function showDecodeTime() {
+        document.getElementById("hackerInfo").style.display = "block";
+        document.getElementById("hackerResult").innerHTML = timeFormatter(decodeTime);
+    }
+
+    function newBlockLoop(center) {
+        var counter = 0;
+        var timer = setInterval(
+            function() {
+                if (counter >= 8) {
+                    clearInterval(timer);
+                } else {
+                    var newBlock = document.createElement("DIV");
+                    newBlock.classList.add("areaBlock");
+                    var overlapX = coordinateArray[center];
+                    var overlapY = coordinateArray[center + 1];
+                    switch (counter) {
+                        case 0:
+                            mapToDesination(overlapX, overlapY + 1, newBlock);
+                            break;
+                        case 1:
+                            mapToDesination(overlapX - 1, overlapY + 1, newBlock);
+                            break;
+                        case 2:
+                            mapToDesination(overlapX - 1, overlapY, newBlock);
+                            break;
+                        case 3:
+                            mapToDesination(overlapX - 1, overlapY - 1, newBlock);
+                            break;
+                        case 4:
+                            mapToDesination(overlapX, overlapY - 1, newBlock);
+                            break;
+                        case 5:
+                            mapToDesination(overlapX + 1, overlapY - 1, newBlock);
+                            break;
+                        case 6:
+                            mapToDesination(overlapX + 1, overlapY, newBlock);
+                            break;
+                        case 7:
+                            mapToDesination(overlapX + 1, overlapY + 1, newBlock);
+                            break;
+                    };
+                    document.getElementById("randomSet").appendChild(newBlock);
+                    counter++;
+                }
+            }, 100);
+    } //end of newBlookLoop function
+
+
+    function linesFly() {
+        var allLines = document.getElementById("lineSection").children;
+        for (var i = 0; i < allLines.length; i++) {
+            allLines[i].style.left = screenWidth + "px";
+        }
+    }
+
+    function textFly() {
+        document.getElementById("personal-title").style.left = "-" + screenWidth + "px";
+        document.getElementById("personal-statement").style.left = "-" + screenWidth + "px";
+    }
+
+    function blocksFly() {
+        document.getElementById("randomSet").style.opacity = 0;
+    }
+
+    function frontVisualOut() {
+        linesFly();
+        setTimeout(function() {
+            textFly()
+        }, 500);
+        setTimeout(function() {
+            blocksFly()
+        }, 800);
+        setTimeout(function() {
+            setFrontVisualDisplayNone();
+        }, 1800);
+    }
+
+
+    //def======= block shift animation =========
+    function animateShift(element) {
+        lastX = element.offsetLeft;
+        lastY = element.offsetTop;
+        var shiftDeltaX, shiftDeltaY, plusOrMinusX, plusOrMinusY;
+        var counter = 0;
+        var timer = setInterval(
+            function() {
+                if (counter >= 7) {
+                    clearInterval(timer);
+                    if (element == document.getElementById("block")) {
+                        mapToDesination(horizontalPress, verticalPress, element);
+                    } else if (element == document.getElementById("hackerInfo")) {
+                        element.style.left = "50%";
+                        element.style.top = "50%";
+                    }
+                } else {
+                    shiftDeltaX = Math.floor(Math.random() * 20 + 5);
+                    shiftDeltaY = Math.floor(Math.random() * 20 + 5);
+                    plusOrMinusX = Math.random() < 0.5 ? -1 : 1;
+                    plusOrMinusY = Math.random() < 0.5 ? -1 : 1;
+                    element.style.left = lastX +
+                        shiftDeltaX * plusOrMinusX + "px";
+                    element.style.top = lastY +
+                        shiftDeltaY * plusOrMinusY + "px";
+                    counter++;
+                }
+            }, 20);
+    } //animation shift function ends
+
+    function setFrontVisualDisplayNone() {
+        document.getElementById("lineSection").style.display = "none";
+        document.getElementById("personal-title").style.display = "none";
+        document.getElementById("personal-statement").style.display = "none";
+        document.getElementById("randomSet").style.display = "none";
+    }
+
+
+
+    function blockEcho() {
+        var counter = 0;
+        var timer = setInterval(
+            function() {
+                if (counter >= 5) {
+                    clearInterval(timer);
+                } else {
+                    randomBlocks[counter].classList.add("zoomToInfinite");
+                    counter++
+                }
+            }, 250);
+    }
+
+
+    //def======= mouse interaction =========
+    function explode(obj) {
+        var tempX = Math.floor(Math.random() * 19 + 1);
+        var tempY = Math.floor(Math.random() * 11 + 1);
+        mapToDesination(tempX, tempY, obj);
+    }
+
+</script>
+
+</html>
