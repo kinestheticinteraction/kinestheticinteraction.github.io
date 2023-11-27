@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang = "en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ObjectUI | Justeen Lee</title>
+    <meta name="description" content="Turo is a temperature sensor equipped with a display that provides real-time accurate temperature.">
+	<meta name="keywords" content="turo, orange, temperature, sensor, weather, interaction design, user experience, UX, IX, product design, industrial, design, justeen, san francisco, new york, hong kong" />
+	<link rel="shortcut icon" href="../assets/favicon.ico"/>
+    
+    <link rel="stylesheet" href="../css/flexslider.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="../css/newstructure.css">
+	<link rel="stylesheet" href="css/objectui.css">
+	<script src="../js/jquery-1.11.1.min.js"></script>
+    <script src="../js/overall.js" defer></script>
+	<script src="../js/jquery.flexslider.js" defer></script>
+        
+	<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-58728717-1', 'auto');
+  ga('send', 'pageview');
+	</script>
+</head>
+
+
+	
+
+	
+<body>
+    <header id="header">
+    <ul id = "navigation">
+        <li class="li-nav"><a id="link-home" onmouseover = "move('index')" onmouseout = "move('currentPath')" href="../index.html">PLAYGROUND</a></li>
+
+        <li class="li-nav"><a id="link-projects" onmouseover = "move('projects')" onmouseout = "move('currentPath')" href="../projects/projects.html"></a></li>
+
+        <li class="li-nav"><a id="link-resume" onmouseover = "move('resume')" onmouseout = "move('currentPath')" href="../resume/resume.html">RESUME</a></li>
+
+        <li class="li-nav"><a id="link-about" onmouseover = "move('about')" onmouseout = "move('currentPath')" href="../about/about.html">ABOUT</a></li>
+    </ul>
+    <span id="indicator-dot"></span>
+    <div class="band" id="navBand"></div>
+    </header>
+
+
+<!--title panel------------------------------>
+    <div id = "title-panel">
+		<div id = "title-img">
+            <img src="images/title-img.jpg" width="100%">
+        </div>
+		
+        <div id ="title-description">
+            <h1>ObjectUI</h1>
+            <h2>
+                Augmented Everyday Objects
+            </h2>
+            <h3>Enhance and extend tangible interaction with AR</h3>
+        </div>           
+    </div>
+	
+	
+<!--intro panel------------------------------>
+    <div id = "intro-panel">
+<!--        <p align = "center"><em>Work In Progress</em></p>-->
+        
+        <p>
+            ObjectUI is an <bold>object-based interface</bold> through augmented reality (AR). Each facet of an object itself is a user interface (UI). As people interact with these UI's on objects, their interaction intent would be embodied through the AR display.
+		</p>
+        
+    </div>
+    
+<!--promotion panel------------------------------>
+	<div id = "promotion-panel">
+        <div id="objectui-trailer" class="video-demo"></div>
+    </div>
+    	
+    
+
+<!--protytype panel------------------------------>
+	<div id = "prototype-panel" class = "panel">
+        <p align = "center">Prototype</p>
+       <p>I made several sample prototypes using Unity 3D to demonstrate the plausibility and potential applications of ObjectUI, including navigation and filtering point of interest.</p>
+        <div id="prototype-navigate" class="video-demo"></div>
+        <h5>Unity3D prototype: navigate to destination</h5>
+        
+        <div id="prototype-filter" class="video-demo"></div>
+        <h5>Unity3D prototype: filter point of interest</h5>
+        
+	</div> 
+	
+<!--product panel------------------------------>
+	<div id = "product-panel" class = "panel">
+        <p align = "center">Application</p>
+        <p>ObjectUI extends the tangible interaction we have with physical objects, such as paper maps, books, textbooks, architecture floor plans, restaurant menus, sketchbooks, etc.
+</p>
+        
+        <p>Interaction occurs upon <bold>direct gestural contact with physical objects</bold>, such as pointing and sliding.
+            
+</p>
+        <div id="translate" class="video-demo"></div>
+        <h5>Augmenting books: translate</h5>
+        
+        <div id="menu" class="video-demo"></div>
+        <h5>Augmenting menus: picture</h5>
+        
+        
+	</div>
+    
+<!--research panel------------------------------>
+	<div id = "research-panel" class = "panel">
+		
+        <p class = "process-breaker">Introduction &amp; Motivation</p>
+        <img src="images/current-ix-method.png" width="100%">
+
+        <p>There are two main categories of AR technology nowadays: eyewear and camera. AR eyewears focus interaction on air gestures and remotes, whereas AR cameras rely on interacting with touchscreens.</p>
+         <img src="images/interaction-problem.png" width="100%">
+
+        <p>However, these types of interaction lack the direct contact physicality and tactile relationship we develop with our world and reality. </p>
+        
+        
+    <div class="band">
+        <div class="driving-question">
+            <img class= "question-mark" src ="images/question-mark.svg">
+            <h3>
+            As we interact with physical objects, can AR <em>enhance</em>, rather than <em>replace</em>, the rich materiality we are already familiar with?
+            
+            </h3>
+		</div>
+        </div>
+        
+    </div>
+    
+<!--     <p align = "center">Relatd Work</p>-->
+
+    
+    
+<!--ideation panel------------------------------>
+	
+	<div id = "ideation-panel" class = "panel">
+		<p align = "center">New paradigm</p>
+        <img src="images/temp-component.png" width="100%">
+        <p>Each object has its UI. <bold>If we touch an object, this touching action carries an intent</bold>. For example, when we point to an item name on a restaurant menu, it could mean we want to direct others’ attention to it, explain, or ask what it is.</p>
+        <img src="images/temp-ix-method.png" width="100%">
+          <p>The AR layer is triggered upon direct hand contact with objects, such as pointing, tapping, and sliding.</p>
+        
+         <p align = "center">Future Work</p>
+        <p>ObjectUI interaction pattern, a set of intuitive gestures for tangible interaction to trigger AR layer.
+            <br><br>
+            A refined version with occlusion removal.
+            <br><br>
+            ObjectUI v2, extending direct contact with voice.
+        </p>
+        
+    </div><!--ideation panel ends-------------------->
+
+
+    
+    
+    	
+<!--other panel------------------------------>
+	
+<!--comment panel------------------------------>
+	<div class = "comment">
+		<h6><bold>Date</bold>: Fall 2016 - Present</h6>
+		<h6><bold>Client</bold>: Studio Project</h6>
+		<h6><bold>State</bold>: Prototype</h6>
+        <h6><bold>Keyword</bold>: AR, Augmented Reality, Mixed Reality, tangible interaction, everyday objects, maps, books</h6>
+	</div>
+	
+<!--body ends + footer ------------------------->
+	<footer>
+		<span class="author"></span>
+		<span class="copyright"></span>
+	</footer>
+</body>
+    
+
+<script type="text/javascript">  
+	$(window).load(function(){
+	  $('.flexslider').flexslider({
+		animation: "fade",
+		start: function(slider){
+		  $('div').removeClass('loading');
+		}
+	  });
+	});
+	//load video
+	$(window).bind("load",
+		function() {
+			setTimeout(addVideo, 1400);
+		}
+	);
+	function addVideo(){
+        document.getElementById("objectui-trailer").innerHTML =	'<iframe src="https://player.vimeo.com/video/194374881?&color=bbbbbb&byline=0&portrait=0" width="100%" height="100%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+        document.getElementById("translate").innerHTML =	'<iframe src="https://player.vimeo.com/video/198541222?loop=1&color=ffffff&title=0&byline=0&portrait=0" width="100%" height="100%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+        document.getElementById("menu").innerHTML =	'<iframe src="https://player.vimeo.com/video/199915576?loop=1&color=ffffff&title=0&byline=0&portrait=0" width="100%" height="100%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+        document.getElementById("prototype-navigate").innerHTML =	'<iframe src="https://player.vimeo.com/video/200915266?loop=1&color=ffffff&title=0&byline=0&portrait=0" width="100%" height="100%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+        document.getElementById("prototype-filter").innerHTML =	'<iframe src="https://player.vimeo.com/video/200915182?loop=1&color=ffffff&title=0&byline=0&portrait=0" width="100%" height="100%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+        
+        
+        
+        
+	};
+</script>	
+
+    
+</html>

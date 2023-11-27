@@ -1,0 +1,158 @@
+/*----------------native tags----------------*/
+.inline-highlight{text-decoration: underline}
+
+p>a:hover {text-decoration: none;}
+footer{margin-top: 100px; color: #bbb;}
+
+
+/*-------------------------------*/
+#navBand, html, body, #title-panel {
+    background-color: #000;
+}
+
+.keywords, p>a:link, p>a:visited {
+    color: #FF0990;
+    color: #CE4498;
+    color: #FF1A92 ;
+}
+
+/*----------------Title----------------*/
+#title-panel{
+    position: relative;
+    height: auto;
+	overflow: hidden;
+    //background-color: #000;
+}
+
+#about-section-wrapper{
+    width: 760px;
+    margin-left: -380px;
+    position: relative;
+    left: 50%;
+    margin-top: 100px;
+}
+
+/*=== body text/content ===*/
+p{
+    position: relative;
+    margin-left: 0;
+    left: 0;
+    width: 100%;
+    font-size: 20px;
+    font-family: Dinpro-light, sans-serif;
+    line-height: 1.2;
+	color: #dfdfdf;
+}
+
+
+#summary, #update, #date {
+    font-size: 35px;
+    font-family: Circular_Air-Bold, sans-serif;
+    letter-spacing: -0.5px;
+	word-spacing: 0px;
+    line-height: 1.2;
+    color: rgb(240,240,240);
+}
+
+#vision, #contact {
+    font-family: DINPro-Regular, sans-serif;
+    color: #fbfbfb;
+    font-size: 24px;
+    line-height: 30px;
+}
+
+
+/*----------------intro----------------*/
+
+
+#date {
+    margin-bottom: 4px;
+    padding-left: 50px; /* half of strike*/
+}
+
+/*=== strikeline through ===*/
+#date:after {
+    position: absolute;
+    margin-top: 25px;
+    left: 0px;
+    content: "";
+    width: 120px;
+    height: 5px;
+    background-color: #FF0990;
+    //background-color: #F31884;
+}
+
+
+
+
+/*----------------Comment----------------*/
+span.top{
+	position: relative;
+	left: 50%;
+	width: 25px;
+	display: block;
+	float: none;
+	font-size: 16px;
+	text-align: center;
+}
+
+/*
+span>a:link {color: rgb(117,117,117); text-decoration:none;}
+span>a:visited {color: rgb(117,117,117);}
+*/
+
+
+
+
+
+
+
+/* for 680px or less */
+@media screen and (max-width: 680px) {
+	/*--responsive all testing--*/
+/* for about.css only*/
+
+    #link-about{text-decoration: underline}
+    .li-nav:hover{text-decoration: underline}
+
+
+    /*
+
+    body
+    == title-panel
+    ==== about-section-wrapper
+    ===== me-pannel
+
+    */
+
+    #about-section-wrapper{
+        width: auto;
+        margin-left: 0px;
+        left: 0;
+        padding: 0px 24px;
+    }
+
+    #about-section-wrapper p{
+        width: auto%;
+}
+    
+@media screen and (max-width: 480px){
+	/* for about.css only*/
+    
+   
+    #about-section-wrapper{
+        padding: 0px 12px;
+        width: 100%;
+        left: 0;
+        margin-left: 0;
+    }
+    
+    
+    #summary, h2{
+        font-size: 35px;
+    }
+
+	/* for about.css only*/	
+}
+    
+   

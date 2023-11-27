@@ -1,0 +1,171 @@
+.highlight>h3,.panel i, .panel em
+{color: #555;}
+
+#navBand {
+    background-color: transparent;
+}
+
+bold{
+    font-family: dinpro-medium;
+}
+
+.li-nav>a:link,
+.li-nav>a:visited,
+.li-nav>a:active,
+#title-description {color: #232323;}
+
+
+/*----------------Title----------------*/
+
+#title-panel{
+    background-color: #fdfdfd;
+}
+
+#title-img{
+    margin-top: -50px;
+}
+
+#title-img>img{
+    width: 1200px;
+    left: 50%;
+    margin-left: -600px;
+}
+
+#title-description{
+    margin-top: -160px;
+}
+
+/*----------------Promotion----------------*/
+
+/*----------------Research----------------*/
+
+/* special case, cuz pictures have no margins themselves*/
+
+#research-panel>img, #ideation-panel>img{
+    margin-top: 24px;
+    margin-bottom: 12px;
+}
+
+.band{
+	background-color: #ff7b03;
+    background-color: #fff;
+    margin-bottom: 20px;
+}
+
+.band>img{
+    width: 1000px;
+    margin-left: -500px;
+    padding: 0;
+}
+@media screen and (max-width: 1000px){
+    .band>img{
+    width: 100%;
+    margin-left: 0px;
+    left: 0;
+    padding: 0;
+}
+}
+
+
+
+
+/*----------------Ideation----------------*/
+
+/*----------------prototype----------------*/
+
+
+
+
+/*----------------Product----------------*/
+
+
+#product-panel>img:first-child, 
+#product-panel>img:last-child{
+	border-top: none;	
+}
+
+#product-panel>img:last-child{
+	margin-bottom: 0px;
+}
+
+.app-left-ui>img,
+.app-right-ui>img{
+    box-shadow: 0px 0px 40px 5px #eee;
+}
+
+.app-left-ui, 
+.app-right-ui{
+    overflow: visible;
+}
+
+#product-panel .app-right,
+#product-panel .app-left{
+    padding: 20px 0;
+}
+
+#product-panel>.band{
+    padding: 10px 0;
+}
+
+
+
+
+/* for 680px or less */
+@media screen and (max-width: 680px){
+
+    #title-img{
+        margin-top: 0px;
+    }
+
+    #title-description{
+        margin-top: -200px;
+    }
+
+    
+	.demo{
+		left: 0;
+		margin-left: 0;
+		width: 100%;
+		min-height: 543px;
+		height: auto;
+		background-color: #000;
+	}
+    
+    .band>img{
+        width: 100%;
+        left: 0;
+        margin-left: 0;
+    }
+    
+/*=== UI showcase overide @680===*/
+    #product-panel .app-right,
+    #product-panel .app-left{
+        padding: 20px 0;
+    }
+
+    #product-panel>.band{
+        padding: 10px 0 ;
+    }
+    
+    .app-left, .app-right{
+        margin-bottom: 0;
+        height: 700px;
+    }
+/*=== UI showcase ends ===*/
+}
+
+@media screen and (max-width: 480px) {
+    #title-img>img{
+        width: 620px;
+        margin-left: -310px;
+    }
+    #title-panel{
+        height: 550px;
+    }
+    #title-description{
+        margin-top: -120px;
+    }
+
+    
+
+}

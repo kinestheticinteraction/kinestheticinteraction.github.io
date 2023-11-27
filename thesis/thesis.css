@@ -1,0 +1,264 @@
+/*<i> for in-text hightlight*/
+.highlight>h3,i, {color: #4B2D80;}
+
+
+/*0830 to newstructure?*/ 
+/*
+li>a:link {color: #fff; text-decoration:none;    transition: .7s ease;
+}
+*/
+
+#navBand {
+    background-color: transparent;
+}
+
+#navigation a{
+    color: #222;
+}
+#indicator-dot{
+    background-color: #222;
+}
+
+
+
+
+/*once pass rendering, change color*/
+
+/*----------------Title----------------*/
+
+/*flash only*/
+#title-panel{
+    background-color: #eee;
+    overflow: hidden;
+}
+
+
+#title-img{
+    //margin-top: 100px;
+    z-index: 1;
+    animation: none;
+}
+
+#title-img>img{
+    width: 1200px;
+    left: 50%;
+    margin-left: -600px;
+}
+
+#title-description{
+    color: #222;
+    margin-top: -200px;
+    z-index: 100;
+}
+
+
+
+/*----------------intro----------------*/
+#intro-panel{
+    margin-top: 50px; /*share 20px margin with p class*/
+}
+
+#test2{
+    background-image: url("../images/2016IxDAwards_Shortlist_Pin.png");
+    background-size: 100% 40px;
+    background-color: yellow;
+    background-repeat: no-repeat;
+    overflow: visible;
+}
+
+/*----------------Promotion----------------*/
+
+
+.recognition a:link{text-decoration: none; }
+
+/*----------------Research----------------*/
+/*to structure*/
+.group-wrapper{
+    position: relative;
+	padding: 30px 0;
+    height: auto;
+}
+
+
+.issue, .issue-icon, .issue-detail>h4, .issue-detail>h5,
+.feature, .feature-icon, .feature-detail>h4, .feature-detail>h5{
+	position:relative;
+    font-size: 25px;
+    //float: left;
+	//height: auto;
+}
+
+.feature{padding: 80px 0;}
+
+
+
+/*----------------Ideation----------------*/
+
+#ideation-panel>img{
+    box-shadow: 0 0 ;
+}
+
+/*----------------prototype----------------*/
+
+
+/*----------------Product----------------*/
+
+#product-panel>img {
+	margin-top: 12px;
+}
+
+
+/* could move to structure */
+iframe{
+    position: relative;
+    //margin-bottom: 30px;
+}
+
+/* could move to structure */
+img+iframe{
+    margin-top: 12px;
+}
+
+#product-panel>img:first-child, #product-panel>img:last-child{
+	border-top: none;	
+}
+
+#product-panel>img:last-child{
+	margin-bottom: 0px;
+}
+
+.column-2{
+    width: 347px;
+    margin: 0 0;
+    margin-bottom: 6px;
+}
+
+/*----------------Market----------------*/
+
+.app-left-ui{
+    margin-left: 0px;
+    //background-color: yellow;
+    width: 350px;
+}
+
+.app-left-ui>video{
+    padding: 100px 0px;
+    width: 100%;
+}
+
+.app-left-info{
+    //background-color: yellow;
+    margin-left: 0px;
+    width: 310px;
+    padding: 0 20px;
+    padding-top: 130px;
+    min-height: 300px;
+    z-index: 10;
+}
+
+.app-left-info>*{
+    width: 100%;
+}
+
+
+
+#market-panel .band{padding: 0px;}
+
+#water-bucket img{margin-top: 25px;}
+#water-bucket>img:last-child{
+    margin-top: 50px;
+}
+/*#water-bucket{width: 700px; left:50%; margin-left: -350px;}*/
+#badges img{margin-top:40px;}
+#badges{min-height: 205px;}
+
+/* for 680px or less */
+@media screen and (max-width: 680px){
+
+
+	/*calor only?*/
+	#prototype-panel>#market-cartridge-mechanism, 
+    #prototype-panel>#video-set-temp{
+		left: 0;
+		margin-left: 0;
+        padding: 0; //0621
+		width: 100%;
+        height: 150px;
+	}
+	
+	.issue, .issue-detail{
+		width: auto;
+	}
+    
+    .app-left, .app-right{
+        margin-bottom: 100px;
+        height: 700px;
+    }
+
+    
+    .app-right>*{position:relative;}
+    
+    .app-left,
+    .app-left-ui, 
+    .app-left-info, 
+    .app-left-info>h2,
+    .app-left-info>h3,
+    .app-left-info>h4,
+    .app-left-info>h5,
+    .app-right,
+    .app-right-ui, 
+    .app-right-info,
+    .app-right-info>h2,
+    .app-right-info>h3,
+    .app-right-info>h4,
+    .app-right-info>h5,
+    .feature,
+    .feature-icon,
+    .feature-detail{
+        //max-width: 680px;
+        width: auto;
+        left: 0%; /*reset >680px*/
+		margin-left: 0px; /*reset >680px*/
+        padding: 0;
+        overflow: visible;
+        text-align: center;
+    }
+    
+    
+    .band>.feature{height: 500px;}
+    .band+.feature{height: 400px; margin-top: 24px;}
+    
+    .app-left+.band{
+        height: 800px;
+        padding: 0;
+    }
+    
+
+    /*center app, feature img*/
+    .feature-icon, 
+    .app-left-ui, 
+    .app-right-ui{
+        width: 300px;
+        left: 50%;
+        margin-left: -150px;
+    }
+    
+    .feature-detail,
+    .app-left-info,
+    .app-right-info{
+        padding: 0 12px;}
+    .app-right-info, .app-left-info{margin-top: 24px;}
+}
+
+
+
+
+/* for 480px or less */
+@media screen and (max-width: 480px) {
+    #title-panel{height: 750px;}
+
+    .app-left, .app-right{
+        height: 730px;
+    }
+    
+}

@@ -1,0 +1,161 @@
+.highlight>h3, i{
+	color: #fa4b2a; /*the verge*/
+	//color: #fe0032; /*parsons color*/
+}
+
+p>a:link {color: #fa4b2a;}
+p>a:visited {color: #fa4b2a;}
+p>a:hover{text-decoration: underline;}
+
+#navBand {
+    background-color: #fdfdfd;
+}
+
+.li-nav>a:link,
+.li-nav>a:visited,
+.li-nav>a:active {color: #fa4b2a;}
+
+/*----------------Title----------------*/
+#title-panel{
+    background-color: #fdfdfd;
+}
+
+#title-img{
+    margin-top: 90px;
+}
+
+#title-img>img{
+    width: 240px;
+    left: 50%;
+    margin-left: -120px;
+}
+
+#title-description{
+    margin-top: 0px;
+    color: #fe0032;
+}
+
+
+/*----------------intro----------------*/
+
+/*----------------Problem----------------*/
+
+/*----------------Product----------------*/
+.product-wrapper{
+	margin-bottom: 100px;
+}
+
+#product-panel>.shadow {
+	margin-bottom: 20px;
+	box-shadow: 0 0 7px 0px grey;
+}
+
+#product-panel>p {
+	margin-bottom: 20px;
+}
+
+.requirement>h1, .requirement>h2{
+	text-align: center;
+}
+
+.requirement>h1{
+	color: #444;
+}
+
+.requirement{
+	position: relative;
+	width: auto;
+	margin-top: 50px;
+	margin-bottom: 20px;	
+} /*rewritten in media query*/
+
+.requirement>h2{
+    position: relative;
+    left: 50%;
+	width: 620px;
+	margin-left:-310px;
+	line-height: 1;
+	font-size: 26px;
+} /*rewritten in media query*/
+
+.album{
+	position: relative;
+	left: 50%;
+	margin-left: -240px;
+	width: 480px;
+} /*rewritten in media query 480*/
+
+.raymond{
+	position: relative;
+	left: 50%;
+	margin-left: -187px;
+	width: 375px;
+} /*rewritten in media query 480*/
+
+
+.gigPoster{
+	position: relative;
+	left: 50%;
+	margin-left: -154px;
+	width: 308px;
+} /*rewritten in media query 480*/
+
+.picture-2{
+	position: relative;
+	max-height:357px;
+	width: 100%;
+}
+
+.klick-gif{
+	position: absolute;
+	margin-top: -31%;
+	margin-left: 76%;
+	width:20%;
+}
+
+#animation-parsons{
+	width: 100%;
+}
+
+/*----------------other----------------*/
+
+/*----------------Comment----------------*/
+
+/*----------------Animations----------------*/
+
+/*----------------native tags----------------*/
+
+
+/* for 680px or less */
+@media screen and (max-width: 680px){
+	/*parsons only*/
+	.title-image-group{
+	/*can adjust this to fit image*/
+		margin: 10% 0 15% 20%; 
+		width: 65%; 
+	}
+
+	.requirement{
+		width: 100%;
+	}
+	
+	.requirement>h2{
+		width: 100%;
+        left: 0;
+		margin-left:0;
+		line-height: 1;
+		font-size: 26px;
+	}
+}
+
+@media screen and (max-width: 480px){
+	.album, .raymond, .gigPoster{
+		left: 0;
+		margin-left: 0;
+		width: 100%;
+	}
+    
+    #title-panel{
+        height: 760px;
+    }
+}
