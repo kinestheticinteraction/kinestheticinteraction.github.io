@@ -1,0 +1,110 @@
+.video-prototypes,
+.animation-prototypes,
+.code-prototypes {
+    position: relative;
+    flex: auto;
+    //float: left;
+    margin-bottom: 30px;
+    //background-color: aqua;
+    width: 100%;
+    min-height: 2200px;
+    height: auto;
+}
+
+
+
+
+.animation-prototypes {
+    min-height: 3000px;
+}
+
+.code-prototypes {
+    min-height: 3500px;
+}
+
+
+.video-prototypes-col1,
+.animation-prototypes-col1,
+.code-prototypes-col1 {
+    position: absolute;
+    width: 150px;
+    height: auto;
+    //background-color: yellow;
+    font: Dinpro-bold, san-serifs;
+    color: #f7f7f7;
+}
+
+.video-prototypes-col2,
+.animation-prototypes-col2,
+.code-prototypes-col2 {
+    position: absolute;
+    margin-left: 150px;
+    width: calc(100% - 150px);
+    min-height: 100px;
+    height: auto;
+    padding: 0;
+}
+
+/*----------------------*/
+body {
+    width: 1360px;
+    margin-left: -680px;
+    height: auto;
+    //min-height: 4000px;
+
+}
+
+html,
+body {
+    background-color: black;
+
+}
+
+#market-panel {
+    margin-top: 100px;
+}
+
+.snapshot {
+    margin-top: 100px;
+    border-radius: 20px;
+    background-color: #333;
+}
+
+.snapshot_col2 {
+    max-width: 900px;
+}
+
+.snapshot_col1 > p,
+.snapshot_col2 > p,
+p > a:link {
+    color: #f7f7f7;
+
+}
+
+
+/*
+#market-panel {
+    height: auto;
+    min-height: 200px;
+    width: 100%;
+    background-color: green;
+}*/
+
+.video-prototypes-col2 > video,
+.animation-prototypes-col2 > video,
+.code-prototypes-col2 > video,
+.video-prototypes-col2 > .vimeo-video > iframe,
+.video-prototypes-col2 > div,
+.code-prototypes-col2 > .vimeo-video > iframe,
+.code-prototypes-col2 > div {
+    float: left;
+    width: 580px;
+    height: 330px;
+    margin: 0;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    //background-color: red;
+    //background-color: white;
+
+
+}
