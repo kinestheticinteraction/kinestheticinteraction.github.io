@@ -1,0 +1,441 @@
+.li-nav > a:link,
+.li-nav > a:visited {
+    color: #F51488;
+    text-decoration: none;
+}
+
+p a:link,
+p a:visited {
+    color: #4D4D4D;
+    text-decoration: none;
+}
+
+p > b,
+p > b > a:link {
+    color: #111;
+}
+
+/*
+h4 is #222
+b text has way smaller font size, so use #111 to make them more visually balanced.
+*/
+
+p a:hover,
+p > b > a:hover {
+    color: #F51488;
+}
+
+#PinterestLens {
+    animation: pinterestOmbre 2s alternate infinite;
+    color: #F51488;
+}
+
+
+@keyframes pinterestOmbre {
+    0% {
+        color: #F51488;
+    }
+
+    100% {
+
+        color: #bb54f2;
+    }
+}
+
+#waymoOne {
+    animation: waymoOmbre 2s alternate infinite;
+    color: #1CCD93;
+}
+
+@keyframes waymoOmbre {
+    0% {
+        color: #0378FF;
+    }
+
+    100% {
+        color: #1CCD93;
+    }
+}
+
+#wingApp {
+    color: #EBB70E;
+}
+
+
+#indicator-dot {
+    background-color: #555;
+}
+
+/*purple #961176*/
+
+#navBand {
+    background-color: #FbFbFb;
+}
+
+span.course,
+    {
+    //padding-bottom: 10px;
+    border-bottom: 1px solid rgba(150, 17, 118, .75);
+}
+
+span.course::after {}
+
+/*body text*/
+p {
+    left: 0;
+    margin: 0;
+    font-family: dinpro-regular, sans-serif;
+    font-size: 15px;
+    color: #4D4D4D;
+    line-height: 1.3;
+    //width: 510px; /*added on 0729*/
+}
+
+p + p {
+    margin-top: 10px;
+}
+
+h4 + p {
+    margin-top: 1px;
+}
+
+.resume-bullets {
+    position: relative;
+    top: 8px;
+    float: left;
+    width: 4px;
+    height: 4px;
+    background-color: #292929;
+}
+
+.resume-bullets + p {
+    padding-left: 10px;
+}
+
+h1,
+h2 {
+    font-family: "DINPRO-REGULAR";
+    text-align: center;
+    color: #292929;
+}
+
+#titleInfo > h1 {
+    padding-top: 10px;
+    font-size: 45px;
+    letter-spacing: -3px;
+    margin-bottom: 10px;
+}
+
+
+#titleInfo > h2,
+#titleInfo a {
+    margin-top: -5px;
+    margin-bottom: 30px;
+    font-size: 15px;
+    color: #222;
+}
+
+
+p + h4 {
+    margin-top: 5px;
+}
+
+
+/*responsibility title*/
+.responsibilityTitle {
+    font-family: "DINPRO-REGULAR", sans-serif;
+    font-size: 20px;
+    color: #060606;
+}
+
+h5.duration,
+.location {
+    position: relative;
+    font-family: "DINPRO-REGULAR", sans-serif;
+    margin-top: 16px;
+    font-size: 14px;
+    letter-spacing: -0.5px;
+    color: #B4B4B4;
+}
+
+h3 + h5.duration {
+    margin-top: 5px;
+}
+
+.location {
+    padding-top: 0px;
+    margin-top: -5px;
+    color: #aaa;
+    font-family: "DINPRO-regular", sans-serif;
+}
+
+h4 > a:link,
+h4 > a:visited {
+    text-decoration: none;
+    color: #222;
+}
+
+h4 > a:hover {
+    color: #F51488;
+}
+
+
+.section {
+    float: left;
+    margin-left: 50px;
+
+}
+
+#education,
+#experience,
+#projects {
+    float: left;
+}
+
+
+/*shift everything right to align with title*/
+
+
+.section,
+.section > p,
+#education,
+#education > p,
+#experience,
+#experience > p,
+#projects,
+#projects > p,
+#talk,
+#talk > p {
+    width: 350px;
+    //background-color: ghostwhite;
+}
+
+
+/* if projects are after education, then add spacing
+*/
+#education + #projects,
+#projects + #proficiency {
+    margin-top: 50px;
+}
+
+/*section title*/
+.section > h3 {
+    margin-bottom: 5px;
+    font-family: "DINPRO-REGULAR", sans-serif;
+    font-size: 20px;
+    color: #B4B4B4;
+}
+
+/*institute name*/
+.section > h4 {
+    font-family: "DINPRO-BOLD", sans-serif;
+    letter-spacing: -.4px;
+    font-size: 20px;
+    color: #292929;
+
+}
+
+
+
+/*----------------Resume----------------*/
+#resume-panel {
+    position: relative;
+    margin-top: 70px;
+    height: auto;
+    margin-left: -400px;
+    left: 50%;
+    width: 800px;
+    min-height: 1200px;
+    //background-color: ghostwhite;
+}
+
+#titleInfo {
+    width: 100%;
+    //margin-left: 0px;
+    margin: 20px 0;
+}
+
+
+#resume-panel,
+#pdf {
+    font-size: 15px;
+}
+
+
+
+/*--------------Media Query starts-----------------*/
+/* for 680px or less */
+@media screen and (max-width: 480px) {
+    #link-resume {
+        text-decoration: underline
+    }
+
+    /* for resume.css only*/
+    #product-panel > div {
+        padding: 0;
+    }
+
+    #resume-panel {
+        width: 100%;
+        width: auto;
+        /*0121 for padding*/
+        height: auto;
+        left: 0;
+        margin-left: 0;
+        margin-right: 0;
+        padding: 0 15px;
+        /*0121*/
+        overflow: hidden;
+    }
+
+    #education,
+    #experience,
+    #projects {
+        margin-left: 0;
+        float: none;
+    }
+
+    #projects p,
+    #education p,
+    #experience p {
+        width: auto;
+        left: 0;
+        margin-left: 0;
+    }
+
+    /*
+	#resume-panel>div{
+		margin-left:10px;
+	}
+*/
+
+    /*
+	#resume-panel>div>*{
+		margin-right: 12px;
+	}
+*/
+
+
+    /* for resume.css only*/
+
+}
+
+
+
+/*
+@media screen and (max-width: 550px){
+	h4>span{
+		display: block;
+	}
+    
+    p+h4{
+        height: 40px;
+    }
+    
+    p, #projects p{
+		width: auto;
+    }
+
+}
+*/
+
+
+/*
+@media screen and (max-width: 480px){
+    
+    h4+h4{
+        margin-top: 10px;
+    }
+    
+}
+*/
+
+
+/* for 415px or less */
+/* exception: adjust size of name*/
+@media screen and (max-width: 430px) {
+
+    p,
+    #projects p {
+        width: auto;
+    }
+
+    #titleInfo > h1 {
+        font-size: 40px;
+        margin-bottom: 10px;
+        line-height: 1.2;
+    }
+
+    #education,
+    #experience,
+    #projects,
+    #talk {
+        float: none;
+    }
+
+    #experience,
+    #projects,
+    #talk {
+        margin-left: 0;
+        margin-top: 30px;
+    }
+
+    .duration,
+    .location {
+        //display: none;
+    }
+
+    .section > h4 {
+        line-height: 1.1;
+    }
+
+    h4 + h4 {
+        margin-top: 0;
+    }
+
+    p + h4 {
+        height: auto;
+    }
+
+    #resume-panel > div > * {
+        //margin-right: 6px;
+    }
+
+    p,
+    #projects p {
+        max-width: 430px;
+    }
+}
+
+
+@media print {
+
+    header,
+    footer,
+    #objective {
+        display: none;
+    }
+
+    span.course {
+        border-bottom: 0;
+    }
+
+    #resume-panel {
+        margin-top: 10px;
+        margin-bottom: 0;
+        padding-bottom: 0;
+        min-height: 1000px;
+    }
+
+    body,
+    html {
+        background-color: transparent;
+    }
+
+    #experience {
+        margin-left: 30px;
+    }
+
+
+
+}
