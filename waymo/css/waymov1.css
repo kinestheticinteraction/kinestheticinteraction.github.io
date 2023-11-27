@@ -1,0 +1,209 @@
+p>bold, a>bold, .highlight>h3, .panel i, .panel em{color: #0078FF;}
+
+a:visited,
+.li-nav>a:link,
+.li-nav>a:visited,
+.li-nav>a:active, 
+h5>a {color: #0078FF;}
+p>a:link{text-decoration: none;}
+
+#navBand {background-color: transparent;}
+
+
+
+/*---  test spacing  ---*/
+/*
+div, div>div{
+    opacity: 0.6;
+    background-color: grey;
+}
+*/
+
+
+/*----------------Title----------------*/
+
+#title-panel{
+    background-color: #ffffff;
+    overflow: hidden;
+}
+
+#title-img{
+    margin-top: 90px;
+    background-color: transparent;
+}
+
+/*
+#title-img>img{
+    width: 800px;
+    left: 50%;
+    margin-left: -400px;
+    margin-top: 50px;
+}
+*/
+
+#title-img>img{
+    width: 1920px;
+    left: 50%;
+    margin-left: -960px;
+    margin-top: -250px;
+}
+
+#title-description{
+    margin-top: 15px;
+    color: #448AFF;
+}
+
+/*----------------Promotion----------------*/
+
+/*----------------Research----------------*/
+
+
+#feature-showcase{
+    position: relative;
+    margin-left: -140px;
+    left: 50%;
+}
+
+#research-panel>img{
+    margin-top: 10px;
+}
+
+.band{
+	background-color: #ff7b03;
+    background-color: #fff;
+    margin-bottom: 20px;
+}
+
+.band>img{
+    width: 1000px;
+    margin-left: -500px;
+    padding: 0;
+}
+
+/*---special case for waymo cuz both demo the app UI---*/
+img+video{
+    margin-top: 10px;
+}
+
+
+@media screen and (max-width: 1000px){
+    .band>img{
+    width: 100%;
+    margin-left: 0px;
+    left: 0;
+    padding: 0;
+}
+}
+
+
+
+
+/*----------------Ideation----------------*/
+
+/*----------------prototype----------------*/
+
+
+
+
+/*----------------Product----------------*/
+
+
+#product-panel>img:first-child, 
+#product-panel>img:last-child{
+	border-top: none;	
+}
+
+
+/*could go to newstructure soon*/
+#product-panel>img:last-child{
+	margin-bottom: 0px;
+}
+
+.app-left-ui>img,
+.app-right-ui>img{
+    box-shadow: 0px 0px 40px 5px #eee;
+}
+
+.app-left-ui, 
+.app-right-ui{
+    overflow: visible;
+}
+
+#product-panel .app-right,
+#product-panel .app-left{
+    padding: 20px 0;
+}
+
+#product-panel>.band{
+    padding: 10px 0;
+}
+
+
+
+
+/* for 680px or less */
+@media screen and (max-width: 680px){
+
+   
+
+    #title-description{
+        margin-top: -200px;
+    }
+
+    
+	.demo{
+		left: 0;
+		margin-left: 0;
+		width: 100%;
+		min-height: 543px;
+		height: auto;
+		background-color: #000;
+	}
+    
+    .band>img{
+        width: 100%;
+        left: 0;
+        margin-left: 0;
+    }
+    
+/*=== UI showcase overide @680===*/
+    #product-panel .app-right,
+    #product-panel .app-left{
+        padding: 20px 0;
+    }
+
+    #product-panel>.band{
+        padding: 10px 0 ;
+    }
+    
+    .app-left, .app-right{
+        margin-bottom: 0;
+        height: 700px;
+    }
+/*=== UI showcase ends ===*/
+
+
+}
+
+@media screen and (max-width: 480px) {
+     #title-img{
+        margin-top: 0px;
+    }
+    
+    #title-img>img{
+        width: 900px;
+        margin-left: -450px;
+        margin-top: 0px;
+    }
+    
+    #title-panel{
+        height: 550px;
+        overflow: hidden;
+    }
+    #title-description{
+        margin-top: -120px;
+    }
+
+    
+
+}

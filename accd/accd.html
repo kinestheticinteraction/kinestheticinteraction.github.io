@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Body in Motion | Justeen Lee</title>
+    <meta name="description" content="Body in Motion">
+    <meta name="keywords" content="VR, AR, augmented reality, body movement, full body motion, foot interface, gestures, gesture interactions, interaction design, user experience, UX, IX, product design, industrial, design, justeen, san francisco, new york, hong kong" />
+    <link rel="shortcut icon" href="../assets/favicon.ico" />
+
+    <link rel="stylesheet" href="../css/newstructure.css">
+    <link rel="stylesheet" href="accd.css">
+    <!--    <script src="accd.js" defer></script>-->
+    <script src="../js/jquery-1.11.1.min.js"></script>
+    <script src="../js/overall.js" defer></script>
+
+    <script>
+        (function(i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function() {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-58728717-1', 'auto');
+        ga('send', 'pageview');
+
+    </script>
+</head>
+
+<body>
+    <header id="header">
+        <ul id="navigation">
+            <li class="li-nav"><a id="link-home" onmouseover="move('index')" onmouseout="move('currentPath')" href="../index.html">PLAYGROUND</a></li>
+
+            <li class="li-nav"><a id="link-projects" onmouseover="move('projects')" onmouseout="move('currentPath')" href="../projects/projects.html">PROJECTS</a></li>
+
+            <li class="li-nav"><a id="link-resume" onmouseover="move('resume')" onmouseout="move('currentPath')" href="../resume/resume.html">RESUME</a></li>
+
+            <li class="li-nav"><a id="link-about" onmouseover="move('about')" onmouseout="move('currentPath')" href="../about/about.html">ABOUT</a></li>
+        </ul>
+        <span id="indicator-dot"></span>
+        <div class="band" id="navBand"></div>
+    </header>
+
+    <!--title panel------------------------------>
+    <div id="title-panel">
+        <div id="title-img">
+            <img src="images/maya-trail.png">
+        </div>
+        <div id="title-description">
+            <h1>Full-Body UI in AR</h1>
+            <!--            <h2>Prototypes of shared AR experiences and gestures</h2>-->
+        </div>
+    </div>
+
+    <!--intro panel------------------------------>
+
+
+    <!--product panel------------------------------>
+    <div id="market-panel" class="panel">
+
+        <div class="snapshot">
+
+            <div class="snapshot_col1">
+                <p>
+                    <snap class="snapshot_col1_role"></snap><br>
+                    Interface designer<br>
+                    Prototyper
+
+                </p>
+                <p>
+                    <snap class="snapshot_col1_collaboration"></snap><br>
+                    N/A
+
+                </p>
+            </div>
+            <div class="snapshot_col2">
+                <p>
+                    <snap class="snapshot_col2_duration"></snap><br>
+                    7 months (rough sum of all projects)
+
+                </p>
+                <p>
+                    <snap class="snapshot_col2_problem">PROBLEM</snap><br>
+                    Hollywood and Silicon Valley had portrayed future immersion as a solo and hand-driven experience.
+                </p>
+                <p>
+                    <snap class="snapshot_col2_impact">IMPACT</snap><br>
+                    A set of prototypes on full-body gesture interface and shared experiences in AR/VR.
+                </p>
+                <p>
+                    <snap class="snapshot_col2_impact">EXECUTION</snap><br>
+                    Many interactive prototypes in Unity 3D<br>
+                    Animation prototypes in After Effects and C4D
+
+                </p>
+            </div>
+        </div>
+
+        <p class="assetTitle">Make a wish and contribute to a public AR installation
+        </p>
+        <p class="assetNote">
+            Wish AR illustrates the future interaction with water fountain/wishing wells, where people can use virtual currency to make a wish, donate to a fund (WWF), and collectively contribute to a public AR installation
+            <br><br>
+            Functional prototypes built in Unity 3D. Scene assets modified in C4D.
+        </p>
+        <!--
+        <video width="100%" autoplay loop muted>
+            <source src="images/Wish%20AR%20-%201%20-%20AR%20layer%20(compressed).mp4" type="video/mp4">
+        </video>
+-->
+        <video width="100%" autoplay loop muted>
+            <source src="images/Wish%20AR%20-%202%20-%20wish%20and%20donate%20to%20WWF%20with%20Starbucks%20card%20(compressed).mp4" type="video/mp4">
+        </video>
+        <video width="100%" autoplay loop muted>
+            <source src="images/Wish%20AR%20-%203%20-%20wish%20for%20health%20with%20Bitcoin%20(compressed).mp4" type="video/mp4">
+        </video>
+
+
+        <p class="assetTitle">Join a shared VR space via body motion
+        </p>
+        <p class="assetNote">
+            Motion XR demonstrates how we can engage in shared VR spaces in public. One can join another's VR world by mimicking the same body movement as the creator of THAT VR world.<br><br>
+            Functional prototypes built in Unity 3D.
+        </p>
+        <div class="video-demo">
+            <iframe src="https://player.vimeo.com/video/256180377?color=fff&autoplay=1&byline=0&portrait=0&loop=1" width="100%" height="450px" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+        </div>
+
+        <video width="100%" autoplay loop muted>
+            <source src="images/prototype-functional-basicPlatform%20-%20cut%20&%20marked%20(compressed).mp4" type="video/mp4">
+        </video>
+
+        <p class="assetTitle">Rely messages quickly with custom hand gestures
+        </p>
+        <p class="assetNote">
+            Gesture AI is a 2-week experiment on using machine learning to train custom gestures.
+            <br><br>Functional prototypes built in Unity 3D.
+        </p>
+
+        <video width="100%" autoplay loop muted>
+            <source src="images/gesture%20ai%20demo%20(compressed).mp4" type="video/mp4">
+        </video>
+
+        <p class="assetTitle" id="footUIMarker">Use feet as an AR interface
+        </p>
+        <p class="assetNote">
+            Explore feet as alternative inputs and test 3 main versions for usability and ergonomics improvement. However, technical limitations with Vuforia and narrow yet passive feet interaction lead to a full body gesture pivot.
+            <br><br>Functional prototypes built in Unity 3D.
+        </p>
+        <video width="100%" autoplay loop muted>
+            <source src="images/v7-%20testing%20-%20justeen%20-%20compressed.mp4" type="video/mp4">
+        </video>
+        <video width="100%" autoplay loop muted>
+            <source src="images/foot%20interface%20testing%20(compressed).mp4" type="video/mp4">
+        </video>
+        <p class="assetTitle">Full-body interface in AR for kinesthetic pleasure
+        </p>
+        <p class="assetNote">
+            Body in Motion is a badminton and hip hop dance inspired interface for AR. Users are able to interact with virtual content with body motion that emphasizes on kinesthetic pleasure, rather than pure efficiency.
+            <br><br>Functional prototypes built in Unity 3D with Kinect. Animation prototype built with C4D and After Effects.
+        </p>
+        <img src="images/installation.png" width="100%">
+        <h5>Exhibition installation (left) with an interactive demo area (right)</h5>
+
+        <img src="images/installation_breakdown.png" width="100%">
+
+        <video width="100%" autoplay loop muted>
+            <source src="images/demo%20area%201%20(compressed).mp4" type="video/mp4">
+        </video>
+        <video width="100%" autoplay loop muted>
+            <source src="images/2P%20AMC%20cut%20(compressed).mp4" type="video/mp4">
+        </video>
+        <video width="100%" autoplay loop muted>
+            <source src="images/body%20in%20motino%20-%20preso%20demo%201.mp4" type="video/mp4">
+        </video>
+        <video width="100%" autoplay loop muted>
+            <source src="images/body%20in%20motino%20-%20preso%20demo%202.mp4" type="video/mp4">
+        </video>
+        <video width="100%" autoplay loop muted>
+            <source src="images/body%20in%20motino%20-%20preso%20demo%203.mp4" type="video/mp4">
+        </video>
+        <video width="100%" autoplay loop muted>
+            <source src="images/solo%20-%20visual%20-%20spin+slide+skip%20v1.mp4" type="video/mp4">
+        </video>
+
+
+
+    </div>
+    <!--marketing-->
+
+    <script>
+        setTimeout(function() {
+            //setSnapShotHeight();
+        }, 180);
+
+        function setSnapShotHeight() {
+            var higherColHeight;
+            var snapshotList = document.getElementsByClassName("snapshot");
+            for (var i = 0; i < snapshotList.length; i++) {
+                //get the higher col height 
+                for (var j = 0; j < snapshotList[i].childElementCount; j++) {
+                    if (j == 0) {
+                        higherColHeight = snapshotList[i].children[j].clientHeight;
+                    } else {
+                        if (higherColHeight < snapshotList[i].children[j].clientHeight) {
+                            higherColHeight = snapshotList[i].children[j].clientHeight;
+                        }
+                    }
+                }
+                //set this snapshot height
+                //console.log(higherColHeight);
+                snapshotList[i].style.height = higherColHeight + 100 + 40 + 60 + "px";
+            }
+
+        }
+
+        function refreshProto() {
+            location.reload();
+        }
+
+
+        var titlePanel = document.getElementById("title-panel");
+        var deviceWidth;
+        updateTitlePanelWidth();
+
+
+        function updateTitlePanelWidth() {
+            deviceWidth = document.documentElement.clientWidth;
+            titlePanel.style.width = deviceWidth + "px";
+            titlePanel.style.marginLeft = -1 * deviceWidth / 2 + "px"
+        }
+        window.addEventListener('resize', updateTitlePanelWidth);
+
+    </script>
+    <style>
+
+    </style>
+
+    <!--body ends + footer ------------------------->
+    <footer>
+        <span class="author"></span>
+        <span class="copyright"></span>
+    </footer>
+</body>
+
+</html>

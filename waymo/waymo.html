@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Waymo | Justeen Lee</title>
+    <meta name="description" content="My internship at Waymo in summer 2018">
+    <meta name="keywords" content="waymo, internship, self-driving car, autonomy, mobility, transportation, interaction design, user experience, UX, IX, product design, industrial, design, justeen, san francisco, hong kong" />
+    <link rel="shortcut icon" href="../assets/favicon.ico" />
+
+    <link rel="stylesheet" href="../css/newstructure.css">
+    <link rel="stylesheet" href="waymo.css">
+    <script src="../js/jquery-1.11.1.min.js"></script>
+    <script src="../js/overall.js" defer></script>
+
+    <script>
+        (function(i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function() {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-58728717-1', 'auto');
+        ga('send', 'pageview');
+
+    </script>
+</head>
+
+
+<body>
+    <div id="backButton" onclick="window.history.back()"></div>
+
+    <!--intro panel------------------------------>
+    <div id="intro-panel">
+        <h1>Waymo One</h1>
+        <h2>UX, UI, Motion</h2>
+        <div class="flex-container">
+            <div>Designing for end consumers and testing with the early riders, I helped tackled a few pain points and usability issues that were unique to self-driving cars:
+                <br>• Waymo self-driving cars can only stop at some areas of the street, likely not the spot users want to be picked up or dropped off
+                <br>• There need to be explorations on saved location and walking instruction UI
+                <br>• Users don’t understand why the car behave in certain ways
+                <br>• Pedestrians gesture to the car 95% of the times, but the car does not have a way to communicate back
+            </div>
+            <div>As a UX design intern, I worked heavily on visual and motion interaction of the pickup dropoff selection, saved locations, icon animations, rider screen HUD signals, car-ID hardware UX, and car-finding AR concept. During my time there, I collaborated with 1 visual designer and 2 front end engineers to implement the changes that later launched as <a href="https://apps.apple.com/us/app/waymo-one/id1343524838" target="_blank">Waymo One</a>.</div>
+        </div>
+    </div>
+    <div id="product-panel">
+        <img src="images/WAYMO_HERO.png" width="100%">
+        <img src="images/WAYMO_PHONE.png" width="100%">
+        <video autoplay loop muted width="100%">
+            <source src="images/WAYMO_WALKING.mp4" type="video/mp4">
+        </video>
+        <video autoplay loop muted width="100%">
+            <source src="images/WAYMO_TIME_TO_BOARD.mp4" type="video/mp4">
+        </video>
+        <video autoplay loop muted width="100%">
+            <source src="images/WAYMO_PASSENGER_SCREEN.mp4" type="video/mp4">
+        </video>
+        <img src="images/WAYMO_BACKSEAT.png" width="100%">
+
+        <img src="images/WAYMO_CARIDNUM.png" width="100%">
+        <img src="images/WAYMO_CARID.png" width="100%">
+        <video autoplay loop muted width="100%" id="waymoCarFindingAR">
+            <source src="images/WAYMO_AR.mp4" type="video/mp4">
+        </video>
+
+    </div>
+    <div id="backButtonEnd" onclick="window.history.back()">BACK</div>
+
+
+    <!--body ends + footer ------------------------->
+    <footer>
+        <span class="author"></span>
+        <span class="copyright"></span>
+    </footer>
+</body>
+
+
+</html>
