@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>CashFlow | Justeen Lee</title>
+    <meta charset="utf-8" />
+    <!--      <meta http-equiv="refresh" content="30"/>-->
+    <style>
+        p {
+            font-family: sans-serif;
+            font-size: 20px;
+        }
+
+        .checkboxes {
+            content: "";
+            position: relative;
+            //width: 40px;
+            //height: 40px;
+            margin: 0 15px;
+            background-color: red;
+            display: inline-block;
+            border: 1px grey;
+            display: visible;
+        }
+
+        #creator {
+            font-style: italic;
+            font-size: 15px;
+        }
+
+        .amount {
+            position: absolute;
+            //text-align: right;
+            //background-color: red;
+            max-width: 75px;
+            //overflow: hidden;
+
+        }
+
+        .branchContainer {
+            //height: 20px;
+            width: 430px;
+            overflow: hidden;
+            //background-color: yellow;
+            padding: 10px 0;
+            margin-bottom: 5px;
+            border: .5px solid #ddd;
+            font-family: sans-serif;
+        }
+
+
+        .branchName {
+            position: absolute;
+            text-align: left;
+            left: 200px;
+            width: 300px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <p>Ultimate Cash Flow
+        <br>
+        <span id="creator">by Justeen Lee</span></p>
+
+
+    <pre id="content" style="white-space: pre-wrap;"></pre>
+
+
+    <p>$$$: <input id="incomeValue" type="text" value="" placeholder="enter income here" onkeyup="calculatePercentage()">
+    </p>
+
+    <p>
+
+
+        <br>
+        <!--/////////////////////////////-->
+
+        <div class="branchContainer">
+            <input class="checkboxes" type="checkbox" id="rb1" value="" onclick="rbCheck(0)">
+            $
+            <span class="amount" id="5Percent"></span>
+            <span class="branchName">5% TD IRA</span>
+        </div>
+
+        <div class="branchContainer">
+            <input class="checkboxes" type="checkbox" id="rb2" value="" onclick="rbCheck(0)">
+            $
+            <span class="amount 30Percent"></span>
+            <span class="branchName">30% TD Individual</span>
+        </div>
+
+        <div class="branchContainer">
+            <input class="checkboxes" type="checkbox" id="rb3" value="" onclick="rbCheck(1)">
+            $
+            <span class="amount" id="35Percent"></span>
+            <span class="branchName">35% TD Total</span>
+        </div>
+        <br>
+        <!--/////////////////////////////-->
+
+        <div class="branchContainer">
+            <input class="checkboxes" type="checkbox" name="td" value="">
+            $
+            <span class="amount 20Percent"></span>
+            <span class="branchName">20% Capital One Saving</span>
+        </div><br>
+        <!--/////////////////////////////-->
+
+        <div class="branchContainer">
+            <input class="checkboxes" type="checkbox" name="td" value="">
+            $
+            <span class="amount 10Percent"></span>
+            <span class="branchName">10% Constant for Saving</span>
+        </div>
+
+        <div class="branchContainer">
+            <input class="checkboxes" type="checkbox" name="td" value="">
+            $
+            <span class="amount 10Percent"></span>
+            <span class="branchName">10% Constant for TD</span>
+        </div>
+
+
+
+        <div class="branchContainer">
+            <input class="checkboxes" type="checkbox" name="td" value="">
+            $
+            <span class="amount 25Percent"></span>
+            <span class="branchName">25% Living Essentials + Happy Spending</span>
+        </div>
+
+        <div class="branchContainer">
+            <input class="checkboxes" type="checkbox" name="td" value="">
+            $
+            <span class="amount" id="45Percent"></span>
+            <span class="branchName">45% Total
+                <br></span>
+        </div>
+
+        <br>
+        <!--/////////////////////////////-->
+
+
+
+        <br><br><br>
+        <p>Useful ref</p>
+
+        <div class="branchContainer">
+            $
+            <span class="amount" id="15Percent"></span>
+            <span class="branchName">15%
+                <br></span>
+        </div>
+        <div class="branchContainer">
+            $
+            <span class="amount" id="constanttdsaving"></span>
+            <span class="branchName">Type in biweekly pay. This gives you 10%/45% (of biweekly pay) for C saving, and another 10%/45% for C TD. (Should be 280 for saving and 280 for TD)
+                <br></span>
+        </div>
+        <script type="text/javascript">
+            //window.setInterval(console.log("1 sec!"), 1000);
+
+
+            //var updateRealTime = setInterval(calculatePercentage(), 1000);
+
+            setDefaultAmount();
+
+            function calculatePercentage() {
+                console.log("start math");
+                var incomeRaw = document.getElementById("incomeValue").value;
+                var income = parseFloat(incomeRaw);
+
+                if (income > 100000000 || income == 0 || income == null) {
+                    setDefaultAmount();
+                    alert("You don't have that much money :P");
+                }
+
+                if (income > 0) {
+                    //console.log("found new value");
+                    document.getElementById("5Percent").innerHTML = (income * 0.05).toFixed(2);
+                    document.getElementById("15Percent").innerHTML = (income * 0.15).toFixed(2);
+
+
+                    document.getElementById("35Percent").innerHTML = (income * 0.35).toFixed(2);
+                    document.getElementById("45Percent").innerHTML = (income * 0.45).toFixed(2);
+                    document.getElementById("constanttdsaving").innerHTML = (income * (10 / 45)).toFixed(2) +
+                        " " + (income * (20 / 45)).toFixed(2);
+
+                    var p30 = document.getElementsByClassName("30Percent");
+                    for (var i = 0; i < p30.length; i++) {
+                        p30[i].innerHTML = (income * 0.3).toFixed(2);
+                    }
+
+                    var p25 = document.getElementsByClassName("25Percent");
+                    for (var j = 0; j < p25.length; j++) {
+                        p25[j].innerHTML = (income * 0.25).toFixed(2);
+
+                    }
+
+                    var p20 = document.getElementsByClassName("20Percent");
+                    for (var j = 0; j < p20.length; j++) {
+                        p20[j].innerHTML = (income * 0.2).toFixed(2);
+
+                    }
+
+                    var p10 = document.getElementsByClassName("10Percent");
+                    for (var j = 0; j < p10.length; j++) {
+                        p10[j].innerHTML = (income * 0.1).toFixed(2);
+
+                    }
+                } else {
+                    setDefaultAmount();
+                }
+
+            }
+
+            function rbCheck(num) {
+                switch (num) {
+                    case 0:
+                        if (document.getElementById("rb1").checked &&
+                            document.getElementById("rb2").checked) {
+                            document.getElementById("rb3").checked = true;
+                        } else {
+                            document.getElementById("rb3").checked = false;
+                        }
+                        break;
+                    case 1:
+                        if (document.getElementById("rb3").checked) {
+                            document.getElementById("rb1").checked = true;
+                            document.getElementById("rb2").checked = true;
+                        } else {
+                            document.getElementById("rb1").checked = false;
+                            document.getElementById("rb2").checked = false;
+                        }
+
+                        //alert("fdsfsdf");
+                        break;
+
+                }
+            }
+
+
+
+            function setDefaultAmount() {
+                //should do get children and set all to "-"
+                document.getElementById("5Percent").innerHTML = "-";
+                document.getElementById("15Percent").innerHTML = "-";
+                document.getElementById("35Percent").innerHTML = "-";
+                document.getElementById("45Percent").innerHTML = "-";
+                document.getElementById("constanttdsaving").innerHTML = "-"
+                var p30 = document.getElementsByClassName("30Percent");
+                for (var i = 0; i < p30.length; i++) {
+                    p30[i].innerHTML = "-";
+                }
+                var p25 = document.getElementsByClassName("25Percent");
+                for (var j = 0; j < p25.length; j++) {
+                    p25[j].innerHTML = "-";
+                }
+                var p20 = document.getElementsByClassName("20Percent");
+                for (var j = 0; j < p20.length; j++) {
+                    p20[j].innerHTML = "-";
+
+                }
+                var p10 = document.getElementsByClassName("10Percent");
+                for (var j = 0; j < p10.length; j++) {
+                    p10[j].innerHTML = "-";
+
+                }
+            }
+
+        </script>
+
+
+</body>
+
+</html>
+<!-- [END sheets_quickstart] -->
