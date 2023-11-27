@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang = "en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>name | Justeen Lee</title>
+    <meta name="description" content="what is this">
+	<meta name="keywords" content="interaction design, user experience, UX, IX, product design, industrial, design, justeen, san francisco, new york, hong kong" />
+	<link rel="shortcut icon" href="../assets/favicon.ico"/>
+	<link rel="stylesheet" href="../css/flexslider.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="../css/newstructure.css">
+	<link rel="stylesheet" href="wishar.css">
+	<script src="../js/jquery-1.11.1.min.js"></script>
+    <script src="empty.js" defer></script>
+    <script src="../js/overall.js" defer></script>
+	<script src="../js/jquery.flexslider.js" defer></script>
+	<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-58728717-1', 'auto');
+  ga('send', 'pageview');
+	</script>
+</head>
+
+<body>
+    <header id="header">
+    <ul id = "navigation">
+        <li class="li-nav"><a id="link-home" onmouseover = "move('index')" onmouseout = "move('currentPath')" href="../index.html">PLAYGROUND</a></li>
+
+        <li class="li-nav"><a id="link-projects" onmouseover = "move('projects')" onmouseout = "move('currentPath')" href="../projects/projects.html">PROJECTS</a></li>
+
+        <li class="li-nav"><a id="link-resume" onmouseover = "move('resume')" onmouseout = "move('currentPath')" href="../resume/resume.html">RESUME</a></li>
+
+        <li class="li-nav"><a id="link-about" onmouseover = "move('about')" onmouseout = "move('currentPath')" href="../about/about.html">ABOUT</a></li>
+    </ul>
+    <span id="indicator-dot"></span>
+    <div class="band" id="navBand"></div>
+    </header>
+
+<!--title panel------------------------------>
+    <div id = "title-panel">
+		<div id = "title-img">
+        </div>
+
+        <div class="video-demo" id="wishAR">
+              <iframe src="https://player.vimeo.com/video/247730544?autoplay=1&loop=1&byline=0&portrait=0" width="100%" height="450" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+        </div>
+        
+    </div>
+
+<!--intro panel------------------------------>
+    <div id = "intro-panel">
+        <p>
+		Wish AR considers the relationship of the built environment and physical things (water fountain/wishing well), with augmented and virtual realities. While architecture has been an ever-evolving discipline for centuries, AR and VR are obviously very new. 
+            
+            <br><br>Yet, there are many assumptions (from Hollywood and Silicon Valley) that people maintain about AR and its eventual relationship with the physical world. Because of this, Wish AR questions many of these assumptions by attempting to build our own positions and theories about the emerging mixed realities.
+		</p>
+    </div>
+
+<!--market panel------------------------------>
+	<div id="product-panel" class="panel">
+        <div class="recognition">
+        </div>
+
+        
+        
+        
+	</div>	
+	
+<!--comment panel------------------------------>
+	<div class = "comment">
+		<h6><bold>Date</bold>: Fall 2017</h6>
+		<h6><bold>Client</bold>: Studio Project</h6>
+		<h6><bold>Team</bold>: Individual </h6>
+		<h6><bold>State</bold>: Prototype</h6>      
+	</div>
+	
+<!--body ends + footer ------------------------->
+		<footer>
+		<span class="author"></span>
+		<span class="copyright"></span>
+	</footer>
+</body>
+
+
+<script type="text/javascript"> 
+//    for slideshow
+	$(window).load(function(){
+	  $('.flexslider').flexslider({
+		animation: "slide",
+		start: function(slider){
+		  $('div').removeClass('loading');
+		}
+	  });
+	});
+    
+</script>
+    
+    
+
+    
+</html>

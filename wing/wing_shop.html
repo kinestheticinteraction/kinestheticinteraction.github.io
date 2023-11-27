@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Wing Delivery | Justeen Lee</title>
+    <meta name="description" content="Wing Delivery App">
+    <meta name="keywords" content="interaction design, user experience, UX, wing delivery, google x labs, moonshot, disruptive technology, radical technology, delivery, product design, transportation design, design for future, justeen, san francisco, new york, hong kong" />
+    <link rel="shortcut icon" href="../assets/favicon.ico" />
+
+    <link rel="stylesheet" href="../css/newstructure.css">
+    <link rel="stylesheet" href="wingv1.css">
+
+    <script src="../js/jquery-1.11.1.min.js"></script>
+    <script src="../js/overall.js" defer></script>
+
+    <script>
+        (function(i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function() {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-58728717-1', 'auto');
+        ga('send', 'pageview');
+
+    </script>
+</head>
+
+<body>
+    <header id="header">
+        <ul id="navigation">
+            <li class="li-nav"><a id="link-home" onmouseover="move('index')" onmouseout="move('currentPath')" href="../index.html">PLAYGROUND</a></li>
+
+            <li class="li-nav"><a id="link-projects" onmouseover="move('projects')" onmouseout="move('currentPath')" href="../projects/projects.html">PROJECTS</a></li>
+
+            <li class="li-nav"><a id="link-resume" onmouseover="move('resume')" onmouseout="move('currentPath')" href="../resume/resume.html">RESUME</a></li>
+
+            <li class="li-nav"><a id="link-about" onmouseover="move('about')" onmouseout="move('currentPath')" href="../about/about.html">ABOUT</a></li>
+        </ul>
+        <span id="indicator-dot"></span>
+        <div class="band" id="navBand"></div>
+    </header>
+
+    <!--title panel------------------------------>
+    <div id="title-panel">
+        <div id="title-img">
+            <img src="images/@1200_shopping_customization.png">
+        </div>
+        <div id="title-description">
+            <h1>Shop and Browse</h1>
+            <h2>Rethink mobile online shopping</h2>
+        </div>
+    </div>
+
+    <!--intro panel------------------------------>
+
+
+    <!--product panel------------------------------>
+    <div id="market-panel" class="panel">
+
+        <div class="snapshot">
+
+            <div class="snapshot_col1">
+                <p>
+                    <snap class="snapshot_col1_role"></snap>
+                    <br>Interface designer
+                    <br>Prototyper
+                    <br>UX researcher
+
+                </p>
+                <p>
+                    <snap class="snapshot_col1_collaboration"></snap><br>
+
+                    PM x1<br>
+                    Front-end x3<br>
+
+                </p>
+            </div>
+            <div class="snapshot_col2">
+                <p>
+                    <snap class="snapshot_col2_duration"></snap><br>
+                    2021.3-2022.8
+
+                </p>
+                <p>
+                    <snap class="snapshot_col2_problem">PROBLEM</snap><br>
+                    Inefficient shopping experiences<br>
+                    Customers complaints
+
+                </p>
+                <p>
+                    <snap class="snapshot_col2_impact">IMPACT</snap>
+                    <br> Coles (our partner) was satisfied with new UIs
+                    <br>Reduced shopping time by 17% from user testing
+                    <br>Inspire and evangelize UX with new interactions across the company (hackathon winning project)
+                </p>
+                <p>
+                    <snap class="snapshot_col2_impact">EXECUTION</snap><br>
+                    Many interactive prototypes in Framer<br>
+
+                </p>
+            </div>
+        </div>
+
+        <p class="assetTitle">Left-Right Swipe Category Navigation
+        </p>
+        <p class="assetNote">
+            Inspired by the persistently present shopping experience in physical stores (IKEA), this navigation model is discoverable, lightweight, and convenient in making category jumping smooth and fluid since vertical scroll browsing is already in motion.
+        </p>
+        <video width="100%" autoplay loop muted>
+            <source src="images/shopping%20-%20category%20nav%20-%20compressed.mp4" type="video/mp4">
+        </video>
+        <div class="framerPrototypeContainer">
+            <div class="framerWebContainer">
+                <iframe class="framerPrototype framerWeb" src="https://framer.com/embed/Catalog-nav-v2--9qMZBSVxjX3KntjRj8oO/uQZvY2rRV?highlights=1"></iframe>
+            </div>
+            <div class="framerSupplementContainer">
+                <div class="protoCaptionDiv">
+                    Prototype made in Framer Web with javascript, React, and typescript.
+                </div>
+                <div class="pointerDiv">
+                    <img class="prototypePointer" src="images/PointerLeft.svg" width="30px">
+                    <span class="prototypePointerText">Try it</span>
+                </div>
+            </div>
+            <!--framerSupplementContainer-->
+        </div>
+        <!--framerPrototypeContainer-->
+
+        <p class="assetTitle">Scalable shopping &amp; browsing
+        </p>
+        <p class="assetNote">
+            There used to be only 3 merchants on the Wing app, and therefore large store tiles were used deliberately. But now Wing has 10+ stores, this design presents usability issues and limits scalability and new feature integration.
+        </p>
+
+        <img src="images/@1200%20smaller%20images.png" width="100%">
+        <p class="assetTitle">Drag Reveal
+        </p>
+        <p class="assetNote">
+            Horizontal scrolling is not the most comfortable and natural thing for your thumb, so each section limits 5 items to reduce strains on the joints and shortcuts the navigation without lifting your thumb by following the already-performing drag motion.
+        </p>
+        <video width="100%" autoplay loop muted>
+            <source src="images/shopping_drag%20reveal%20@2x_v3%20(compressed).mp4" type="video/mp4">
+        </video>
+        <p class="assetTitle">Drag Browse
+        </p>
+        <p class="assetNote">
+            You can simply drag left and right to preview the popular items in a store on the home screen, which allows you to browse more items without navigating back and forth.
+        </p>
+        <video width="100%" autoplay loop muted>
+            <source src="images/shopping_drag%20browse%20(compressed).mp4" type="video/mp4">
+        </video>
+        <p class="assetTitle">Point and choose, literally
+        </p>
+        <p class="assetNote">
+            Inspired by clean and clear topping layout in physical restaurants, a pill-based customization makes it easier to choose without opening and collapsing million dropdowns.
+        </p>
+
+        <video width="100%" autoplay loop muted>
+            <source src="images/shopping_customization%20@2x_v2%20(compressed).mp4" type="video/mp4">
+        </video>
+        <div class="framerPrototypeContainer">
+            <div class="framerWebContainer">
+                <iframe class="framerPrototype framerWeb" src="https://framer.com/embed/Shop--yXeiAiU4WhwGvFCUojhp/x3QLkDsQT?highlights=0"></iframe>
+            </div>
+            <div class="framerSupplementContainer">
+                <div class="protoCaptionDiv">
+                    Prototype made in Framer Web with javascript, React, and typescript.
+                </div>
+                <div class="pointerDiv">
+                    <img class="prototypePointer" src="images/PointerLeft.svg" width="30px">
+                    <span class="prototypePointerText">Try it</span>
+                </div>
+            </div>
+            <!--framerSupplementContainer-->
+        </div>
+        <!--framerPrototypeContainer-->
+
+        <p class="assetTitle">Look at an item
+        </p>
+        <p class="assetNote">
+            Applying bottom sheet for item selection is as if you're picking up an item in a physical store: a focused yet temporary task. The shaded store view behind acts as an anchor to keep you oriented and aware of the context, just like in a physical space.
+        </p>
+        <img src="images/@1200_item%20look%20at.png" width="100%">
+
+
+
+
+
+        <!--add holding phone demo-->
+    </div>
+    <!--marketing-->
+
+    <script>
+        setTimeout(function() {
+            //setSnapShotHeight();
+        }, 180);
+
+        function setSnapShotHeight() {
+            var higherColHeight;
+            var snapshotList = document.getElementsByClassName("snapshot");
+            for (var i = 0; i < snapshotList.length; i++) {
+                //get the higher col height 
+                for (var j = 0; j < snapshotList[i].childElementCount; j++) {
+                    if (j == 0) {
+                        higherColHeight = snapshotList[i].children[j].clientHeight;
+                    } else {
+                        if (higherColHeight < snapshotList[i].children[j].clientHeight) {
+                            higherColHeight = snapshotList[i].children[j].clientHeight;
+                        }
+                    }
+                }
+                //set this snapshot height
+                //console.log(higherColHeight);
+                snapshotList[i].style.height = higherColHeight + 100 + 40 + 60 + "px";
+            }
+
+        }
+
+        function refreshProto() {
+            location.reload();
+        }
+
+
+        var titlePanel = document.getElementById("title-panel");
+        var deviceWidth;
+        updateTitlePanelWidth();
+
+
+        function updateTitlePanelWidth() {
+            deviceWidth = document.documentElement.clientWidth;
+            titlePanel.style.width = deviceWidth + "px";
+            titlePanel.style.marginLeft = -1 * deviceWidth / 2 + "px"
+        }
+        window.addEventListener('resize', updateTitlePanelWidth);
+
+    </script>
+    <style>
+        /*        overriding wing.css*/
+
+        #title-panel {
+            background-color: #fff;
+            /*    left 50% is already defined in newstructure.css */
+            width: 2560px;
+            margin-left: -1280px;
+        }
+
+    </style>
+
+    <!--body ends + footer ------------------------->
+    <footer>
+        <span class="author"></span>
+        <span class="copyright"></span>
+    </footer>
+</body>
+
+</html>

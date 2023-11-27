@@ -1,0 +1,481 @@
+/*<i> for in-text hightlight*/
+.highlight > h3,
+i,
+p > a:visited,
+p > a:active,
+p > a:link {
+    text-decoration: none;
+    color: #3c3c3c;
+    font-family: DINPro-Medium, sans-serif
+}
+
+p > a:hover {
+    color: #fcd637;
+}
+
+#navBand {
+    background-color: transparent;
+}
+
+/*overriding structure css, ready to migrate*/
+/*---body--- default = 700------------------------------*/
+body {
+    margin-left: -400px;
+    width: 800px;
+    min-height: 500px;
+    //overflow: hidden;
+}
+
+#intro-panel {
+    width: 100%;
+    margin-left: -400px
+}
+
+/* depend on the style, might merge this to newstructure*/
+.snapshot {
+    background-color: #fbfbfb;
+    overflow: hidden;
+    margin-bottom: 50px;
+}
+
+.assetTitle,
+.assetNote {
+    text-align: center;
+    font-size: 18px;
+    font-family: dinpro-regular, sans-serif;
+    position: relative;
+    width: 100%;
+    max-width: 700px;
+    left: 50%;
+    margin-left: -350px;
+    margin-bottom: 20px;
+}
+
+.assetTitle {
+    font-size: 24px;
+    font-family: dinpro-medium, sans-serif;
+    margin-top: 60px;
+    margin-bottom: 0;
+}
+
+/*once pass rendering, change color*/
+/*----------------Title----------------*/
+#title-img > img {
+    /* left 50% is already defined in newstructure.css */
+    /* set left back to 0 because you can just let 100% max out this image container #title-img */
+    width: 700px;
+    margin-left: -350px;
+    margin-top: 50px;
+}
+
+#title-description {
+    position: absolute;
+    color: #3c3c3c;
+    top: 450px;
+}
+
+#navigation a {
+    color: #3c3c3c;
+}
+
+/*----------------intro----------------*/
+#intro-panel {
+    margin-top: 50px;
+    /*share 20px margin with p class*/
+}
+
+#test2 {
+    background-image: url("../images/2016IxDAwards_Shortlist_Pin.png");
+    background-size: 100% 40px;
+    background-color: yellow;
+    background-repeat: no-repeat;
+    overflow: visible;
+}
+
+/*----------------Promotion----------------*/
+#market-panel > img,
+#market-panel > video {
+    /* margin-top: 30px;
+    */
+}
+
+/*you don't know what the next element is, but do you know the pre, so it's better to use margin -top*/
+.recognition a:link {
+    text-decoration: none;
+}
+
+.recognition_mediaIcons {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+/*----------------Research----------------*/
+/*to structure*/
+.group-wrapper {
+    position: relative;
+    padding: 30px 0;
+    height: auto;
+}
+
+.issue,
+.issue-icon,
+.issue-detail > h4,
+.issue-detail > h5,
+.feature,
+.feature-icon,
+.feature-detail > h4,
+.feature-detail > h5 {
+    position: relative;
+    font-size: 25px;
+    //float: left;
+    //height: auto;
+}
+
+.feature {
+    padding: 80px 0;
+}
+
+/*----------------Ideation----------------*/
+#ideation-panel > img {
+    box-shadow: 0 0;
+}
+
+/*----------------prototype----------------*/
+/*might need to update newstructure with this*/
+.framerPrototypeContainer {
+    /*    background-color: beige;*/
+}
+
+.framerWebContainer {
+    width: 350px;
+}
+
+.framerWebContainer > .framerWeb {
+
+    width: 100%;
+    margin-left: 0;
+}
+
+.framerSupplementContainer {
+    /*    background-color: rebeccapurple;*/
+}
+
+.prototypePointer {
+    margin-top: 487px;
+}
+
+.dxprototypes {
+    position: relative;
+    width: 300px;
+    height: 612px;
+    margin-left: -150px;
+    left: 50%;
+    float: left;
+    //background: red;
+    border: none;
+}
+
+/*----------------Product----------------*/
+#product-panel > img {
+    margin-bottom: 30px;
+    //border-top: 1px solid #ddd;
+}
+
+/* h1 {
+     font-family: helvetica, sans-serif;
+     font-weight: 900;
+     color: #222;
+     font-size: 100px;
+     letter-spacing: -8px;
+     opacity: .5;
+     position: relative;
+     top: 70px;
+}
+ */
+/* could move to structure */
+iframe {
+    position: relative;
+    //margin-bottom: 30px;
+}
+
+/* could move to structure */
+img + iframe {
+    /* margin-top: 12px;
+    */
+}
+
+#product-panel > img:first-child,
+#product-panel > img:last-child {
+    border-top: none;
+}
+
+#product-panel > img:last-child {
+    margin-bottom: 0px;
+}
+
+/*----------------Market----------------*/
+.app-left,
+.app-right {
+    position: relative;
+    left: 50%;
+    margin-left: -350px;
+    width: 700px;
+    height: 435px;
+    overflow: hidden;
+}
+
+.app-left-ui,
+.app-left-info,
+.app-right-ui,
+.app-right-info {
+    position: relative;
+    float: left;
+    overflow: hidden;
+}
+
+/*override the one in calor*/
+.app-left-ui,
+.app-right-ui {
+    position: relative;
+    margin-top: 12px;
+}
+
+.app-left-ui {
+    margin-left: 70px;
+}
+
+/*reposition app-right content*/
+.app-right > * {
+    position: absolute;
+}
+
+.app-right-ui {
+    left: 450px;
+}
+
+.app-left-info > *,
+.app-right-info > * {
+    width: 350px;
+}
+
+/*add to calor*/
+.app-left-ui > img,
+.app-right-ui > img {
+    width: 230px;
+}
+
+/*info can be pushed to next line due to app width*/
+.app-left-info,
+.app-right-info {
+    margin-left: 50px;
+    padding-top: 100px;
+}
+
+.app-left-info > h2,
+.app-right-info > h2 {
+    font-size: 48px;
+    font-family: Roboto-Light;
+}
+
+.app-left-info > h3,
+.app-right-info > h3 {
+    font-size: 28px;
+    margin-bottom: 10px;
+    line-height: 1.4;
+    font-family: Roboto-Light;
+}
+
+.app-left-info > h4,
+.app-right-info > h4 {
+    font-size: 20px;
+    line-height: 1.4;
+    font-family: Roboto-Light;
+}
+
+#market-panel .band {
+    padding: 0px;
+}
+
+#water-bucket img {
+    margin-top: 25px;
+}
+
+#water-bucket > img:last-child {
+    margin-top: 50px;
+}
+
+/*#water-bucket{
+    width: 700px;
+     left:50%;
+     margin-left: -350px;
+}
+*/
+#badges img {
+    margin-top: 40px;
+}
+
+#badges {
+    min-height: 205px;
+}
+
+@media screen and (max-width: 768px) {
+    html {
+        //width: 100%;
+    }
+
+    body {
+        margin-left: 0;
+        width: 100%;
+        min-height: 800px;
+        left: 0;
+    }
+
+    #title-panel,
+    #title-img {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    #title-panel {
+        height: 100vw;
+    }
+
+    #title-img {
+        margin-left: 0;
+        width: 100%;
+        left: 0;
+    }
+
+    #title-description {
+        top: 65vw;
+    }
+
+    #title-description > h1 {
+        font-size: 8vw;
+    }
+
+    #title-description > h2 {
+        font-size: 6vw;
+    }
+
+    #title-img > img {
+        width: 100%;
+        margin-left: 0;
+        left: 0;
+    }
+
+    .assetTitle,
+    .assetNote {
+        margin-left: 0;
+        width: calc(100% - 32px);
+        left: 0;
+        max-width: none;
+        padding: 0 16px;
+    }
+}
+
+/* for 680px or less */
+@media screen and (max-width: 680px) {
+
+    /*calor only?*/
+    #prototype-panel > #market-cartridge-mechanism,
+    #prototype-panel > #video-set-temp {
+        left: 0;
+        margin-left: 0;
+        padding: 0;
+        //0621 width: 100%;
+        height: 150px;
+    }
+
+    .issue,
+    .issue-detail {
+        width: auto;
+    }
+
+    .app-left,
+    .app-right {
+        margin-bottom: 100px;
+        height: 700px;
+    }
+
+    .app-right > * {
+        position: relative;
+    }
+
+    .app-left,
+    .app-left-ui,
+    .app-left-info,
+    .app-left-info > h2,
+    .app-left-info > h3,
+    .app-left-info > h4,
+    .app-left-info > h5,
+    .app-right,
+    .app-right-ui,
+    .app-right-info,
+    .app-right-info > h2,
+    .app-right-info > h3,
+    .app-right-info > h4,
+    .app-right-info > h5,
+    .feature,
+    .feature-icon,
+    .feature-detail {
+        //max-width: 680px;
+        width: auto;
+        left: 0%;
+        /*reset >680px*/
+        margin-left: 0px;
+        /*reset >680px*/
+        padding: 0;
+        overflow: visible;
+        text-align: center;
+    }
+
+    .band > .feature {
+        height: 500px;
+    }
+
+    .band + .feature {
+        height: 400px;
+        margin-top: 24px;
+    }
+
+    .app-left + .band {
+        height: 800px;
+        padding: 0;
+    }
+
+    /*center app, feature img*/
+    .feature-icon,
+    .app-left-ui,
+    .app-right-ui {
+        width: 300px;
+        left: 50%;
+        margin-left: -150px;
+    }
+
+    .feature-detail,
+    .app-left-info,
+    .app-right-info {
+        padding: 0 12px;
+    }
+
+    .app-right-info,
+    .app-left-info {
+        margin-top: 24px;
+    }
+}
+
+/* for 480px or less */
+@media screen and (max-width: 480px) {
+    #title-panel {
+        height: 750px;
+    }
+
+    .app-left,
+    .app-right {
+        height: 730px;
+    }
+}
