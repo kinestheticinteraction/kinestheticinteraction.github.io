@@ -126,7 +126,6 @@ svg{
     left: 50px;
     font-family: Circular_Air-Bold, sans-serif;
     color: #FF0083;
-    letter-spacing: 3px;
     font-size: 35px;
     font-weight: 700;
     -webkit-transition: 1s cubic-bezier(.53,.01,.81,.01);
@@ -135,7 +134,7 @@ svg{
 
 #personal-statement{
     position: absolute;
-    top: 294px;
+    top: 280px;
     left: 5%;
     font-family: DINPro-Regular, sans-serif;
     color: #fbfbfb;
