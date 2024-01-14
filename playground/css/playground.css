@@ -120,12 +120,12 @@ svg{
 }
 #personal-title {
     position: absolute;
-    width: 550px;
-    z-index: 3;
-    top: 195px;
+	top: 195px;
     left: 50px;
+	z-index: 3;
+    width: 600px;
 /*     font-family: Circular_Air-Bold, sans-serif; */
-    font-family: DINPro-Bold, sans-serif;
+    font-family: DINPro-Medium, sans-serif;
     color: #FF0083;
     font-size: 35px;
     font-weight: 700;
@@ -135,11 +135,11 @@ svg{
 
 #personal-statement{
     position: absolute;
-    top: 280px;
+    top: 300px;
     left: 5%;
+    width: 570px;
     font-family: DINPro-Regular, sans-serif;
     color: #fbfbfb;
-    width: 570px;
     font-size: 24px;
     line-height: 30px;
     font-weight: 100;
