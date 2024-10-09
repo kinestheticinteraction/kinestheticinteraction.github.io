@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Searchbar 2025</title>
+        <link rel="stylesheet" href="styles.css" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    </head>
+
+    <body>
+        <div id="navBar">
+            <div id="searchPanel"  class="sbCollapsedState">
+                <div id="searchBar">
+                    <img src="https://github.com/kinestheticinteraction/testing123/blob/main/Search.png?raw=true" id="searchIcon">
+                    <input autocomplete="off"
+                           type="text" id="searchInput" placeholder="Search YouTube">
+                    <img src="https://github.com/kinestheticinteraction/testing123/blob/main/Mic.png?raw=true" id="micIcon" >
+                </div>
+                <div id="searchHistory" onscroll="scrolling()"></div>
+            </div>
+         <div id="scrim"></div>
+
+        </div>
+    </body>
+</html>
+
+
+<script>
+    $('#searchInput').on('focus',function () {
+        $('#searchInput').css("color", "#000");
+        $('#searchPanel').removeClass("sbCollapsedState");
+        $('#searchPanel').addClass("sbExpandedState");
+        $('#scrim').css("opacity", 0.3);
+        $('#scrollHint').addClass("show");
+        $('#scrollHint').removeClass("hide");
+    });
+    
+    $('#searchInput').on('blur',function () {
+        $('#searchPanel').addClass("sbCollapsedState");
+        $('#searchPanel').removeClass("sbExpandedState");
+        $('#scrim').css("opacity", 0);
+        $('#scrollHint').addClass("hide");
+        $('#scrollHint').removeClass("show");
+    });
+    
+    var listNames = [
+        "pilates workout",
+        "terracotta bedroom",
+        "indoor plants",
+        "paint the town red doja cat",
+        "first we feast",
+        "cheesecake recipes",
+        "low light beginner plants for a bathroom",
+        "hiking california",
+        "polymer clay art using recycled materials",
+        "roland garros 2024",
+        "wwdc highlights mkbhd",
+        "Temu Haul",
+        "Lofi Music",
+        "Sabrina Carpenter",
+        "humane pin unboxing",
+        ];
+    var thumbnailUrls = [
+        "https://i3.ytimg.com/vi/ezke0GlKeM4/maxresdefault.jpg",
+        "https://i3.ytimg.com/vi/_i0oh9n907I/maxresdefault.jpg",
+        "https://i3.ytimg.com/vi/5W8QZIe1AlU/maxresdefault.jpg",
+        "https://i3.ytimg.com/vi/m4_9TFeMfJE/maxresdefault.jpg",
+        "https://i3.ytimg.com/vi/gHuWxAXD5Pk/maxresdefault.jpg",
+        "https://i3.ytimg.com/vi/tpsywnPNDsw/maxresdefault.jpg",
+        "https://i3.ytimg.com/vi/IUXZb4eDOBg/maxresdefault.jpg",
+        "https://i3.ytimg.com/vi/J57_i8V3wik/maxresdefault.jpg",
+        "https://i3.ytimg.com/vi/tnfh7cydAkA/maxresdefault.jpg",
+        "https://i3.ytimg.com/vi/TlYHfLa4TcQ/maxresdefault.jpg",
+        "https://i3.ytimg.com/vi/qkYoBNdcXBU/maxresdefault.jpg",
+        "https://i3.ytimg.com/vi/Jreb79_XOsA/maxresdefault.jpg",
+        "https://i3.ytimg.com/vi/jfKfPfyJRdk/maxresdefault.jpg",
+        "https://i3.ytimg.com/vi/KEG7b851Ric/maxresdefault.jpg",
+        "https://i3.ytimg.com/vi/0O2yTG3n1Vc/maxresdefault.jpg",
+    ];
+    var searchHistoryNum = listNames.length;
+    var searchIconSrc = "https://github.com/kinestheticinteraction/testing123/blob/main/Arrow%20Time.png?raw=true"
+    var xIconSrc="https://github.com/kinestheticinteraction/testing123/blob/main/16px%20X.png?raw=true";
+    
+    for (var i = 0; i < searchHistoryNum; i++) {
+        var thisDiv = document.createElement('div');
+        thisDiv.classList.add("listItem");
+        thisDiv.appendChild(document.createElement('img'));
+        thisDiv.querySelector("img").src = searchIconSrc;
+        thisDiv.appendChild(document.createElement('p'));        
+        thisDiv.querySelector("p").innerHTML = listNames[i];
+        var thumbnail = document.createElement('img');
+        thumbnail.src = thumbnailUrls[i];
+        thumbnail.classList.add("thumbnail");
+        thisDiv.appendChild(thumbnail);
+        var deleteButton = document.createElement('img');
+        deleteButton.src = xIconSrc;
+        deleteButton.classList.add("deleteButton");
+        deleteButton.classList.add("hide");
+        thisDiv.appendChild(deleteButton);
+        document.getElementById("searchHistory").appendChild(thisDiv);  
+        if (i == searchHistoryNum -1){
+            var scrollHint = document.createElement('div');
+            scrollHint.setAttribute("id", "scrollHint");
+            scrollHint.classList.add("hide");
+            thisDiv.appendChild(scrollHint);
+        }
+    }
+
+    $('.listItem').hover(
+        //hover in
+        function () {       
+        this.querySelector(".deleteButton").classList.remove("hide");
+        this.querySelector(".deleteButton").classList.add("show");
+        document.getElementById("searchInput").value = this.querySelector("p").innerText;
+    }, 
+        // hover out
+        function () {       
+        this.querySelector(".deleteButton").classList.add("hide");
+        this.querySelector(".deleteButton").classList.remove("show");
+        document.getElementById("searchInput").value ="";
+    });
+    
+    const searchHistoryDiv = document.getElementById("searchHistory");
+    
+    function scrolling(){
+        let height = searchHistoryDiv.clientHeight;
+        let scrollHeight = searchHistoryDiv.scrollHeight - height;
+        let scrollTop = searchHistoryDiv.scrollTop;
+        let percentage = scrollTop/scrollHeight;
+        let scrollValue = percentage.toFixed(2);
+        
+        let start1 = 0.9;
+        let stop1 = 1;
+        let start2 = 1;
+        let stop2 = 0;
+        
+        if (scrollValue >= 0.9) {
+            let newOpacity = start2 + (stop2 - start2) * ((scrollValue - start1) / (stop1 - start1));
+            $('#scrollHint').css("opacity", newOpacity.toFixed(1));
+        }
+    }
+    
+
+</script>
