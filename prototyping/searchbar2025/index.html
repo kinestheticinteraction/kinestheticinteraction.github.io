@@ -25,22 +25,7 @@
 
 
 <script>
-    $('#searchInput').on('focus',function () {
-        $('#searchInput').css("color", "#000");
-        $('#searchPanel').removeClass("sbCollapsedState");
-        $('#searchPanel').addClass("sbExpandedState");
-        $('#scrim').css("opacity", 0.3);
-        $('#scrollHint').addClass("show");
-        $('#scrollHint').removeClass("hide");
-    });
-    
-    $('#searchInput').on('blur',function () {
-        $('#searchPanel').addClass("sbCollapsedState");
-        $('#searchPanel').removeClass("sbExpandedState");
-        $('#scrim').css("opacity", 0);
-        $('#scrollHint').addClass("hide");
-        $('#scrollHint').removeClass("show");
-    });
+   
     
     var listNames = [
         "pilates workout",
@@ -80,47 +65,95 @@
     var searchIconSrc = "https://github.com/kinestheticinteraction/testing123/blob/main/Arrow%20Time.png?raw=true"
     var xIconSrc="https://github.com/kinestheticinteraction/testing123/blob/main/16px%20X.png?raw=true";
     
-    for (var i = 0; i < searchHistoryNum; i++) {
-        var thisDiv = document.createElement('div');
-        thisDiv.classList.add("listItem");
-        thisDiv.appendChild(document.createElement('img'));
-        thisDiv.querySelector("img").src = searchIconSrc;
-        thisDiv.appendChild(document.createElement('p'));        
-        thisDiv.querySelector("p").innerHTML = listNames[i];
-        var thumbnail = document.createElement('img');
-        thumbnail.src = thumbnailUrls[i];
-        thumbnail.classList.add("thumbnail");
-        thisDiv.appendChild(thumbnail);
-        var deleteButton = document.createElement('img');
-        deleteButton.src = xIconSrc;
-        deleteButton.classList.add("deleteButton");
-        deleteButton.classList.add("hide");
-        thisDiv.appendChild(deleteButton);
-        document.getElementById("searchHistory").appendChild(thisDiv);  
-        if (i == searchHistoryNum -1){
-            var scrollHint = document.createElement('div');
-            scrollHint.setAttribute("id", "scrollHint");
-            scrollHint.classList.add("hide");
-            thisDiv.appendChild(scrollHint);
+    function addAllSearchHistoryQueries(){
+        for (var i = 0; i < searchHistoryNum; i++) {
+            var thisDiv = document.createElement('div');
+            thisDiv.classList.add("listItem");
+            thisDiv.appendChild(document.createElement('img'));
+            thisDiv.querySelector("img").src = searchIconSrc;
+            thisDiv.appendChild(document.createElement('p'));        
+            thisDiv.querySelector("p").innerHTML = listNames[i];
+            var thumbnail = document.createElement('img');
+            thumbnail.src = thumbnailUrls[i];
+            thumbnail.classList.add("thumbnail");
+            thisDiv.appendChild(thumbnail);
+            var deleteButton = document.createElement('img');
+            deleteButton.src = xIconSrc;
+            deleteButton.classList.add("deleteButton");
+            deleteButton.classList.add("hide");
+            thisDiv.appendChild(deleteButton);
+            document.getElementById("searchHistory").appendChild(thisDiv);  
+            if (i == searchHistoryNum -1){
+                var scrollHint = document.createElement('div');
+                scrollHint.setAttribute("id", "scrollHint");
+                scrollHint.classList.add("hide");
+                thisDiv.appendChild(scrollHint);
+            }
         }
+        
+        $('.listItem').hover(
+            //hover in
+            function () {       
+                //if (allowHoverPreview){
+                //    this.querySelector(".deleteButton").classList.remove("hide");
+                //    this.querySelector(".deleteButton").classList.add("show");
+                //    document.getElementById("searchInput").value = this.querySelector("p").innerText;
+                // }
+                this.querySelector(".deleteButton").classList.remove("hide");
+                    this.querySelector(".deleteButton").classList.add("show");
+                    document.getElementById("searchInput").value = this.querySelector("p").innerText;
+            }, 
+            // hover out
+            function () {       
+            this.querySelector(".deleteButton").classList.add("hide");
+            this.querySelector(".deleteButton").classList.remove("show");
+            document.getElementById("searchInput").value ="";
+        });
+    }
+    
+    function removeAllSearchHistoryQueries(){
+        const myNode = document.getElementById("searchHistory");
+        myNode.innerHTML = '';
+        
     }
 
-    $('.listItem').hover(
-        //hover in
-        function () {       
-        this.querySelector(".deleteButton").classList.remove("hide");
-        this.querySelector(".deleteButton").classList.add("show");
-        document.getElementById("searchInput").value = this.querySelector("p").innerText;
-    }, 
-        // hover out
-        function () {       
-        this.querySelector(".deleteButton").classList.add("hide");
-        this.querySelector(".deleteButton").classList.remove("show");
-        document.getElementById("searchInput").value ="";
+    var allowHoverPreview = false;
+    var hoverPreviewTimeout;
+    function setHoverPreview() {
+        allowHoverPreview = true
+        addAllSearchHistoryQueries();
+        clearTimeout(hoverPreviewTimeout);
+    }
+    
+     $('#searchInput').on('focus',function () {
+        $('#searchInput').css("color", "#000");
+        $('#searchPanel').removeClass("sbCollapsedState");
+        $('#searchPanel').addClass("sbExpandedState");
+        $('#scrim').css("opacity", 0.3);
+        $('#scrollHint').addClass("show");
+        $('#scrollHint').removeClass("hide");
+        hoverPreviewTimeout = setTimeout(setHoverPreview, 50);
     });
     
-    const searchHistoryDiv = document.getElementById("searchHistory");
+    function unsetHoverPreview() {
+        allowHoverPreview = false
+        removeAllSearchHistoryQueries();
+        clearTimeout(hoverPreviewTimeout);
+    }
     
+    $('#searchInput').on('blur',function () {
+        $('#searchPanel').addClass("sbCollapsedState");
+        $('#searchPanel').removeClass("sbExpandedState");
+        $('#scrim').css("opacity", 0);
+        $('#scrollHint').addClass("hide");
+        $('#scrollHint').removeClass("show");
+        hoverPreviewTimeout = setTimeout(unsetHoverPreview, 100);
+    });
+    
+    
+    
+    
+    const searchHistoryDiv = document.getElementById("searchHistory");
     function scrolling(){
         let height = searchHistoryDiv.clientHeight;
         let scrollHeight = searchHistoryDiv.scrollHeight - height;

@@ -1,15 +1,22 @@
 body {
-    background: #fbfbfb;
+    /*background: #fbfbfb;*/
+    margin:0;
+    padding: 0;
     overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
+    background-repeat: no-repeat;
+    background-size: 1100px;
+    background-image: url("https://github.com/kinestheticinteraction/searchbar2025.github.io/blob/main/YT%20BG%203%20col.png?raw=true");
 }
 
 #navBar{
+    margin:0;
+    padding: 0;
     height: 56px;
     width: 100%;
-    background-color: #f0f0f0;
+    /*background-color: #f0f0f0;*/
     z-index: 0;
 }
 
@@ -25,15 +32,16 @@ body {
 }
 
 #searchPanel{
-    overflow: clip;
+    overflow: hidden;
 }
 
 #searchBar{
-    border-radius: 100px;
+    border-radius: 20px;
     border: solid 1px rgb(0, 0, 0, 0.1);
+    border-style: inset;
     top:0;
     align-content: center;
-    width: 100%;
+    width: calc(100% - 2px);
     background-color: white;
 }
 
@@ -122,6 +130,12 @@ body {
     flex-wrap: wrap;
     overflow: scroll;
     margin-top: 8px;
+    z-index: -1;
+    /*overflow-y: hidden;*/
+}
+
+#searchHistory::-webkit-scrollbar {
+  display: none;
 }
 
 #scrollHint{
@@ -182,6 +196,7 @@ body {
     width: 16px;
     height: 16px;
     margin-right: 4px;
+    cursor: pointer;
 }
 
 .show{
