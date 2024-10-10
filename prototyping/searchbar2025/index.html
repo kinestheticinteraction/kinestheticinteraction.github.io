@@ -86,7 +86,7 @@
             if (i == searchHistoryNum -1){
                 var scrollHint = document.createElement('div');
                 scrollHint.setAttribute("id", "scrollHint");
-                scrollHint.classList.add("hide");
+                scrollHint.classList.add("show");
                 thisDiv.appendChild(scrollHint);
             }
         }
@@ -94,20 +94,15 @@
         $('.listItem').hover(
             //hover in
             function () {       
-                //if (allowHoverPreview){
-                //    this.querySelector(".deleteButton").classList.remove("hide");
-                //    this.querySelector(".deleteButton").classList.add("show");
-                //    document.getElementById("searchInput").value = this.querySelector("p").innerText;
-                // }
                 this.querySelector(".deleteButton").classList.remove("hide");
-                    this.querySelector(".deleteButton").classList.add("show");
-                    document.getElementById("searchInput").value = this.querySelector("p").innerText;
+                this.querySelector(".deleteButton").classList.add("show");
+                document.getElementById("searchInput").value = this.querySelector("p").innerText;
             }, 
             // hover out
             function () {       
-            this.querySelector(".deleteButton").classList.add("hide");
-            this.querySelector(".deleteButton").classList.remove("show");
-            document.getElementById("searchInput").value ="";
+                this.querySelector(".deleteButton").classList.add("hide");
+                this.querySelector(".deleteButton").classList.remove("show");
+                document.getElementById("searchInput").value ="";
         });
     }
     
@@ -150,27 +145,25 @@
         hoverPreviewTimeout = setTimeout(unsetHoverPreview, 100);
     });
     
-    
-    
-    
     const searchHistoryDiv = document.getElementById("searchHistory");
     function scrolling(){
-        let height = searchHistoryDiv.clientHeight;
-        let scrollHeight = searchHistoryDiv.scrollHeight - height;
-        let scrollTop = searchHistoryDiv.scrollTop;
-        let percentage = scrollTop/scrollHeight;
-        let scrollValue = percentage.toFixed(2);
-        
-        let start1 = 0.9;
-        let stop1 = 1;
-        let start2 = 1;
-        let stop2 = 0;
-        
-        if (scrollValue >= 0.9) {
-            let newOpacity = start2 + (stop2 - start2) * ((scrollValue - start1) / (stop1 - start1));
-            $('#scrollHint').css("opacity", newOpacity.toFixed(1));
-        }
+       if ($('#searchPanel').hasClass('sbExpandedState')) {
+            let height = searchHistoryDiv.clientHeight;
+            let scrollHeight = searchHistoryDiv.scrollHeight - height;
+            let scrollTop = searchHistoryDiv.scrollTop;
+            let percentage = scrollTop/scrollHeight;
+            let scrollValue = percentage.toFixed(2);
+
+            let start1 = 0.9;
+            let stop1 = 1;
+            let start2 = 1;
+            let stop2 = 0;
+
+            if (scrollValue >= 0.9) {
+                let newOpacity = start2 + (stop2 - start2) * ((scrollValue - start1) / (stop1 - start1));
+                $('#scrollHint').css("opacity", newOpacity.toFixed(1));
+            }
+       }
     }
-    
 
 </script>
