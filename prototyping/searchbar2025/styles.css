@@ -1,5 +1,4 @@
 body {
-    /*background: #fbfbfb;*/
     margin:0;
     padding: 0;
     overflow: hidden;
@@ -8,6 +7,8 @@ body {
     align-items: center;
     background-repeat: no-repeat;
     background-size: 1100px;
+    background-position:center;
+    background-position-y: 0;
     background-image: url("https://github.com/kinestheticinteraction/searchbar2025.github.io/blob/main/YT%20BG%203%20col.png?raw=true");
 }
 
