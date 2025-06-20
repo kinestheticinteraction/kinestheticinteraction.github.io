@@ -108,7 +108,7 @@ b {
 
 
 #backButton,
-#backButtonEnd {
+#backButtonEnd{
     width: 50px;
     height: 50px;
     position: fixed;
@@ -116,17 +116,20 @@ b {
     /* 100 + 10 to align with title*/
     margin-top: 110px;
     margin-left: -100px;
-    transition-duration: 0.1s;
+    /*transition-duration: 0.1s;*/
 }
 
-#backButton:hover {
+/*
+#backButton:hover{
     background-color: black;
     cursor: pointer;
 }
+*/
 
-#backButtonEnd {
+#backButtonEnd,
+.endLink{
     position: relative;
-    //background-color: red;
+    /*background-color: red;*/
     width: 200px;
     height: auto;
     margin: 0;
@@ -140,7 +143,17 @@ b {
     text-align: center;
 }
 
-#backButtonEnd:hover {
+.endLink{
+    display: block;
+    width: 500px;
+    margin-left:-250px;
+    margin-top: 50px;
+    text-align: center;
+        
+}
+
+#backButtonEnd:hover,
+a.endLink:hover{
     background-color: black;
     color: #a3a3a3;
     cursor: pointer;
@@ -411,12 +424,6 @@ header {
 .headroom--unpinned {
     -webkit-transform: translateY(-100%);
     transform: translateY(-100%);
-}
-
-
-img {
-     /* for all images*/
-    pointer-events: none;
 }
 
 /*---body---------------------------------*/
@@ -1156,16 +1163,10 @@ footer {
     margin-bottom: 10px;
 }
 
-footer > a:any-link {
-    color: #bbb;
-}
-
 .author {
     display: inline;
     float: left;
 }
-
-
 
 .copyright {
     float: right;
@@ -1177,9 +1178,8 @@ footer > a:any-link {
 }
 
 .copyright:after {
-    content: "Crack Smiles :) | © 2024 Justeen Lee | Terms of Use";
+    content: "© 2024 Justeen Lee | Crack Smiles with Surprise and Delight";
 }
-
 
 /*feature-type--------------*/
 .shadow {
