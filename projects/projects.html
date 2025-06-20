@@ -194,7 +194,9 @@
 
             </a>
         </div>
-        <div class="square" onmouseover="sayHiToReader(3)" onmouseout="sayHiToReader(0)">
+        
+        
+        <div class="square" onmouseover="sayHiToReader('pinterest')" onmouseout="sayHiToReader(0)">
             <a href="../pinterest/pinterest.html">
                 <div class="imgContainer">
                     <img class="data-img square-img" src="images/500w%20placeholder%2003.png" alt="ux" width="100%">
@@ -213,25 +215,30 @@
             </a>
         </div>
 
-
-
-
         <!--
-            <div class="square one">
-				<a href="../iosreminders/iosreminders.html">
-                     <section class="square-img">
-                         <section class="caption">
-                            <h2>Reminders</h2>
-                            <h3 class="project-caption">
-                                Redesign Reminders for iOS 13
-                            </h3>
-                        </section>
-                        <img src="images/project-reminders.png" width="100%">
-                    </section>
-                    
-				</a>
-			</div>
--->
+        <div class="square" onmouseover="sayHiToReader('YTSearch')" onmouseout="sayHiToReader(0)">
+            <a href="">
+                <div class="imgContainer">
+                    <img class="data-img square-img" src="images/500w%20placeholder%2003.png" alt="ux" width="100%">
+                    <video width="100%" autoplay muted loop class="webThumbnailVideo">
+                        <source src="images/YT%20web%20search%20(with%20zoom)%20thumbnail%20.mp4" 
+                                type="video/mp4" >
+                    </video>
+
+                </div>
+                <section class="caption">
+                    <h2>YouTube Web Search</h2>
+                    <h3 class="project-caption">
+                        UX, UI, Motion
+                    </h3>
+                </section>
+
+            </a>
+        </div>
+        -->
+
+
+
 
         <!--
         <div class="square two">
@@ -320,6 +327,9 @@
     <div id="hidden-product-panel">
         <button type="button" id="hidden-button" onclick="TapSecretMenuButton()">Secret Menu</button>
         <div id="hidden-list">
+            <a href="../youtube/youtube.html" target="_blank">
+                YouTube Desktop Search
+            </a>
             <a href="../museumar/museumar.html" target="_blank">
                 Museum AR Tour
             </a>
@@ -419,8 +429,11 @@
                 responseString.innerHTML = "Wing is drone delivery. Nice choice!";
             } else if (param == 2) {
                 responseString.innerHTML = "Waymo self-drivng cars? Also a good one.";
-            } else if (param == 3) {
+            } else if (param == 'pinterest') {
                 responseString.innerHTML = "Search and pin your interests is fun, too.";
+            } else if (param == 'YTSearch') {
+                responseString.innerHTML = "Email me to request work samples";
+                
             } else {
                 responseString.innerHTML = "Selected Projects";
             }
