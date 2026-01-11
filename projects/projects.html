@@ -7,7 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Projects | Justeen Lee</title>
     <meta name="description" content="A catalog of projects and explorations by Justeen Lee">
-    <meta name="keywords" content="projects, interaction, IX, industrial, design, user experience, UX, user interface, UI, portfolio, justeen lee, san francisco, new york, hong kong" />
+    <meta name="keywords"
+        content="projects, interaction, IX, industrial, design, user experience, UX, user interface, UI, portfolio, justeen lee, san francisco, new york, hong kong" />
     <link rel="shortcut icon" href="../assets/favicon.ico" />
     <link rel="stylesheet" href="../css/newstructure.css">
 
@@ -17,9 +18,9 @@
     <script src="../js/overall.js" defer></script>
 
     <script>
-        (function(i, s, o, g, r, a, m) {
+        (function (i, s, o, g, r, a, m) {
             i['GoogleAnalyticsObject'] = r;
-            i[r] = i[r] || function() {
+            i[r] = i[r] || function () {
                 (i[r].q = i[r].q || []).push(arguments)
             }, i[r].l = 1 * new Date();
             a = s.createElement(o),
@@ -39,13 +40,17 @@
 <body>
     <header id="header">
         <ul id="navigation">
-            <li class="li-nav"><a id="link-home" onmouseover="move('index')" onmouseout="move('currentPath')" href="../index.html">PLAYGROUND</a></li>
+            <li class="li-nav"><a id="link-home" onmouseover="move('index')" onmouseout="move('currentPath')"
+                    href="../index.html">PLAYGROUND</a></li>
 
-            <li class="li-nav"><a id="link-projects" onmouseover="move('projects')" onmouseout="move('currentPath')" href=""></a></li>
+            <li class="li-nav"><a id="link-projects" onmouseover="move('projects')" onmouseout="move('currentPath')"
+                    href=""></a></li>
 
-            <li class="li-nav"><a id="link-resume" onmouseover="move('resume')" onmouseout="move('currentPath')" href="../resume/resume.html">RESUME</a></li>
+            <li class="li-nav"><a id="link-resume" onmouseover="move('resume')" onmouseout="move('currentPath')"
+                    href="../resume/resume.html">RESUME</a></li>
 
-            <li class="li-nav"><a id="link-about" onmouseover="move('about')" onmouseout="move('currentPath')" href="../about/about.html">ABOUT</a></li>
+            <li class="li-nav"><a id="link-about" onmouseover="move('about')" onmouseout="move('currentPath')"
+                    href="../about/about.html">ABOUT</a></li>
         </ul>
         <span id="indicator-dot"></span>
         <div class="band" id="navBand"></div>
@@ -56,14 +61,13 @@
 
         <!--<h1 id="response">Selected Projects</h1>-->
 
-        
+
         <div class="square" onmouseover="sayHiToReader('YTSearch')" onmouseout="sayHiToReader(0)">
             <a href="../youtube/youtubeShorts.html">
                 <div class="imgContainer">
                     <img class="data-img square-img" src="images/MOBILE_PLACEHOLDER.png" alt="ux" width="100%">
                     <video width="100%" autoplay muted loop class="webThumbnailVideo">
-                        <source src="images/1500w%20YTS.mp4" 
-                                type="video/mp4" >
+                        <source src="images/1500w%20YTS.mp4" type="video/mp4">
                     </video>
 
                 </div>
@@ -83,8 +87,7 @@
                 <div class="imgContainer">
                     <img class="data-img square-img" src="images/WEB_PLACEHOLDER.png" alt="ux" width="100%">
                     <video width="100%" autoplay muted loop class="webThumbnailVideo">
-                        <source src="images/YT%20web%20search%20(with%20zoom)%20thumbnail%20.mp4" 
-                                type="video/mp4" >
+                        <source src="images/YT%20web%20search%20(with%20zoom)%20thumbnail%20.mp4" type="video/mp4">
                     </video>
 
                 </div>
@@ -103,21 +106,21 @@
                 <div class="imgContainer">
                     <img class="data-img square-img" src="images/MOBILE_PLACEHOLDER.png" alt="ux" width="100%">
                     <video width="100%" autoplay muted loop>
-                        <source src="images/1500w%20closure.mp4" type="video/mp4">
+                        <source src="images/1500w last call.mp4" type="video/mp4">
                     </video>
 
                 </div>
                 <section class="caption">
-                    <h2>Closing Hours</h2>
+                    <h2>Last Call</h2>
                     <h3 class="project-caption">
-                        Product Design, UX, UI
+                        Product Design, UX, Motion
                     </h3>
                 </section>
 
             </a>
         </div>
 
-        
+
         <div class="square" onmouseover="sayHiToReader(1)" onmouseout="sayHiToReader(0)">
             <a href="../wing/wing.html">
                 <div class="imgContainer">
@@ -156,8 +159,8 @@
 
             </a>
         </div>
-        
-        
+
+
         <div class="square" onmouseover="sayHiToReader('pinterest')" onmouseout="sayHiToReader(0)">
             <a href="../pinterest/pinterest.html">
                 <div class="imgContainer">
@@ -176,8 +179,8 @@
 
             </a>
         </div>
-    
-    
+
+
 
         <!--
         <div class="square">
@@ -430,7 +433,7 @@
                 responseString.innerHTML = "Search and pin your interests is fun, too.";
             } else if (param == 'YTSearch') {
                 responseString.innerHTML = "Email me to request work samples";
-                
+
             } else {
                 responseString.innerHTML = "Selected Projects";
             }
