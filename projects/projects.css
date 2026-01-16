@@ -6,7 +6,8 @@ body {
     background-color: black;
     width: 800px;
     margin-left: -400px;
-    left: 50%;x
+    left: 50%;
+    x
 }
 
 #indicator-dot {
@@ -17,7 +18,7 @@ body {
     background-color: black;
 }
 
-li-nav > a {
+li-nav>a {
     color: white;
 }
 
@@ -27,7 +28,7 @@ header {
     margin-left: -350px;
 }
 
-img ~ img {
+img~img {
     margin-top: 0px;
     /*overrule structure.css*/
 }
@@ -57,7 +58,11 @@ footer {
     min-height: 1000px;
     height: auto;
     margin-top: 80px;
-    /*background-color: yellow;*/
+    /* background-color: yellow; */
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 30px;
+    column-gap: 10px;
 }
 
 
@@ -76,8 +81,8 @@ footer {
 
 /*hack 2023.3.29*/
 .square {
-    float: left;
-    margin: 30px 0px 0px 10px;
+    /* float: left;
+    margin: 30px 0px 0px 10px; */
 }
 
 #temporary-videos iframe {
@@ -120,7 +125,7 @@ footer {
 }
 
 
-.imgContainer > video {
+.imgContainer>video {
     position: relative;
     margin: 0;
     padding: 0;
@@ -129,15 +134,15 @@ footer {
     transition: .1s;
 }
 
-.imgContainer > video:hover {
+.imgContainer>video:hover {
     transform: scale(.98);
 }
 
-.imgContainer > .webThumbnailVideo{
+.imgContainer>.webThumbnailVideo {
     transform: scale(1.02);
 }
 
-.imgContainer > .webThumbnailVideo:hover{
+.imgContainer>.webThumbnailVideo:hover {
     transform: scale(1);
 }
 
@@ -166,8 +171,8 @@ footer {
 
 
 
-.square-img > img,
-.square-img > video {
+.square-img>img,
+.square-img>video {
     position: relative;
     margin-top: 80px;
     width: 280px;
@@ -178,7 +183,7 @@ footer {
 
 
 /*hack 2023.3.29*/
-#pinterestTile > video {
+#pinterestTile>video {
     margin-top: 140px;
     width: 400px;
     margin-left: -200px;
@@ -187,7 +192,7 @@ footer {
 
 
 
-#project-motion > img {
+#project-motion>img {
     width: 250px;
 
 }
@@ -202,18 +207,18 @@ footer {
 }
 
 .caption,
-.caption > h2,
-.caption > h3 {
+.caption>h2,
+.caption>h3 {
     width: 100%;
     color: #fbfbfb;
 }
 
-.caption > h2 {
+.caption>h2 {
     font-size: 24px;
     font-family: DINPro-Medium, sans-serif;
 }
 
-.caption > h3 {
+.caption>h3 {
     font-size: 16px;
     font-family: DINPro-Regular, sans-serif;
     opacity: 0.5;
@@ -364,7 +369,7 @@ footer {
 
 
     /* mobile version */
-    [href="../tv/tv.html"] > .square-img {
+    [href="../tv/tv.html"]>.square-img {
         width: 100%;
         left: 0;
         margin-left: 0;
@@ -372,9 +377,9 @@ footer {
 
     }
 
-    .square a > h2,
-    .wide a > h2,
-    .tall a > h2 {
+    .square a>h2,
+    .wide a>h2,
+    .tall a>h2 {
         position: absolute;
         margin-top: -32px;
         margin-left: 16px;
@@ -390,9 +395,9 @@ footer {
     }
 
 
-    #product-panel > .square,
-    #product-panel > .wide,
-    #product-panel > .tall {
+    #product-panel>.square,
+    #product-panel>.wide,
+    #product-panel>.tall {
         width: 100%;
         left: 0;
         margin-left: 0;
@@ -400,18 +405,18 @@ footer {
 
 
     /*not a good practice, jsut for temporary visualization*/
-    #product-panel > .tall + .three + .square + .square + .three,
-    #product-panel > .tall + .three + .square + .square + .three + .one + .two,
-    #product-panel > .tall + .three + .square + .square + .three + .one + .two + .three + .one,
-    #product-panel > .tall + .three + .square + .square + .three + .one + .two + .three + .one + .two + .three {
+    #product-panel>.tall+.three+.square+.square+.three,
+    #product-panel>.tall+.three+.square+.square+.three+.one+.two,
+    #product-panel>.tall+.three+.square+.square+.three+.one+.two+.three+.one,
+    #product-panel>.tall+.three+.square+.square+.three+.one+.two+.three+.one+.two+.three {
         margin-left: 0px;
     }
 
-    #product-panel > .square ~ .square ~ .square {
+    #product-panel>.square~.square~.square {
         margin-left: 0px;
     }
 
-    #product-panel > .square {
+    #product-panel>.square {
         margin-left: 0px;
     }
 
