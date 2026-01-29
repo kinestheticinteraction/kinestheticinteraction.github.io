@@ -1,0 +1,1884 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>v10 with chatgpt</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Instrument+Serif:ital@0;1&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
+
+</head>
+
+<body>
+    <h1 class="instrument-serif-regular-italic">Make Take The Edge Off Money - 5M</h1>
+    <!-- KPI Cards (3 same-width boxes) -->
+    <div id="kpi-cards">
+        <div class="kpi-card" data-index="0">
+            <div class="kpi-title" data-role="title">
+                <a href="https://feargreedmeter.com/" target="_blank" rel="noopener noreferrer" class="kpi-link">
+                    Fear or Greed
+                </a>
+            </div>
+
+            <div class="kpi-number" data-role="number">-</div>
+
+            <div class="kpi-slider" aria-label="Range indicator">
+                <div class="kpi-track">
+                    <div class="kpi-dot" data-role="dot" style="left: 50%;"></div>
+                </div>
+                <div class="kpi-range">
+                    <span data-role="min">N/A</span>
+                    <span data-role="max">N/A</span>
+                </div>
+            </div>
+
+            <div class="kpi-desc" data-role="desc">N/A</div>
+        </div>
+
+        <div class="kpi-card" data-index="1">
+            <div class="kpi-title" data-role="title">SP500 Forward PE</div>
+            <div class="kpi-number" data-role="number">-</div>
+            <div class="kpi-slider" aria-label="Range indicator">
+                <div class="kpi-track">
+                    <div class="kpi-dot" data-role="dot" style="left: 50%;"></div>
+                </div>
+                <div class="kpi-range">
+                    <span data-role="min">N/A</span>
+                    <span data-role="max">N/A</span>
+                </div>
+            </div>
+
+            <div class="kpi-desc" data-role="desc">N/A</div>
+        </div>
+
+        <div class="kpi-card" data-index="2">
+            <div class="kpi-title" data-role="title">
+                <a href="https://www.google.com/finance/beta/quote/VIX:INDEXCBOE" target="_blank"
+                    rel="noopener noreferrer" class="kpi-link">
+                    VIX
+                </a>
+            </div>
+
+            <div class="kpi-number" data-role="number">-</div>
+            <div class="kpi-slider" aria-label="Range indicator">
+                <div class="kpi-track">
+                    <div class="kpi-dot" data-role="dot" style="left: 50%;"></div>
+                </div>
+                <div class="kpi-range">
+                    <span data-role="min">N/A</span>
+                    <span data-role="max">N/A</span>
+                </div>
+            </div>
+
+            <div class="kpi-desc" data-role="desc">N/A</div>
+        </div>
+    </div>
+
+    <div id="controls-container">
+        <button id="send-alert-button">Send Alert</button>
+        <button id="refresh-button">Refresh</button>
+
+        <div class="segmented-control padding-segment">
+            <button class="padding-option" data-padding="2px">2px</button>
+            <button class="padding-option active" data-padding="4px">4px</button>
+            <button class="padding-option" data-padding="8px">8px</button>
+        </div>
+
+        <div class="control-tile opacity-tile">
+            <label for="opacity-slider">Opacity</label>
+            <input id="opacity-slider" type="range" min="0" max="100" value="100" />
+        </div>
+    </div>
+
+    <div id="refresh-label">
+        Table will auto-refresh every 60s
+        <span style="margin: 0 5px;">•</span>
+        <span id="market-status"></span>
+    </div>
+    <div class="panel-container">
+        <div id="data-container"></div>
+    </div>
+
+
+
+    <script>
+        const sheetId = '1FZdLX9VaEWhwODrMLyJc42W9Af8FFsouegDlZjiqm-M';
+        const apiKey = 'AIzaSyAcOWCTdpZSkjHS8dC0_y2dKi15e-m7zwY';
+        const sheetName = 'DCF model';
+        const dataRange = 'A6:O34';
+        let refreshInterval;
+        const dataContainer = document.getElementById('data-container');
+        const refreshButton = document.getElementById('refresh-button');
+        const sendAlertButton = document.getElementById('send-alert-button');
+        const dcfUpsideHeader = 'DCF upside';
+        const dcfUpsideTooltipText = 'Stock upside based on discounted cash flow model';
+        const fcfPercentHeader = 'FCF %';
+        const fcfPercentTooltipText = 'Free cash flow yield today';
+        const fcfGHeader = 'FCF G';
+        const fcfGTooltipText = 'YoY Free cash flow growth rate based on avg trailing 5 yrs';
+        const epsGHeader = 'EPS G';
+        const epsGTooltipText = 'YoY Earnings per share growth rate based on avg trailing 5 yrs';
+        const revGHeader = 'Rev G';
+        const revGTooltipText = 'YoY Revenue growth rate based on avg trailing 5 yrs';
+        const peHeader = 'PE';
+        const peTooltipText = 'Trailing 12mo price to earnings ratio';
+        const bbPercentHeader = 'BB %';
+        const bbPercentTooltipText = 'YoY stock buyback rate based on avg trailing 5 years';
+        const tickerColumnHeader = 'Ticker';
+        const vooTicker = 'VOO';
+        const paddingOptions = document.querySelectorAll('.padding-option');
+        const epsPeHeader = 'EPS > PE';
+        const fcfPeHeader = 'FCF > PE';
+        const marketStatusLabel = document.getElementById('market-status');
+        const opacitySlider = document.getElementById('opacity-slider');
+        const kpiSummary = {
+            fearGreed: 'N/A',
+            forwardPE: 'N/A',
+            vix: 'N/A'
+        };
+        // Map tickers to logo URLs (fill this out with the tickers you care about)
+        const TICKER_LOGOS = {
+            AAPL: 'https://cdn.iconscout.com/icon/free/png-512/free-apple-logo-icon-svg-download-png-1239445.png?f=webp&w=512',
+            GOOG: 'https://www.svgrepo.com/show/303108/google-icon-logo.svg',
+            AMZN: 'https://logoeps.com/wp-content/uploads/2025/02/amazon_icon_logo-logo_brandlogos.net_fgndw-200x200.png',
+            META: 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/meta-color.png',
+            VOO: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpNq2_49Z-dT6VtwGwCe9clAeJ9gLjoCscPA&s',
+            ABNB: 'https://img.icons8.com/color/1200/airbnb.jpg',
+            BKNG: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Booking.com_Icon_2022.svg/250px-Booking.com_Icon_2022.svg.png',
+            AZO: 'https://logos-world.net/wp-content/uploads/2022/04/AutoZone-Symbol.png',
+            HOOD: 'https://seeklogo.com/images/R/robinhood-icon-logo-ACF2820914-seeklogo.com.png',
+            FIG: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Figma-logo.svg/1667px-Figma-logo.svg.png',
+            FNGS: 'https://static.stocktitan.net/company-logo/fngs-lg.webp',
+            QQQ: 'https://companieslogo.com/img/orig/invesco-qqq-6e7735b4.png?t=1720244494',
+            SCHG: 'https://pbs.twimg.com/profile_images/1970124601813356544/SO8M3o7R_400x400.jpg',
+            CASH: 'https://em-content.zobj.net/source/apple/419/dollar-banknote_1f4b5.png',
+            WSM: 'https://companieslogo.com/img/orig/WSM-cbca8e30.png?t=1720244494',
+            HSY: 'https://companieslogo.com/img/orig/HSY-c3b1d702.png?t=1720244492',
+            CMG: 'https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/Chipotle_Mexican_Grill_logo.svg/1200px-Chipotle_Mexican_Grill_logo.svg.png',
+            UBER: 'https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png',
+            DUOL: 'https://1000logos.net/wp-content/uploads/2020/10/Duolingo-logo.png',
+            NFLX: 'https://images.icon-icons.com/2699/PNG/512/netflix_logo_icon_170919.png',
+            APP: 'https://www.vhv.rs/dpng/d/540-5402680_applovin-logo-png-transparent-png.png',
+            NVDA: 'https://upload.wikimedia.org/wikipedia/sco/thumb/2/21/Nvidia_logo.svg/1200px-Nvidia_logo.svg.png',
+            AVGO: 'https://ik.imagekit.io/kkbzr2uz4cp/stock/nasdaq/avgo.png',
+            COST: 'https://companieslogo.com/img/orig/COST-180a6d1f.png?t=1720244491',
+            TPL: 'https://d1io3yog0oux5.cloudfront.net/texaspacific/files/pages/texaspacific/db/760/description/tpl-flag-logo.png',
+            MA: 'https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg',
+            TSLA: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Tesla_T_symbol.svg/771px-Tesla_T_symbol.svg.png',
+            FICO: 'https://upload.wikimedia.org/wikipedia/commons/9/9a/FICO_logo.svg',
+            ASML: 'https://1000logos.net/wp-content/uploads/2022/05/ASML-Logo.png'
+        };
+        let currentPadding = '4px';
+        let currentOpacity = 1;
+        async function fetchData() {
+            dataContainer.classList.add('fading');
+            const startOpacity = currentOpacity;
+            const halfOpacity = startOpacity / 2;
+            dataContainer.style.opacity = startOpacity;
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${sheetName}!${dataRange}?key=${apiKey}`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                displayData(data.values);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                dataContainer.innerText = 'Error loading data.';
+            } finally {
+                setTimeout(() => {
+                    dataContainer.style.opacity = halfOpacity;
+                    setTimeout(() => {
+                        dataContainer.classList.remove('fading');
+                        dataContainer.style.opacity = startOpacity;
+                    }, 100);
+                }, 100);
+            }
+            fetchAllKPI();
+        }
+
+        function renderTickerCell(td, tickerRaw) {
+            const ticker = (tickerRaw || '').trim().toUpperCase();
+            td.innerHTML = ''; // clear existing text
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'ticker-wrapper';
+            wrapper.style.display = 'flex';
+            wrapper.style.alignItems = 'center';
+            wrapper.style.gap = '8px';
+
+            const logoUrl = TICKER_LOGOS[ticker];
+            if (logoUrl) {
+                const img = document.createElement('img');
+                img.className = 'ticker-logo';
+                img.src = logoUrl;
+                img.alt = `${ticker} logo`;
+                img.loading = 'lazy';
+                img.style.width = '20px';
+                img.style.height = '20px';
+                img.style.borderRadius = '3px';
+                img.style.objectFit = 'contain';
+                wrapper.appendChild(img);
+            }
+
+            const text = document.createElement('span');
+            text.className = 'ticker-text';
+            text.textContent = ticker;
+            text.style.fontWeight = '600';
+            wrapper.appendChild(text);
+
+            td.appendChild(wrapper);
+        }
+
+
+        function getHighlightClass(index, floatValue, headers) {
+            const dcfUpsideColumnIndex = headers.indexOf('DCF upside');
+            const peColumnIndex = headers.indexOf('PE');
+            const fcfPercentColumnIndex = headers.indexOf('FCF %');
+            const fcfGColumnIndex = headers.indexOf('FCF G');
+            const epsGColumnIndex = headers.indexOf('EPS G');
+            const revGColumnIndex = headers.indexOf('Rev G');
+            const bbPercentColumnIndex = headers.indexOf('BB %');
+            if (index === dcfUpsideColumnIndex) {
+                if (floatValue > 0.20) return 'highlight-green-l2';
+                if (floatValue > 0.10) return 'highlight-green-l1';
+                if (floatValue < -0.30) return 'highlight-pink';
+                if (floatValue < -0.10) return 'highlight-orange';
+            } else if (index === fcfPercentColumnIndex) {
+                if (floatValue > 0.04) return 'highlight-green-l2';
+                if (floatValue > 0.03) return 'highlight-green-l1';
+                if (floatValue < 0.015) return 'highlight-pink';
+            } else if (index === peColumnIndex) {
+                if (floatValue > 100) return 'highlight-pink';
+                if (floatValue > 50) return 'highlight-orange';
+                if (floatValue < 20) return 'highlight-green-l2';
+                if (floatValue < 21.8) return 'highlight-green-l1';
+            } else if (index === fcfGColumnIndex || index === epsGColumnIndex || index === revGColumnIndex) {
+                if (floatValue > 0.20) return 'highlight-green-l2';
+                if (floatValue > 0.10) return 'highlight-green-l1';
+            } else if (index === bbPercentColumnIndex) {
+                if (floatValue < -0.05) return 'highlight-green-l2';
+                if (floatValue < -0.03) return 'highlight-green-l1';
+            }
+            return '';
+        }
+
+        function displayData(values) {
+            dataContainer.innerHTML = '';
+            if (!values || values.length === 0) {
+                dataContainer.innerText = 'No data found in the specified range.';
+                return;
+            }
+
+            const table = document.createElement('table');
+            const thead = document.createElement('thead');
+            const tbody = document.createElement('tbody');
+
+            if (values.length > 0) {
+                const headers = values[0];
+                const tickerColumnHeader = 'Ticker';
+                const tickerColumnIndex = headers.indexOf(tickerColumnHeader);
+
+                table.style.tableLayout = 'fixed';
+                const colgroup = document.createElement('colgroup');
+                headers.forEach((h, i) => {
+                    const col = document.createElement('col');
+                    if (i === tickerColumnIndex) {
+                        col.style.width = '110px';
+                    }
+                    colgroup.appendChild(col);
+                });
+                table.appendChild(colgroup);
+
+                const headerRow = document.createElement('tr');
+
+                // --- 🟢 NEW: Group Header Row Logic ---
+                const groupRow = document.createElement('tr');
+                const groupMap = {
+                    'DCF upside': { name: 'Potential', color: 'transparent' },
+                    'FCF %': { name: 'Value', color: 'transparent' },
+                    'PE': { name: 'Value', color: 'transparent' },
+                    'FCF G': { name: 'Growth', color: 'transparent' },
+                    'EPS G': { name: 'Growth', color: 'transparent' },
+                    'Rev G': { name: 'Growth', color: 'transparent' },
+                    'BB %': { name: 'Growth', color: 'transparent' },
+                    'ROCE': { name: 'Business', color: 'transparent' },
+                    'Gross Margin': { name: 'Business', color: 'transparent' },
+                    'Operating Margin': { name: 'Business', color: 'transparent' },
+                    'Cash Conversion': { name: 'Business', color: 'transparent' },
+                    'Interest Cover': { name: 'Business', color: 'transparent' }
+                };
+
+                let currentGroup = null;
+                let currentTh = null;
+
+                headers.forEach((h, i) => {
+                    const groupInfo = groupMap[h] || { name: '', color: 'transparent' };
+                    // Check if we can merge with previous
+                    if (currentTh && currentGroup && groupInfo.name === currentGroup.name && groupInfo.name !== '') {
+                        currentTh.colSpan = (currentTh.colSpan || 1) + 1;
+                    } else if (currentTh && groupInfo.name === '' && currentGroup.name === '') {
+                        // Merge adjacent empty groups too
+                        currentTh.colSpan = (currentTh.colSpan || 1) + 1;
+                    } else {
+                        // Create new group cell
+                        const th = document.createElement('th');
+                        th.textContent = groupInfo.name;
+                        th.style.backgroundColor = groupInfo.color;
+                        th.style.textAlign = 'center';
+                        th.style.fontWeight = 'bold';
+                        th.style.padding = '6px 4px';
+                        th.style.border = '1px solid var(--border)';
+                        th.style.color = 'var(--accent)';
+                        th.colSpan = 1;
+
+                        groupRow.appendChild(th);
+                        currentTh = th;
+                        currentGroup = groupInfo;
+                    }
+
+                    // 🔸 Divider Fix for Group Row
+                    if (h.includes('Today')) {
+                        if (currentTh) currentTh.style.borderRight = '4px solid var(--border)';
+                    }
+                });
+
+                // Add the group row to thead FIRST
+                thead.appendChild(groupRow);
+                // ------------------------------------------
+
+                headers.forEach((headerText, index) => {
+                    const th = document.createElement('th');
+                    th.textContent = headerText;
+                    th.style.position = 'relative';
+                    th.style.textAlign = 'right';
+                    th.style.padding = currentPadding;
+
+                    // Add divider after 'Today $' column
+                    const todayIndex = headers.findIndex(h => h.includes('Today'));
+                    if (index === todayIndex && todayIndex !== -1) {
+                        th.style.borderRight = '4px solid var(--border)';
+                    }
+
+                    let tooltipText = '';
+                    if (headerText === dcfUpsideHeader) {
+                        tooltipText = dcfUpsideTooltipText;
+                    } else if (headerText === fcfPercentHeader) {
+                        tooltipText = fcfPercentTooltipText;
+                    } else if (headerText === fcfGHeader) {
+                        tooltipText = fcfGTooltipText;
+                    } else if (headerText === epsGHeader) {
+                        tooltipText = epsGTooltipText;
+                    } else if (headerText === revGHeader) {
+                        tooltipText = revGTooltipText;
+                    } else if (headerText === peHeader) {
+                        tooltipText = peTooltipText;
+                    } else if (headerText === bbPercentHeader) {
+                        tooltipText = bbPercentTooltipText;
+                    } else if (headerText === epsPeHeader) {
+                        tooltipText = 'Is EPS greater than PE?';
+                    } else if (headerText === fcfPeHeader) {
+                        tooltipText = 'Is FCF greater than PE?';
+                    }
+
+                    if (tooltipText) {
+                        const tooltipSpan = document.createElement('span');
+                        tooltipSpan.classList.add('tooltip');
+                        tooltipSpan.textContent = tooltipText;
+                        th.appendChild(tooltipSpan);
+                    }
+
+                    headerRow.appendChild(th);
+                });
+
+                thead.appendChild(headerRow);
+                table.appendChild(thead);
+                table.appendChild(tbody);
+
+                const epsPeColumnIndex = headers.indexOf(epsPeHeader);
+                const fcfPeColumnIndex = headers.indexOf(fcfPeHeader);
+                const dcfUpsideColumnIndex = headers.indexOf('DCF upside');
+                const peColumnIndex = headers.indexOf('PE');
+                const fcfPercentColumnIndex = headers.indexOf('FCF %');
+
+                // 🔹 Find 'Today $' column for divider
+                const todayColumnIndex = headers.findIndex(h => h.includes('Today'));
+
+                // 🔹 target columns for VOO comparison
+                const roceColumnIndex = headers.indexOf('ROCE');
+                const grossMarginColumnIndex = headers.indexOf('Gross Margin');
+                const opMarginColumnIndex = headers.indexOf('Operating Margin');
+                const cashConvColumnIndex = headers.indexOf('Cash Conversion');
+                const interestCoverColumnIndex = headers.indexOf('Interest Cover');
+
+                // 🔹 which of those should also get "2x VOO ⇒ green"
+                const doubleGoodCols = new Set([
+                    roceColumnIndex,
+                    grossMarginColumnIndex,
+                    opMarginColumnIndex,
+                    cashConvColumnIndex
+                ]);
+
+                // 🔹 collect VOO baseline values
+                const vooBaselines = {}; // key: columnIndex → numeric baseline
+                if (tickerColumnIndex !== -1) {
+                    for (let i = 1; i < values.length; i++) {
+                        const row = values[i];
+                        const ticker = (row[tickerColumnIndex] || '').trim();
+                        if (ticker === 'VOO') {
+                            const targetCols = [
+                                roceColumnIndex,
+                                grossMarginColumnIndex,
+                                opMarginColumnIndex,
+                                cashConvColumnIndex,
+                                interestCoverColumnIndex
+                            ];
+                            targetCols.forEach(idx => {
+                                if (idx !== -1) {
+                                    const raw = row[idx] ?? '';
+                                    const asStr = String(raw);
+                                    const num = parseFloat(asStr.replace('%', ''));
+                                    if (!isNaN(num)) {
+                                        vooBaselines[idx] = num;
+                                    }
+                                }
+                            });
+                            break;
+                        }
+                    }
+                }
+
+                for (let i = 1; i < values.length; i++) {
+                    const dataRow = document.createElement('tr');
+                    const rowData = values[i];
+
+                    let isVooRow = false;
+                    if (tickerColumnIndex !== -1 && rowData[tickerColumnIndex]) {
+                        const ticker = rowData[tickerColumnIndex].trim().toUpperCase();
+                        if (ticker === 'VOO') {
+                            dataRow.classList.add('highlight-voo-row');
+                            isVooRow = true;
+                        } else if (ticker === 'CASH') {
+                            dataRow.classList.add('highlight-cash-row');
+                        }
+                    }
+
+                    headers.forEach((_, index) => {
+                        const cellData = rowData[index] || '';
+                        const td = document.createElement('td');
+                        td.style.position = 'relative';
+                        td.style.padding = currentPadding;
+
+                        // Add divider after 'Today $' column
+                        if (index === todayColumnIndex && todayColumnIndex !== -1) {
+                            td.style.borderRight = '4px solid var(--border)';
+                        }
+
+                        if (index === tickerColumnIndex) {
+                            td.style.textAlign = 'left';
+                            renderTickerCell(td, cellData);
+                        } else {
+                            td.textContent = cellData;
+                            td.style.textAlign = 'right';
+                        }
+
+                        if (isVooRow) {
+                            // Let the CSS class handle background
+                        } else {
+                            const fcfGColumnIndex = headers.indexOf('FCF G');
+                            const epsGColumnIndex = headers.indexOf('EPS G');
+                            const bbPercentColumnIndex = headers.indexOf('BB %');
+                            const revGColumnIndex = headers.indexOf('Rev G');
+
+                            let floatValue = parseFloat(cellData);
+                            if (
+                                index === dcfUpsideColumnIndex ||
+                                index === fcfPercentColumnIndex ||
+                                index === fcfGColumnIndex ||
+                                index === epsGColumnIndex ||
+                                index === revGColumnIndex ||
+                                index === bbPercentColumnIndex
+                            ) {
+                                const asStr = (cellData ?? '').toString();
+                                if (asStr.includes('%')) {
+                                    floatValue = parseFloat(asStr.replace('%', '')) / 100;
+                                }
+                            }
+
+                            td.classList.remove(
+                                'highlight-green-l1',
+                                'highlight-green-l2',
+                                'highlight-orange',
+                                'highlight-pink'
+                            );
+
+                            // existing threshold-based highlighting for earlier columns
+                            if (index === dcfUpsideColumnIndex) {
+                                if (floatValue > 0.20) {
+                                    td.classList.add('highlight-green-l2');
+                                } else if (floatValue > 0.10 && floatValue <= 0.20) {
+                                    td.classList.add('highlight-green-l1');
+                                } else if (floatValue < -0.30) {
+                                    td.classList.add('highlight-pink');
+                                } else if (floatValue < -0.10) {
+                                    td.classList.add('highlight-orange');
+                                }
+                            } else if (index === fcfPercentColumnIndex) {
+                                if (floatValue > 0.04) {
+                                    td.classList.add('highlight-green-l2');
+                                } else if (floatValue > 0.03 && floatValue <= 0.04) {
+                                    td.classList.add('highlight-green-l1');
+                                } else if (floatValue < 0.015) {
+                                    td.classList.add('highlight-pink');
+                                }
+                            } else if (index === peColumnIndex) {
+                                if (floatValue > 100) {
+                                    td.classList.add('highlight-pink');
+                                } else if (floatValue > 50) {
+                                    td.classList.add('highlight-orange');
+                                } else if (floatValue < 20) {
+                                    td.classList.add('highlight-green-l2');
+                                } else if (floatValue < 21.8 && floatValue >= 20) {
+                                    td.classList.add('highlight-green-l1');
+                                }
+                            } else if (index === fcfGColumnIndex) {
+                                if (floatValue > 0.20) {
+                                    td.classList.add('highlight-green-l2');
+                                } else if (floatValue > 0.10 && floatValue <= 0.20) {
+                                    td.classList.add('highlight-green-l1');
+                                }
+                            } else if (index === epsGColumnIndex) {
+                                if (floatValue > 0.20) {
+                                    td.classList.add('highlight-green-l2');
+                                } else if (floatValue > 0.10 && floatValue <= 0.20) {
+                                    td.classList.add('highlight-green-l1');
+                                }
+                            } else if (index === revGColumnIndex) {
+                                if (floatValue > 0.20) {
+                                    td.classList.add('highlight-green-l2');
+                                } else if (floatValue >= 0.10 && floatValue <= 0.20) {
+                                    td.classList.add('highlight-green-l1');
+                                }
+                            } else if (index === bbPercentColumnIndex) {
+                                if (floatValue < -0.05) {
+                                    td.classList.add('highlight-green-l2');
+                                } else if (floatValue < -0.03 && floatValue >= -0.05) {
+                                    td.classList.add('highlight-green-l1');
+                                }
+                            } else if (
+                                index === epsPeColumnIndex &&
+                                cellData &&
+                                cellData.trim().toUpperCase() === 'TRUE'
+                            ) {
+                                td.classList.add('highlight-green-l1');
+                            } else if (
+                                index === fcfPeColumnIndex &&
+                                cellData &&
+                                cellData.trim().toUpperCase() === 'TRUE'
+                            ) {
+                                td.classList.add('highlight-green-l1');
+                            }
+
+                            // 🔴 / 🟢 NEW: relative-to-VOO logic for ROCE, GM, OM, Cash Conv, Interest Cover
+                            const vooBase = vooBaselines[index];
+                            if (!isVooRow && vooBase !== undefined && !isNaN(vooBase)) {
+                                let val = parseFloat(String(cellData).replace('%', ''));
+                                if (!isNaN(val)) {
+                                    if (val < vooBase) {
+                                        // worse than VOO
+                                        // td.classList.add('highlight-pink'); 
+                                    } else if (doubleGoodCols.has(index) && val >= 2 * vooBase) {
+                                        // 2x or more better than VOO (for the 4 key columns) -> Deep Green
+                                        td.classList.add('highlight-green-l2');
+                                    } else {
+                                        // Better than VOO but not 2x -> Light Green
+                                        td.classList.add('highlight-green-l1');
+                                    }
+                                }
+                            }
+                        }
+
+                        dataRow.appendChild(td);
+                    });
+
+                    tbody.appendChild(dataRow);
+                }
+
+                dataContainer.appendChild(table);
+            }
+        }
+
+
+
+        function setupRefresh() {
+            // refreshInterval = setInterval(() => { fetchData(); fetchTopStats(); }, 60000); // enable both if you turn on auto-refresh
+            if (refreshButton) {
+                refreshButton.addEventListener('click', () => {
+                    fetchData();
+                    burstPhysicsEmojis(refreshButton);
+                });
+            }
+        }
+
+        function handlePaddingChange(event) {
+            const selectedPadding = event.target.dataset.padding;
+            if (selectedPadding) {
+                document.querySelectorAll('.padding-option').forEach(option => {
+                    option.classList.remove('active');
+                });
+                event.target.classList.add('active');
+                currentPadding = selectedPadding;
+                const table = document.querySelector('#data-container table');
+                if (table) {
+                    const cells = table.querySelectorAll('th, td');
+                    cells.forEach(cell => {
+                        cell.style.padding = selectedPadding;
+                    });
+                }
+            }
+        }
+
+        function updateMarketStatus() {
+            const now = new Date();
+            const pstTime = new Date(now.toLocaleString('en-US', {
+                timeZone: 'America/Los_Angeles'
+            }));
+            const hour = pstTime.getHours();
+            const minute = pstTime.getMinutes();
+            const marketOpenHour = 6;
+            const marketOpenMinute = 30;
+            const marketCloseHour = 13;
+            const marketCloseMinute = 0;
+            let marketStatusText = '';
+            if (hour < marketOpenHour || (hour === marketOpenHour && minute < marketOpenMinute) || hour > marketCloseHour || (hour === marketCloseHour && minute >= marketCloseMinute)) {
+                marketStatusText = 'Market Closed';
+            } else {
+                let minutesUntilClose = (marketCloseHour - hour) * 60 + (marketCloseMinute - minute);
+                if (minutesUntilClose < 0) {
+                    minutesUntilClose = 0;
+                }
+                marketStatusText = `${minutesUntilClose} min until market close`;
+            }
+            marketStatusLabel.textContent = marketStatusText;
+        }
+
+        function sendAlertToDiscord() {
+            const webhookURL = "https://discord.com/api/webhooks/1402747123509760040/xQj8_NlaXDOdWFycxcX5pF2V5IcIgqco7HaY4YNEQ_6aoDGtcTkiS2nMgyY331DceUBf";
+
+            function getTextWithoutTooltip(cell) {
+                const clone = cell.cloneNode(true);
+                const tooltips = clone.querySelectorAll('.tooltip');
+                tooltips.forEach(tooltip => tooltip.remove());
+                return clone.textContent;
+            }
+            const table = document.querySelector('#data-container table');
+            if (!table) {
+                alert("No table data available");
+                return;
+            }
+            const rows = table.querySelectorAll('tr');
+            let tableData = [];
+            let foundCash = false;
+            for (let i = 0; i < rows.length && !foundCash; i++) {
+                const cells = rows[i].querySelectorAll('th, td');
+                if (cells.length >= 2) {
+                    const firstCol = getTextWithoutTooltip(cells[0]).trim();
+                    const secondCol = getTextWithoutTooltip(cells[1]).trim();
+                    tableData.push([firstCol, secondCol]);
+                    if (firstCol.toLowerCase() === 'cash') {
+                        foundCash = true;
+                    }
+                }
+            }
+            if (tableData.length === 0) {
+                const message = {
+                    content: "No table data found"
+                };
+                fetch(webhookURL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(message)
+                })
+                    .then(response => {
+                        if (response.ok) alert(" 'Not 100% accurate DCF upside' sent to Discord!");
+                        else alert("Failed to send message.");
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("An error occurred.");
+                    });
+                return;
+            }
+
+            let maxCol1Width = 0;
+            let maxCol2Width = 0;
+            tableData.forEach(row => {
+                maxCol1Width = Math.max(maxCol1Width, row[0].length);
+                maxCol2Width = Math.max(maxCol2Width, row[1].length);
+            });
+            const now = new Date();
+            const dayOfWeek = now.toLocaleDateString('en-US', {
+                weekday: 'long'
+            });
+            const month = now.toLocaleDateString('en-US', {
+                month: 'long'
+            });
+            const day = now.getDate();
+            const year = now.getFullYear();
+            //create message string
+            let messageContent = "";
+            // messageContent += `Fear & Greed: ${kpiSummary.fearGreed}\n`;
+            // messageContent += `SP500 Forward PE: ${kpiSummary.forwardPE}\n`;
+            // messageContent += `VIX: ${kpiSummary.vix}\n`;
+            messageContent += `${kpiSummary.fearGreed}, `;
+            messageContent += `Fwd PE ${kpiSummary.forwardPE}, `;
+            messageContent += `VIX ${kpiSummary.vix}\n`;
+
+            messageContent += "------------------\n";
+            tableData.slice(1).forEach((row, index) => {
+                const col1Padded = row[0].padEnd(maxCol1Width);
+                const col2Padded = row[1].padEnd(maxCol2Width);
+                messageContent += `${col1Padded} | ${col2Padded}\n`;
+
+            });
+            messageContent += "------------------\n";
+            messageContent += "Not 100% accurate DCF upside on ";
+            messageContent += `${dayOfWeek} ${month} ${day}, ${year}\n\n`;
+
+
+            const message = {
+                content: messageContent
+            };
+            fetch(webhookURL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(message)
+            })
+                .then(response => {
+                    if (response.ok) alert("Alert sent to Discord! Not a member yet? Email justeenvlogger@gmail.com to join!");
+                    else alert("Failed to send message.");
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("An error occurred.");
+                });
+        }
+
+        function scheduleAutomaticAlerts() {
+            function checkAndSendAlert() {
+                const now = new Date();
+                const pstTime = new Date(now.toLocaleString('en-US', {
+                    timeZone: 'America/Los_Angeles'
+                }));
+                const dayOfWeek = pstTime.getDay();
+                const hour = pstTime.getHours();
+                const minute = pstTime.getMinutes();
+                if (dayOfWeek >= 1 && dayOfWeek <= 5 && hour === 12 && minute === 45) {
+                    console.log("Sending automatic alert at 12:45pm PST");
+                    sendAlertToDiscord();
+                }
+            }
+            setInterval(checkAndSendAlert, 60000);
+        }
+
+        function getNextAlertTime() {
+            const now = new Date();
+            const pstNow = new Date(now.toLocaleString('en-US', {
+                timeZone: 'America/Los_Angeles'
+            }));
+            const today = new Date(pstNow);
+            today.setHours(12, 31, 0, 0);
+            if (pstNow > today || pstNow.getDay() === 0 || pstNow.getDay() === 6) {
+                const nextDay = new Date(pstNow);
+                nextDay.setDate(nextDay.getDate() + 1);
+                nextDay.setHours(12, 31, 0, 0);
+                while (nextDay.getDay() === 0 || nextDay.getDay() === 6) {
+                    nextDay.setDate(nextDay.getDate() + 1);
+                }
+                return nextDay;
+            }
+            return today;
+        }
+
+        function init() {
+            fetchData();
+            setupRefresh();
+            paddingOptions.forEach(option => {
+                option.addEventListener('click', handlePaddingChange);
+            });
+            updateMarketStatus();
+            setInterval(updateMarketStatus, 60000);
+            opacitySlider.addEventListener('input', function () {
+                const opacityValue = this.value / 100;
+                dataContainer.style.opacity = opacityValue;
+                currentOpacity = opacityValue;
+            });
+            if (sendAlertButton) {
+                sendAlertButton.addEventListener('click', sendAlertToDiscord);
+            }
+            scheduleAutomaticAlerts();
+            console.log(`Next automatic alert scheduled for: ${getNextAlertTime().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' })} PST`);
+        }
+        window.onload = init;
+
+        function createAlertModal(message) {
+            const existingModal = document.getElementById('custom-alert-modal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            const modal = document.createElement('div');
+            modal.id = 'custom-alert-modal';
+            modal.style.position = 'fixed';
+            modal.style.top = '50%';
+            modal.style.left = '50%';
+            modal.style.transform = 'translate(-50%, -50%)';
+            modal.style.backgroundColor = 'white';
+            modal.style.border = '1px solid #ccc';
+            modal.style.borderRadius = '8px';
+            modal.style.padding = '20px';
+            modal.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+            modal.style.zIndex = '2000';
+            modal.style.maxWidth = '300px';
+            modal.style.textAlign = 'center';
+            const messageDiv = document.createElement('div');
+            messageDiv.textContent = message;
+            messageDiv.style.marginBottom = '15px';
+            messageDiv.style.fontSize = '16px';
+            messageDiv.style.color = '#333';
+            modal.appendChild(messageDiv);
+            const closeButton = document.createElement('button');
+            closeButton.textContent = 'OK';
+            closeButton.style.padding = '8px 20px';
+            closeButton.style.border = 'none';
+            closeButton.style.backgroundColor = '#4CAF50';
+            closeButton.style.color = 'white';
+            closeButton.style.borderRadius = '5px';
+            closeButton.style.cursor = 'pointer';
+            closeButton.addEventListener('click', () => {
+                modal.remove();
+            });
+            modal.appendChild(closeButton);
+            document.body.appendChild(modal);
+        }
+        // === KPI Card helpers ===
+        // Safely set dot position between 0..100 (% of track width)
+        function setDotPosition(dotEl, value, min, max) {
+            const v = Number(value),
+                lo = Number(min),
+                hi = Number(max);
+            if (!isFinite(v) || !isFinite(lo) || !isFinite(hi) || hi === lo) {
+                dotEl.style.left = '50%'; // neutral
+                dotEl.style.opacity = '0.35'; // deemphasize when N/A
+                return;
+            }
+            const pct = Math.max(0, Math.min(1, (v - lo) / (hi - lo)));
+            dotEl.style.left = (pct * 100) + '%';
+            dotEl.style.opacity = '1';
+        }
+        /**
+         * Update a single KPI card.
+         * @param {number} index - 0,1,2
+         * @param {{value?:string|number, min?:number, max?:number, title?:string, desc?:string, display?:string}} data
+         *   - value: numeric value used to position the dot
+         *   - min/max: slider range
+         *   - title/desc: texts
+         *   - display: optional display string for the big number (e.g., "15.2%") — falls back to value
+         */
+        function setKPI(index, data = {}) {
+            const card = document.querySelector(`.kpi-card[data-index="${index}"]`);
+            if (!card) return;
+            const numberEl = card.querySelector('[data-role="number"]');
+            const dotEl = card.querySelector('[data-role="dot"]');
+            const minEl = card.querySelector('[data-role="min"]');
+            const maxEl = card.querySelector('[data-role="max"]');
+            const titleEl = card.querySelector('[data-role="title"]');
+            const descEl = card.querySelector('[data-role="desc"]');
+            // --- Number text ---
+            if ('display' in data) {
+                numberEl.textContent = (data.display ?? 'N/A');
+            } else if ('value' in data) {
+                numberEl.textContent = (data.value ?? 'N/A');
+            }
+            // --- Range labels ---
+            if ('min' in data) {
+                minEl.textContent = isFinite(Number(data.min)) ? String(data.min) : 'N/A';
+            }
+            if ('max' in data) {
+                maxEl.textContent = isFinite(Number(data.max)) ? String(data.max) : 'N/A';
+            }
+            // --- Title & Description (preserve links) ---
+            if ('title' in data) {
+                const val = data.title ?? 'N/A';
+                const link = titleEl.querySelector('a');
+                if (link) {
+                    // Easter-egg titles like Fear or Greed / VIX
+                    link.textContent = val;
+                } else {
+                    titleEl.textContent = val;
+                }
+            }
+            if ('desc' in data) {
+                descEl.textContent = data.desc ?? 'N/A';
+            }
+            // --- Dot position on the track ---
+            setDotPosition(dotEl, data.value, data.min, data.max);
+            // --- KPI COLOR LOGIC ---
+            const v = Number(data.value);
+            const lo = Number(data.min);
+            const hi = Number(data.max);
+            // Default to middle if invalid
+            let pos = 0.5;
+            if (isFinite(v) && isFinite(lo) && isFinite(hi) && hi !== lo) {
+                // 👇 this is your original math, just guarded:
+                pos = (v - lo) / (hi - lo);
+                pos = Math.max(0, Math.min(1, pos)); // clamp 0–1
+            }
+            const redColor = '#e74c3c';
+            const orangeColor = '#fdb737';
+            const greenColor = '#4CAF50';
+            let color;
+            const titleText = titleEl.textContent.trim(); // works even with <a> inside
+            if (titleText === 'VIX') {
+                // VIX: low = bad (red), high = good (green)
+                if (pos <= 1 / 3) color = redColor;
+                else if (pos <= 2 / 3) color = orangeColor;
+                else color = greenColor;
+            } else {
+                // Fear/Greed, Forward PE, etc: low = good (green), high = bad (red)
+                if (pos <= 1 / 3) color = greenColor;
+                else if (pos <= 2 / 3) color = orangeColor;
+                else color = redColor;
+            }
+            numberEl.style.color = color;
+            dotEl.style.backgroundColor = color;
+        }
+        // end setKPI() function
+        /** Update many at once */
+        function setKPIs(arr = []) {
+            arr.forEach((item, i) => setKPI(i, item));
+        }
+        // OPTIONAL: Example demo values — remove when you wire real data.
+        document.addEventListener('DOMContentLoaded', () => {
+            // Leave as N/A by default; uncomment to preview the visuals:
+            /*
+            setKPIs([
+              { value: 15, min: -30, max: 30, display: '15%', title: 'DCF Upside', desc: 'Estimated upside from DCF model.' },
+              { value: 3.4, min: 0, max: 10, display: '3.4%', title: 'FCF Yield', desc: 'Free cash flow yield (TTM).' },
+              { value: 21.6, min: 0, max: 50, display: '21.6x', title: 'P/E Ratio', desc: 'Price to earnings, trailing 12 months.' },
+            ]);
+            */
+        });
+
+        function burstPhysicsEmojis(btnEl) {
+            const {
+                Engine,
+                Render,
+                World,
+                Bodies,
+                Body,
+                Runner
+            } = Matter;
+            // Create engine once globally (so emojis pile up)
+            if (!window._emojiEngine) {
+                const canvas = document.getElementById("emojiCanvas");
+                const engine = Engine.create();
+                engine.gravity.y = 1; // gravity strength
+                const render = Render.create({
+                    engine,
+                    canvas,
+                    options: {
+                        width: window.innerWidth,
+                        height: window.innerHeight,
+                        wireframes: false,
+                        background: "transparent"
+                    }
+                });
+                const wallThickness = 100;
+                // Ground so emojis don't fall forever
+                const ground = Bodies.rectangle(
+                    window.innerWidth / 2,
+                    window.innerHeight + 50,
+                    window.innerWidth + wallThickness * 2, // a little wider than screen
+                    100, {
+                    isStatic: true
+                }
+                );
+                // Left & right walls so they stay in viewport horizontally
+                const leftWall = Bodies.rectangle(
+                    -wallThickness / 2,
+                    window.innerHeight / 2,
+                    wallThickness,
+                    window.innerHeight * 2, {
+                    isStatic: true
+                }
+                );
+                const rightWall = Bodies.rectangle(
+                    window.innerWidth + wallThickness / 2,
+                    window.innerHeight / 2,
+                    wallThickness,
+                    window.innerHeight * 2, {
+                    isStatic: true
+                }
+                );
+                World.add(engine.world, [ground, leftWall, rightWall]);
+                const runner = Runner.create();
+                Runner.run(runner, engine);
+                Render.run(render);
+                // Save references so we can update them on resize
+                window._emojiEngine = engine;
+                window._emojiRender = render;
+                window._emojiGround = ground;
+                window._emojiLeftWall = leftWall;
+                window._emojiRightWall = rightWall;
+                window._emojiWallThickness = wallThickness;
+                // 🔁 Keep canvas + walls in sync with window size
+                window.addEventListener("resize", () => {
+                    const w = window.innerWidth;
+                    const h = window.innerHeight;
+                    // Resize canvas / render
+                    render.canvas.width = w;
+                    render.canvas.height = h;
+                    render.options.width = w;
+                    render.options.height = h;
+                    const gt = window._emojiGround;
+                    const lw = window._emojiLeftWall;
+                    const rw = window._emojiRightWall;
+                    const wt = window._emojiWallThickness;
+                    // --- ground ---
+                    Body.setPosition(gt, {
+                        x: w / 2,
+                        y: h + 50
+                    });
+                    const groundWidth = gt.bounds.max.x - gt.bounds.min.x;
+                    const targetGroundWidth = w + wt * 2;
+                    if (groundWidth > 0) {
+                        Body.scale(gt, targetGroundWidth / groundWidth, 1);
+                    }
+                    // --- walls ---
+                    const targetWallHeight = h * 2;
+                    const wallHeight = lw.bounds.max.y - lw.bounds.min.y;
+                    if (wallHeight > 0) {
+                        const scaleY = targetWallHeight / wallHeight;
+                        Body.scale(lw, 1, scaleY);
+                        Body.scale(rw, 1, scaleY);
+                    }
+                    Body.setPosition(lw, {
+                        x: -wt / 2,
+                        y: h / 2
+                    });
+                    Body.setPosition(rw, {
+                        x: w + wt / 2,
+                        y: h / 2
+                    });
+                });
+            }
+            const engine = window._emojiEngine;
+            const EMOJIS = ["💲", "💵", "😌"];
+            // Where to spawn emojis
+            const rect = btnEl.getBoundingClientRect();
+            const originX = rect.left + rect.width / 2;
+            const originY = rect.top + rect.height / 2;
+            const burstSize = 16;
+            for (let i = 0; i < burstSize; i++) {
+                const emoji = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+                const body = Bodies.circle(originX, originY, 20, {
+                    restitution: 0.6, // bounciness
+                    render: {
+                        sprite: {
+                            texture: emojiToPNG(emoji),
+                            xScale: 0.8,
+                            yScale: 0.8
+                        },
+                        opacity: 1
+                    }
+                });
+                // Give each emoji a random push
+                Body.setVelocity(body, {
+                    x: (Math.random() - 0.5) * 8,
+                    y: -Math.random() * 8
+                });
+                World.add(engine.world, body);
+                // 🕒 After 5s, fade over 0.2s, then remove
+                setTimeout(() => {
+                    const fadeDuration = 200;
+                    const steps = 8;
+                    const stepTime = fadeDuration / steps;
+                    let currentStep = 0;
+                    const fadeInterval = setInterval(() => {
+                        currentStep++;
+                        const t = currentStep / steps;
+                        body.render.opacity = Math.max(0, 1 - t);
+                        if (currentStep >= steps) {
+                            clearInterval(fadeInterval);
+                            World.remove(engine.world, body);
+                        }
+                    }, stepTime);
+                }, 5000);
+            }
+        }
+
+        function emojiToPNG(emoji) {
+            const canvas = document.createElement("canvas");
+            canvas.width = canvas.height = 64;
+            const ctx = canvas.getContext("2d");
+            ctx.font = "48px serif";
+            ctx.fillText(emoji, 8, 48);
+            return canvas.toDataURL();
+        }
+
+        async function fetchAllKPI() {
+            fetchKPI1();
+            fetchKPI2();
+            fetchKPI3();
+        }
+        async function fetchKPI1() {
+            const range = 'B37:C41'; // title, number, and up to 3 desc lines
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(sheetName)}!${range}?key=${apiKey}`;
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const json = await res.json();
+                const rows = Array.isArray(json.values) ? json.values : [];
+                // rows[0] => [B37, C37]
+                const title = (rows[0]?.[0] ?? 'N/A').toString();
+                const numberDisplay = (rows[0]?.[1] ?? 'N/A').toString();
+                // Parse numeric for dot position (strip % if present)
+                let numericValue = Number(numberDisplay);
+                if (!isFinite(numericValue)) {
+                    const asStr = numberDisplay.replace('%', '').trim();
+                    const parsed = Number(asStr);
+                    numericValue = isFinite(parsed) ? parsed : NaN;
+                }
+                const d1 = (rows[1]?.[1] ?? '').toString().trim();
+                const d2 = (rows[2]?.[1] ?? '').toString().trim();
+                const d3 = (rows[3]?.[1] ?? '').toString().trim();
+                const d4 = (rows[4]?.[1] ?? '').toString().trim();
+                const desc = [d2, d3, d4].filter(Boolean).join('\n');
+                // update summary for Discord
+                kpiSummary.fearGreed = `${numberDisplay} ${d1}`.trim() || 'N/A';
+                setKPI(0, {
+                    value: numericValue, // for dot position
+                    display: numberDisplay + " " + d1, // big number
+                    min: 0,
+                    max: 100,
+                    title,
+                    desc
+                });
+            } catch (e) {
+                console.error('fetchKPI1 error:', e);
+                kpiSummary.fearGreed = 'N/A';
+                setKPI(0, {
+                    value: NaN,
+                    display: 'N/A',
+                    min: 0,
+                    max: 100,
+                    title: 'N/A',
+                    desc: 'N/A'
+                });
+            }
+        }
+        async function fetchKPI2() {
+            // Quoted sheet name in case it has spaces
+            const a1 = `'${sheetName.replace(/'/g, "''")}'!C47`;
+            const urlFmt = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(a1)}?key=${apiKey}&valueRenderOption=FORMATTED_VALUE`;
+            const urlRaw = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(a1)}?key=${apiKey}&valueRenderOption=UNFORMATTED_VALUE`;
+            const dRange = 'C48:C50';
+            const urlDesc = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(sheetName)}!${dRange}?key=${apiKey}`;
+            try {
+                const [resFmt, resRaw, resDesc] = await Promise.all([
+                    fetch(urlFmt),
+                    fetch(urlRaw),
+                    fetch(urlDesc)
+                ]);
+                if (!resFmt.ok || !resRaw.ok || !resDesc.ok) {
+                    throw new Error(`HTTP ${resFmt.status}/${resRaw.status}/${resDesc.status}`);
+                }
+                const jsonFmt = await resFmt.json();
+                const jsonRaw = await resRaw.json();
+                const jsonDesc = await resDesc.json();
+                const displayVal = jsonFmt.values?.[0]?.[0] ?? "N/A"; // what you show as text
+                let numericVal = jsonRaw.values?.[0]?.[0]; // numeric for dot
+                if (!isFinite(Number(numericVal))) {
+                    const parsed = Number((displayVal || "").replace("%", "").trim());
+                    numericVal = isFinite(parsed) ? parsed : NaN;
+                }
+                const dArray = Array.isArray(jsonDesc.values) ? jsonDesc.values : [];
+                const d1 = (dArray[0]?.[0] ?? '').toString().trim();
+                const d2 = (dArray[1]?.[0] ?? '').toString().trim();
+                const d3 = (dArray[2]?.[0] ?? '').toString().trim();
+                const desc = [d1, d2, d3].filter(Boolean).join('\n');
+                // update summary for Discord
+                kpiSummary.forwardPE = String(displayVal || 'N/A');
+                setKPI(1, {
+                    value: Number(numericVal),
+                    display: displayVal,
+                    min: 15,
+                    max: 40,
+                    desc
+                });
+            } catch (e) {
+                console.error("fetchKPI2 error:", e);
+                kpiSummary.forwardPE = 'N/A';
+                setKPI(1, {
+                    value: NaN,
+                    display: "N/A",
+                    min: 10,
+                    max: 40,
+                    title: "N/A",
+                    desc: "N/A"
+                });
+            }
+        }
+        async function fetchKPI3() {
+            try {
+                // Safely quote the sheet name in A1 notation
+                const a1 = `'${sheetName.replace(/'/g, "''")}'!C42:C45`;
+                const url =
+                    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(a1)}` +
+                    `?key=${apiKey}&valueRenderOption=FORMATTED_VALUE&majorDimension=ROWS`;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const json = await res.json();
+                const rows = Array.isArray(json.values) ? json.values : []; // [["C42"],["C43"],["C44"],["C45"]]
+                const c42 = rows[0]?.[0] ?? "";
+                const c43 = rows[1]?.[0] ?? "";
+                const c44 = rows[2]?.[0] ?? "";
+                const c45 = rows[3]?.[0] ?? "N/A"; // extra line / note
+                const desc = [String(c43), String(c44), String(c45)]
+                    .map(s => s.trim())
+                    .filter(Boolean)
+                    .join("\n") || "N/A";
+                // Numeric for dot: strip "%" if present
+                let numericVal = Number(String(c42).replace("%", "").trim());
+                if (!isFinite(numericVal)) numericVal = NaN;
+                // update summary for Discord
+                kpiSummary.vix = String(c42 || 'N/A');
+                setKPI(2, {
+                    value: numericVal, // dot
+                    display: String(c42), // big number text
+                    min: 10,
+                    max: 40,
+                    desc
+                });
+            } catch (e) {
+                console.error("fetchKPI3 error:", e);
+                kpiSummary.vix = 'N/A';
+                setKPI(2, {
+                    value: NaN,
+                    display: "N/A",
+                    min: 10,
+                    max: 40,
+                    title: "N/A",
+                    desc: "N/A"
+                });
+            }
+        }
+    </script>
+    <canvas id="emojiCanvas" style="position: fixed; top: 0; left: 0; pointer-events:none; z-index:100;">
+    </canvas>
+</body>
+
+<style>
+    /* deep money green */
+    :root {
+        --bg: #0F2413;
+        --panel: #1E3A24;
+        --panelOnPanel: #0F2413DD;
+        --border: #304F2F;
+        --divider: #ffffff;
+        --text-primary: #f8fafc;
+        --text-dim: #A2B894;
+        --accent: rgba(171, 248, 56, 1);
+        --accent-bg: rgba(171, 248, 56, 0.15);
+        --accent-hover-bg: rgba(171, 248, 56, 0.25);
+        --scale: 0.75;
+        --radius-lg: 20px;
+        --radius-sm: 10px;
+        --benchmark-bg-color: #2D2D2D;
+        --font-stack: "Google Sans Flex", sans-serif;
+
+    }
+
+    .instrument-serif-regular {
+        font-family: "Instrument Serif", serif;
+        font-weight: 400;
+        font-style: normal;
+    }
+
+    .instrument-serif-regular-italic {
+        font-family: "Instrument Serif", serif;
+        font-weight: 400;
+        font-style: italic;
+    }
+
+    html {
+        background-color: var(--bg);
+    }
+
+    body {
+        font-family: var(--font-stack);
+        margin: 0 auto;
+        /* changed from 0 to 0 auto for centering */
+        max-width: 1200px;
+        /* constrain width */
+        padding: calc(2rem * var(--scale)) 16px;
+        padding-top: 32px;
+        z-index: 0;
+        box-sizing: border-box;
+        /* ensure padding doesn't break max-width */
+    }
+
+    h1 {
+        font-size: calc(3.6rem * var(--scale));
+        font-weight: 600;
+        text-align: center;
+        margin: 0;
+        margin-bottom: calc(1rem * var(--scale));
+        color: var(--text-primary);
+    }
+
+
+    /* === KPI Cards === */
+    #kpi-cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 12px;
+        /* sits above your controls */
+    }
+
+    .kpi-card {
+        background: var(--panel);
+        /* border: 2px solid var(--border); */
+        border-radius: 14px;
+        padding: 12px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-height: 120px;
+    }
+
+    .kpi-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .kpi-number {
+        font-size: 24px;
+        font-weight: 600;
+        line-height: 1.1;
+
+    }
+
+    .kpi-slider {
+        display: grid;
+        grid-template-rows: auto auto;
+        gap: 6px;
+    }
+
+    .kpi-track {
+        position: relative;
+        height: 8px;
+        border-radius: 999px;
+        background: var(--bg);
+        overflow: hidden;
+    }
+
+    .kpi-dot {
+        position: absolute;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+    }
+
+    .kpi-range {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: var(--text-dim);
+    }
+
+    .kpi-desc {
+        font-size: 12px;
+        line-height: 1.3;
+        color: var(--text-dim);
+        white-space: pre-line;
+    }
+
+    .kpi-link {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .kpi-link:hover {
+        text-decoration: underline;
+    }
+
+
+    /* Responsive: stack to 1 or 2 columns on small screens 
+        @media (max-width: 900px) {
+          #kpi-cards { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 600px) {
+          #kpi-cards { grid-template-columns: 1fr; }
+        }
+      */
+
+
+    /* === Controls toolbar === */
+
+    #controls-container {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    /* Segmented control (shared for modes + padding) */
+    .segmented-control {
+        background-color: var(--panelOnPanel);
+        border: 2px solid var(--border);
+        border-radius: var(--radius-sm);
+        display: inline-flex;
+        overflow: hidden;
+    }
+
+    .segmented-control button {
+        min-width: calc(9rem * var(--scale));
+        height: calc(3.5rem * var(--scale));
+
+        background: transparent;
+        border: none;
+        color: var(--text-primary);
+        padding: calc(0.8rem * var(--scale)) calc(1rem * var(--scale));
+        cursor: pointer;
+        transition: background-color 0.12s, filter 0.12s;
+        font-size: calc(1.1rem * var(--scale));
+        font-weight: 600;
+        line-height: 1.2;
+    }
+
+    .segmented-control button:hover {
+        background-color: rgba(56, 189, 248, 0.07);
+    }
+
+    .segmented-control button:active {
+        filter: brightness(1.2);
+    }
+
+    .segmented-control button.active {
+        background-color: var(--accent-bg);
+        color: var(--accent);
+        font-weight: 700;
+    }
+
+    .segmented-control button.active:hover {
+        background-color: var(--accent-hover-bg);
+    }
+
+    /* Padding segmented-control is narrower but same style */
+    .padding-segment .padding-option {
+        min-width: calc(3.5rem * var(--scale));
+    }
+
+    /* === Generic pill control tile (Send / Refresh / Opacity) === */
+
+    .control-tile {
+        background-color: var(--panelOnPanel);
+        border: 2px solid var(--border);
+        border-radius: var(--radius-sm);
+        height: calc(3.5rem * var(--scale));
+
+        display: inline-flex;
+        align-items: center;
+        gap: calc(0.75rem * var(--scale));
+        padding: 0 calc(1rem * var(--scale));
+    }
+
+    /* Buttons inside tiles (Send + Refresh) */
+
+    #send-alert-button,
+    #refresh-button {
+        width: 6.5rem;
+        height: calc(3.5rem * var(--scale) + 4px);
+
+        font-size: calc(1.5rem * var(--panel-scale));
+        font-weight: 600;
+        cursor: pointer;
+
+        /* ----- */
+
+        align-items: center;
+        background-color: var(--accent);
+        color: #ffffff;
+        border: 2px solid var(--accent);
+        border-radius: var(--radius-sm);
+
+        line-height: 1.5;
+        transition: background-color 0.12s, filter 0.12s;
+    }
+
+    #send-alert-button {
+        background-color: #9c88ff;
+        border-color: #9c88ff;
+    }
+
+    #send-alert-button:hover {
+        color: #9c88ff;
+    }
+
+    #refresh-button {
+        background-color: #4caf50;
+        border-color: #4caf50;
+    }
+
+    #refresh-button:hover {
+        color: #4caf50;
+    }
+
+    #send-alert-button:hover,
+    #refresh-button:hover {
+        background-color: rgba(56, 189, 248, 0.07);
+    }
+
+
+
+    #send-alert-button:active,
+    #refresh-button:active {
+        filter: brightness(1.2);
+    }
+
+    /* Opacity tile: label + range */
+
+    .opacity-tile label {
+        white-space: nowrap;
+        font-size: calc(1.1rem * var(--scale));
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .opacity-tile input[type="range"] {
+        width: calc(8rem * var(--scale));
+        accent-color: var(--accent);
+        cursor: pointer;
+    }
+
+
+    #refresh-label {
+        display: block;
+        text-align: center;
+        font-size: 0.8em;
+        color: #777;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+        margin-bottom: 10px;
+    }
+
+    /* === TABLE + STICKY FIRST COLUMN === */
+    /* === TABLE + STICKY TICKER COLUMN === */
+
+    .panel-container {
+        background-color: var(--panel);
+        padding: 24px;
+        border-radius: 14px;
+        /* border: 2px solid var(--border); */
+        margin-top: 20px;
+    }
+
+    #data-container {
+        width: 100%;
+        overflow-x: auto;
+        /* scrolls horizontally */
+        opacity: 1;
+        transition: opacity 200ms linear;
+        position: relative;
+        z-index: 0;
+    }
+
+    #data-container table {
+        border-collapse: collapse;
+        width: 100%;
+        table-layout: fixed;
+        /* fill container width */
+        font-size: 0.8em;
+        background: transparent;
+        min-width: 1000px;
+    }
+
+    #data-container table th,
+    #data-container table td {
+        border: 1px solid var(--border);
+        padding: 4px;
+        position: relative;
+        text-align: right;
+        box-sizing: border-box;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: var(--text-primary);
+    }
+
+    #data-container table th {
+        background-color: var(--panel);
+        /* Allow headers to wrap */
+        white-space: normal !important;
+        overflow: visible;
+        vertical-align: middle;
+        text-align: center !important;
+        line-height: 1.1;
+        font-size: 0.9em;
+        color: var(--accent);
+        font-weight: 700;
+    }
+
+    /* Width for the Ticker column (first column) */
+    #data-container table th:first-child,
+    #data-container table td:first-child {
+        width: 110px;
+        max-width: none;
+        text-overflow: clip;
+        z-index: 6;
+        /* stay above data */
+    }
+
+    /* Keep ticker DATA left aligned, but allow header to center */
+    #data-container table td:first-child {
+        text-align: left;
+    }
+
+    /* 🔒 sticky ticker content */
+    #data-container .ticker-wrapper {
+        position: sticky;
+        left: 0;
+        z-index: 5;
+        background: var(--panel);
+        /* base background for first col */
+        padding-right: 8px;
+        /* keep some space from next column */
+    }
+
+    /* when row is VOO, keep grey background even for sticky content */
+    .highlight-voo-row .ticker-wrapper {
+        background: #ddd !important;
+    }
+
+    /* add color */
+    .highlight-green-l1 {
+        background-color: #35643C !important;
+        /* good green */
+        color: #ffffff !important;
+    }
+
+    .highlight-green-l2 {
+        background-color: #5BA663 !important;
+        /* better green */
+        color: #ffffff !important;
+    }
+
+    .highlight-orange {
+        background-color: #8E711D !important;
+        /* yellow */
+        color: #ffffff !important;
+    }
+
+    .highlight-pink {
+        background-color: #752F2B !important;
+        /* red */
+        color: #ffffff !important;
+    }
+
+    .tooltip {
+        background-color: black;
+        color: #fff;
+        text-align: left;
+        padding: 5px;
+        border-radius: 3px;
+        font-size: 0.7em;
+        white-space: wrap;
+        /* (You can change to 'normal' if you like) */
+        width: 150px;
+        position: absolute;
+        z-index: 1000;
+        left: 50%;
+        top: 120%;
+        transform: translateX(-50%);
+        opacity: 0;
+    }
+
+    th:hover .tooltip {
+        visibility: visible;
+        opacity: 1;
+        z-index: 1000;
+    }
+
+    .highlight-voo-row td,
+    .highlight-cash-row td {
+        background-color: var(--benchmark-bg-color) !important;
+        color: var(--text-primary) !important;
+    }
+
+    .highlight-voo-row td:first-child,
+    .highlight-cash-row td:first-child {
+        text-align: right !important;
+    }
+
+    /* Keep background even for sticky content */
+    .highlight-voo-row .ticker-wrapper,
+    .highlight-cash-row .ticker-wrapper {
+        background: var(--benchmark-bg-color) !important;
+    }
+
+    /* #opacity-slider-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  height: fit-content;
+} */
+
+    .opacity-control {
+        height: calc(3.5rem * var(--scale));
+
+        display: flex;
+        align-items: center;
+        gap: calc(0.75rem * var(--scale));
+        background-color: var(--panelOnPanel);
+        border: 2px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 0 calc(1rem * var(--scale));
+        color: var(--text-primary);
+    }
+
+    .opacity-control label {
+        white-space: nowrap;
+        font-size: calc(1.1rem * var(--scale));
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .opacity-control input[type="range"] {
+        width: calc(8rem * var(--scale));
+        accent-color: var(--accent);
+        cursor: pointer;
+    }
+
+    .opacity-control input[type="range"]:active {
+        filter: brightness(1.2);
+    }
+
+    .opacity-tile {
+        display: flex;
+        align-items: center;
+        gap: calc(0.75rem * var(--scale));
+    }
+
+
+
+
+
+    /* Media query for screens smaller than 600px (typical mobile) */
+    @media (max-width: 600px) {
+        table {
+            font-size: 0.7em;
+        }
+
+        th,
+        td {
+            padding: 3px;
+            min-width: 50px;
+        }
+
+        .padding-option {
+            padding: 6px 10px;
+            font-size: 0.8em;
+        }
+
+        .tooltip {
+            width: 120px;
+        }
+
+        /*   #controls-container {
+    flex-direction: column;
+    align-items: flex-start;
+  } */
+        #opacity-slider-container {
+            margin-top: 10px;
+        }
+    }
+
+    @media (max-width: 820px) {
+
+        /* Make the controls row use the SAME 3-col grid behavior */
+        #controls-container {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            justify-content: center;
+            align-items: stretch;
+            /* make items same height behavior */
+        }
+
+        /* Every control fills its grid cell */
+        #send-alert-button,
+        #refresh-button,
+        .padding-segment {
+            width: 100%;
+            min-width: 0;
+            /* IMPORTANT: allow shrinking inside grid */
+            box-sizing: border-box;
+        }
+
+        /* 🔥 Fix: segmented control must be allowed to shrink */
+        .padding-segment {
+            display: flex;
+            /* keep it a single pill */
+            overflow: hidden;
+        }
+
+        .padding-segment .padding-option {
+            flex: 1 1 0;
+            /* buttons share width evenly */
+            min-width: 0;
+            /* IMPORTANT: override your min-width rules */
+            width: 0;
+            /* makes flex distribution perfect */
+            padding-left: 0;
+            /* optional: tighter */
+            padding-right: 0;
+            /* optional: tighter */
+        }
+
+        /* Opacity takes whole second row and stays in-bounds */
+        .opacity-tile {
+            grid-column: 1 / -1;
+            width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
+            justify-content: space-between;
+        }
+
+        /* slider should never push outside */
+        .opacity-tile input[type="range"] {
+            flex: 1 1 auto;
+            min-width: 0;
+            width: auto;
+            /* let flex control it */
+            max-width: 100%;
+        }
+    }
+</style>
+
+</html>
