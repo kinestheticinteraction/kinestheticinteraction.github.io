@@ -1,0 +1,4022 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>F*uck U Money Calculator</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+  <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+  <header class="app-header">
+    <h1 class="instrument-serif-regular-italic">Make F*ck U Money - 20M</h1>
+
+    <div class="top-controls-row">
+      <div class="segmented-control">
+
+        <button id="mode-prop" class="active" data-mode="propertyVsEtf">Property vs ETF</button>
+        <button id="mode-etf" data-mode="etfEtf">ETF vs ETF</button>
+      </div>
+
+      <div class="scale-control">
+        <label for="uiScaleRange">UI Size</label>
+        <input id="uiScaleRange" type="range" min="0.5" max="1.5" step="0.05" value="0.75" />
+      </div>
+
+    </div>
+
+  </header>
+
+  <!-- Global inputs -->
+  <div class="global-row">
+    <!-- NEW: Global initial investment for ETF vs ETF -->
+    <div class="field" id="initialInvestmentGlobalField">
+      <label for="initialInvestmentGlobalInput">Initial investment ($)</label>
+      <input id="initialInvestmentGlobalInput" type="number" value="50000" />
+      <div class="helper-line">
+        Starting lump sum for all ETF scenarios in ETF vs ETF mode.
+      </div>
+    </div>
+
+    <!-- Monthly inflow -->
+    <div class="field" id="monthlyInflowField">
+      <label for="monthlyInflowInput">Monthly inflow ($)</label>
+      <input id="monthlyInflowInput" type="number" value="0" />
+      <div class="helper-line">
+        In Property vs ETF mode we ignore this and instead invest the mortgage amount.
+      </div>
+    </div>
+
+    <!-- Editable years dropdown (ETF vs ETF mode only) -->
+    <div class="field" id="yearsEditableField">
+      <label for="yearsInput">Years to simulate</label>
+      <select id="yearsInput">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="30" selected>30</option>
+      </select>
+    </div>
+
+  </div>
+  <!--end of global row -->
+
+  <section id="editorPanel">
+
+    <div id="scenarioEditorContainer"></div>
+
+    <div class="actions-row">
+      <button id="addScenarioBtn" class="action-btn">+ Add Scenario</button>
+      <button id="runSimBtn" class="action-btn run-btn">See Your F*uck U Money Future 💰🔮</button>
+    </div>
+
+  </section> <!-- editor section -->
+
+  <section class="panel results-panel" id="resultsPanel">
+
+    <div id="noResultsMsg" class="results-empty">
+      Add your nums and click "See Your F*uck U Money Future 💰🔮"
+    </div>
+
+    <div class="scenario-header-row" id="futuresTitle">
+      <div class="scenario-title">
+        <span class="scenario-title-text">Your 2 Different Futures 🔮🔮</span>
+      </div>
+    </div>
+
+    <div id="summaryWrapper" class="summary-wrapper"></div>
+
+    <div class="scroll-wrapper">
+      <table>
+        <thead id="resultsHead"></thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+
+    <!-- ✅ Always-visible assumptions (under 30yr table) -->
+    <div id="assumptionsUnderTable" class="assumptions-under-table">
+      <div class="assumptions-content">
+        <div>How does this comparison work?</div>
+
+        <div class="assumptions-bullets">
+          <div>• ETF compounds monthly and dividends reinvested quarterly</div>
+
+          <div>• Initial investment to ETF = property downpayment + closing cost</div>
+          <div>• Dividend from ETF = rent from property</div>
+          <div>• Monthly contribution to ETF = monthly out-of-pocket to property</div>
+          <div>• When property cashflow turns positive, it’s used to pay down principal and recast the mortgage. </div>
+          <div>• When property cashflow turns positive, you no longer put in money to the property, so the contribution to the ETF also stops.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    /* ---------- DOM refs ---------- */
+    const scenarioEditorContainer = document.getElementById("scenarioEditorContainer");
+    const addScenarioBtn = document.getElementById("addScenarioBtn");
+    const runSimBtn = document.getElementById("runSimBtn");
+    const yearsInput = document.getElementById("yearsInput");
+    const monthlyInflowInput = document.getElementById("monthlyInflowInput");
+    const modeEtfBtn = document.getElementById("mode-etf");
+    const modePropBtn = document.getElementById("mode-prop");
+    const uiScaleRange = document.getElementById("uiScaleRange");
+    const resultsHeadEl = document.getElementById("resultsHead");
+    const resultsBodyEl = document.getElementById("resultsBody");
+    const resultsPanelEl = document.getElementById("resultsPanel");
+    const initialInvestmentGlobalInput = document.getElementById("initialInvestmentGlobalInput");
+    const noResultsMsgEl = document.getElementById("noResultsMsg");
+    const summaryWrapperEl = document.getElementById("summaryWrapper");
+    /*--default values--*/
+    const DEFAULTS = {
+      sharedInitialInvestment: null, // cash you start with
+      property: {
+        downPayment: 154600,
+        downPct: 20,
+        closingPct: 3,
+        rate: 6,
+        appreciation: 5,
+        taxPct: 1.11,
+        maintPct: 0,
+        maintGrowth: 3,
+        hoaMonthly: 894,
+        hoaGrowth: 4,
+        insuranceMonthly: 258,
+        rentMonthly: 3551,
+        rentGrowth: 5,
+        occupancyPct: 92,
+        mgmtPct: 0,
+        randomFeeMonthly: 0,
+      },
+      etfCompareMode: {
+        name: "SCHD",
+        initialInvestment: null, // we'll inject sharedInitialInvestment at runtime
+        leveragePct: 0,
+        constantLeverage: false,
+        marginRate: 5,
+        etfGrowth: 5,
+        divGrowth: 7,
+        startingYield: 4,
+        retirementAccount: false
+      },
+      etfScenario: {
+        // ETF vs ETF mode defaults
+        namePrefix: "ETF Scenario ",
+        initialInvestment: 50000,
+        leveragePct: 0,
+        constantLeverage: true,
+        marginRate: 5,
+        etfGrowth: 5,
+        divGrowth: 7,
+        startingYield: 4,
+        retirementAccount: false
+      }
+    };
+    // --- Local ETF library (numbers are approximate, tweak to taste) ---
+    const ETF_LIBRARY = [{
+        ticker: "SCHD",
+        name: "Schwab U.S. Dividend Equity ETF",
+        cagr10: 7.68, // 10Y total return CAGR (%)
+        divCagr10: 10.4, // 10Y dividend growth CAGR (%)
+        startingYield: 3.8 // current/starting dividend yield (%)
+      },
+      {
+        ticker: "VOO",
+        name: "Vanguard S&P 500 ETF",
+        cagr10: 11.0,
+        divCagr10: 6.1,
+        startingYield: 1.1
+      },
+      {
+        ticker: "QQQ",
+        name: "Invesco QQQ Trust",
+        cagr10: 18,
+        divCagr10: 9.45,
+        startingYield: 0.47
+      },
+      {
+        ticker: "QQQI",
+        name: "NEOS Nasdaq-100 High Income ETF",
+        cagr10: 5,
+        divCagr10: 3.4,
+        startingYield: 13.67
+      },
+      {
+        ticker: "J15 Super ETF",
+        name: "45 FNGS + 30 VGT + 25 TOPT",
+        cagr10: 20.1, //22.7*0.45+18.6*0.3+17.2*0.25
+        divCagr10: 1.2,
+        startingYield: 0.21
+      },
+       {
+        ticker: "VGT",
+        name: "Vanguard Information Technology Index Fund ETF",
+        cagr10: 18.6,
+        divCagr10: 0.8, //10yr is 10%, 2 yr is 2.4%
+        startingYield: 0.4
+      },
+      {
+        ticker: "TOPT",
+        name: "Ishares Top 20 U S Stocks ETF",
+        cagr10: 17.2,
+        divCagr10: 4,
+        startingYield: 0.34
+      },
+      
+      {
+        ticker: "SCHG",
+        name: "Schwab US Large-Cap Growth ETF",
+        cagr10: 17.5,
+        divCagr10: 6,
+        startingYield: 0.36
+      }
+    ]; // ETF library local
+    // Simple matcher: ticker exact first, then startsWith by ticker/name
+    function findEtfMeta(query) {
+      if (!query) return null;
+      const q = query.trim().toLowerCase();
+      // exact ticker
+      let hit = ETF_LIBRARY.find(etf => etf.ticker.toLowerCase() === q);
+      if (hit) return hit;
+      // startsWith ticker or name
+      hit = ETF_LIBRARY.find(etf =>
+        etf.ticker.toLowerCase().startsWith(q) ||
+        etf.name.toLowerCase().startsWith(q)
+      );
+      return hit || null;
+    }
+    /* ---------- State ---------- */
+    let appMode = "propertyVsEtf"; // "etfEtf" | "propertyVsEtf"
+    /* Property-mode shared state so we can recalc derived fields live */
+    //let sharedInitialInvestment = 100000; // default!!!
+    DEFAULTS.sharedInitialInvestment = DEFAULTS.property.downPayment;
+    let sharedInitialInvestment = DEFAULTS.sharedInitialInvestment;
+    let propInputsCache = null; // we'll read/write to DOM and keep computed values
+    // 🆕 keep track of user's non-Zillow values
+    let lastUserMaintPct = null;
+    let lastUserMgmtPct = null;
+    let lastUserMaintGrowth = null;
+    /* ---------- utils ---------- */
+    function fmtNum(n) {
+      if (!Number.isFinite(n)) return "-";
+      return Math.floor(n).toLocaleString("en-US");
+    }
+
+    function fmtShort(n) {
+      if (!Number.isFinite(n)) return "-";
+      const abs = Math.abs(n);
+      if (abs >= Math.pow(10, 9)) return (n / Math.pow(10, 9)).toFixed(1).replace(/\.0$/, "") + "B";
+      if (abs >= Math.pow(10, 6)) return (n / Math.pow(10, 6)).toFixed(1).replace(/\.0$/, "") + "M";
+      if (abs >= Math.pow(10, 3)) return (n / Math.pow(10, 3)).toFixed(1).replace(/\.0$/, "") + "K";
+      return Math.floor(n).toString();
+    }
+
+    function fmtFull(n) {
+      if (!Number.isFinite(n)) return "-";
+      return Math.floor(n).toLocaleString("en-US");
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+    /* ---------- UI scale ---------- */
+    uiScaleRange.addEventListener("input", () => {
+      const panels = document.querySelectorAll(".panel");
+      panels.forEach(p => {
+        p.style.setProperty("--panel-scale", uiScaleRange.value);
+      });
+    });
+
+    function autoFillEtfFieldsFromMeta(block, etfMeta) {
+      if (!block || !etfMeta) return;
+      const nameInput = block.querySelector(".sc-name");
+      const growthInput = block.querySelector(".sc-etfgrowth");
+      const divGrowthInput = block.querySelector(".sc-divgrowth");
+      const startYieldInput = block.querySelector(".sc-startyield");
+      // Optional: normalize name to ticker
+      if (nameInput) {
+        nameInput.value = etfMeta.ticker;
+      }
+      if (growthInput) {
+        growthInput.value = etfMeta.cagr10;
+        growthInput.dispatchEvent(new Event("input", {
+          bubbles: true
+        }));
+      }
+      if (divGrowthInput) {
+        divGrowthInput.value = etfMeta.divCagr10;
+        divGrowthInput.dispatchEvent(new Event("input", {
+          bubbles: true
+        }));
+      }
+      if (startYieldInput) {
+        startYieldInput.value = etfMeta.startingYield;
+        startYieldInput.dispatchEvent(new Event("input", {
+          bubbles: true
+        }));
+      }
+    }
+
+    function setupEtfAutocomplete(nameInput, block) {
+      if (!nameInput) return;
+      const field = nameInput.closest(".etf-name-field") || nameInput.parentElement;
+      if (!field) return;
+      // Create dropdown container (once per field)
+      let dropdown = field.querySelector(".etf-suggestions");
+      if (!dropdown) {
+        dropdown = document.createElement("div");
+        dropdown.className = "etf-suggestions";
+        field.appendChild(dropdown);
+      }
+
+      function hideDropdown() {
+        dropdown.style.display = "none";
+      }
+
+      function showDropdown() {
+        dropdown.style.display = "block";
+      }
+
+      function renderList(items) {
+        dropdown.innerHTML = "";
+        if (!items.length) {
+          hideDropdown();
+          return;
+        }
+        items.forEach(etf => {
+          const item = document.createElement("div");
+          item.className = "etf-suggestion-item";
+          item.dataset.ticker = etf.ticker;
+          item.innerHTML = `
+        <span class="etf-suggestion-item-ticker">${etf.ticker}</span>
+        <span class="etf-suggestion-item-name">${escapeHtml(etf.name)}</span>
+      `;
+          // Use mousedown so blur on input doesn't kill the click first
+          item.addEventListener("mousedown", (e) => {
+            e.preventDefault();
+            nameInput.value = etf.ticker;
+            autoFillEtfFieldsFromMeta(block, etf);
+            hideDropdown();
+          });
+          dropdown.appendChild(item);
+        });
+        showDropdown();
+      }
+
+      function filterAndRender() {
+        const q = nameInput.value.trim().toLowerCase();
+        // Filter list
+        let list = ETF_LIBRARY;
+        if (q) {
+          list = ETF_LIBRARY.filter(etf =>
+            etf.ticker.toLowerCase().includes(q) ||
+            etf.name.toLowerCase().includes(q)
+          );
+        }
+        renderList(list);
+        // If exact ticker typed, auto-fill immediately
+        if (q) {
+          const exact = ETF_LIBRARY.find(
+            etf => etf.ticker.toLowerCase() === q
+          );
+          if (exact) {
+            autoFillEtfFieldsFromMeta(block, exact);
+          }
+        }
+      }
+      // Show full list on focus
+      nameInput.addEventListener("focus", () => {
+        filterAndRender();
+        renderList(ETF_LIBRARY);
+        dropdown.style.display = "block";
+      });
+      // Filter as user types
+      nameInput.addEventListener("input", () => {
+        filterAndRender();
+      });
+      // Enter key = try to snap to best exact match
+      nameInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          const meta = findEtfMeta(nameInput.value);
+          if (meta) {
+            autoFillEtfFieldsFromMeta(block, meta);
+            hideDropdown();
+          }
+        }
+      });
+      // Click outside → hide dropdown
+      document.addEventListener("click", (e) => {
+        if (!field.contains(e.target)) {
+          hideDropdown();
+        }
+      });
+    }
+
+    function createETFScenarioBlock(
+      index,
+      fromData = null,
+      removable = true,
+      compareMode = false,
+      monthlyContributionROVal = 0
+    ) {
+      const block = document.createElement("div");
+      block.className = "scenario-block etf-block";
+      block.setAttribute("data-type", "etf");
+      block.setAttribute("data-index", index);
+      const base = (compareMode ? DEFAULTS.etfCompareMode : DEFAULTS.etfScenario);
+      const defaultData = {
+        name: compareMode ?
+          base.name : `${DEFAULTS.etfScenario.namePrefix}${index}`,
+        initialInvestment: compareMode ?
+          (sharedInitialInvestment ?? DEFAULTS.sharedInitialInvestment) : base.initialInvestment,
+        leveragePct: base.leveragePct,
+        constantLeverage: base.constantLeverage,
+        marginRate: base.marginRate,
+        etfGrowth: base.etfGrowth,
+        divGrowth: base.divGrowth,
+        startingYield: base.startingYield,
+        retirementAccount: base.retirementAccount
+      };
+      const data = fromData || defaultData;
+      // HEADER: title + remove button
+      const headerHTML = `
+    <div class="scenario-header-row">
+      <div class="scenario-title">
+        <span class="scenario-title-text">${
+          compareMode ? "ETF" : `ETF Scenario ${index}`
+        }</span>
+      </div>
+      <button class="scenario-remove-btn"${
+        (!removable || index === 1) ? " disabled" : ""
+      }>
+        ✕ Remove
+      </button>
+    </div>
+  `;
+      // ETF vs ETF: name + retirement in same row, both as field boxes
+      const nameAndRetirementRowEtfMode = `
+  <div class="field-group">
+    <div class="field etf-name-field">
+      <label>ETF name</label>
+      <input class="sc-name" type="text" value="${escapeHtml(data.name)}" />
+    </div>
+  </div>
+`;
+      // Property vs ETF: readonly initial / monthly + retirement box
+      // Property vs ETF: readonly initial / monthly + retirement box
+      const readonlyInitialAndMonthlyRow = `
+  <div class="field-group">
+
+   
+
+    <div class="readonly-field">
+      <label>Monthly Contribution to ETF ($)</label>
+      <div class="readonly-value etf-monthly-contr-ro">
+        ${fmtNum(monthlyContributionROVal)}
+      </div>
+      <div class="helper-line">
+        Changes yearly to match property cashflow
+      </div>
+    </div>
+
+  </div>
+`;
+      // ETF growth row (same for both modes, just position differs)
+      const growthRow = `
+  <div class="section-divider">ETF growth rates</div>
+
+  <div class="field-group">
+    <div class="field">
+      <label>ETF growth/yr ($)</label>
+      <div class="stepper-row" data-step="1" data-unit="%" data-min="0">
+        <input class="sc-etfgrowth" type="number" value="${data.etfGrowth}" />
+        <button type="button" class="step-btn step-down">-1%</button>
+        <button type="button" class="step-btn step-up">+1%</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Dividend growth/yr (%)</label>
+      <div class="stepper-row" data-step="1" data-unit="%" data-min="0">
+        <input class="sc-divgrowth" type="number" value="${data.divGrowth}" />
+        <button type="button" class="step-btn step-down">-1%</button>
+        <button type="button" class="step-btn step-up">+1%</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Starting dividend yield (%)</label>
+      <input class="sc-startyield" type="number" value="${data.startingYield}" />
+
+      <!-- 👇 Retirement checkbox now lives inside this field -->
+      <div class="checkbox-field">
+        <div class="checkbox-row">
+          <input class="sc-retirement" type="checkbox" ${data.retirementAccount ? "checked" : ""}/>
+          <label class="checkbox-label">Retirement account (no div tax)</label>
+        </div>
+       
+      </div>
+    </div>
+  </div>
+`;
+      // Margin loan row (used in both modes, just assembled differently)
+      const leverageRow = `
+    <div class="section-divider">Margin Loan</div>
+
+    <div class="field-group">
+      <div class="field">
+        <label>Leverage %</label>
+        <div class="stepper-row" data-step="5" data-unit="%" data-min="0">
+          <input class="sc-levpct" type="number" value="${data.leveragePct}" />
+          <button type="button" class="step-btn step-down">-5%</button>
+          <button type="button" class="step-btn step-up">+5%</button>
+        </div>
+      </div>
+
+      <div class="field leverage-advanced">
+        <label>Margin interest %</label>
+        <input class="sc-marginrate" type="number" value="${data.marginRate}" />
+      </div>
+
+      <div class="checkbox-field leverage-advanced">
+        <div class="checkbox-row">
+          <input class="sc-constlev" type="checkbox" ${
+            data.constantLeverage ? "checked" : ""
+          }/>
+          <label class="checkbox-label">Constant leverage (rebalance yearly)</label>
+        </div>
+      </div>
+    </div>
+  `;
+      // Assemble the block based on mode
+      if (compareMode) {
+        // Property vs ETF: readonly row → growth → margin
+        block.innerHTML = `
+      ${headerHTML}
+      ${growthRow}
+      ${leverageRow}
+    `;
+      } else {
+        // ETF vs ETF: name/retirement → growth → margin
+        block.innerHTML = `
+      ${headerHTML}
+      ${nameAndRetirementRowEtfMode}
+      ${growthRow}
+      ${leverageRow}
+    `;
+      }
+      // Remove button behavior
+      const removeBtn = block.querySelector(".scenario-remove-btn");
+      removeBtn.addEventListener("click", () => {
+        if (removeBtn.disabled) return;
+        block.remove();
+        renumberEtfBlocks();
+      });
+      if (appMode === "propertyVsEtf") {
+        removeBtn.style.display = "none";
+      }
+      // Advanced leverage show/hide with animation
+      const levInput = block.querySelector(".sc-levpct");
+      const advancedEls = Array.from(block.querySelectorAll(".leverage-advanced"));
+      advancedEls.forEach(el => {
+        el.addEventListener("transitionend", (e) => {
+          if (!el.classList.contains("leverage-advanced--animating-out")) return;
+          if (e.propertyName !== "opacity" && e.propertyName !== "max-height") return;
+          el.classList.add("leverage-advanced--hidden");
+          el.classList.remove("leverage-advanced--animating-out");
+        });
+      });
+
+      function showAdvanced(el) {
+        if (!el) return;
+        if (el.classList.contains("leverage-advanced--visible")) return;
+        el.classList.remove("leverage-advanced--hidden");
+        el.classList.remove("leverage-advanced--animating-out");
+        void el.offsetHeight;
+        el.classList.add("leverage-advanced--visible");
+      }
+
+      function hideAdvanced(el) {
+        if (!el) return;
+        if (!el.classList.contains("leverage-advanced--visible")) {
+          el.classList.add("leverage-advanced--hidden");
+          return;
+        }
+        el.classList.remove("leverage-advanced--visible");
+        el.classList.add("leverage-advanced--animating-out");
+      }
+
+      function updateAdvancedVisibility() {
+        const v = parseFloat(levInput?.value) || 0;
+        if (v > 0) {
+          advancedEls.forEach(showAdvanced);
+        } else {
+          advancedEls.forEach(hideAdvanced);
+        }
+      }
+      if (levInput) {
+        levInput.addEventListener("input", updateAdvancedVisibility);
+        updateAdvancedVisibility();
+      }
+      // 🔍 Hook up ETF autocomplete dropdown to the name field (ETF vs ETF mode)
+      const nameInput = block.querySelector(".sc-name");
+      if (nameInput) {
+        setupEtfAutocomplete(nameInput, block);
+      }
+      return block;
+    }
+    //createETFScenarioBlock ends
+    /* Shared header block for Property vs ETF mode:
+       - Initial investment ($)
+       We watch this and recompute derived numbers. */
+    function createSharedInvestmentBlock() {
+      const block = document.createElement("div");
+      block.className = "shared-block shared-investment-block";
+      block.innerHTML = `
+    <div class="scenario-header-row">
+      <div class="scenario-title">
+        <span class="scenario-title-text">Initial Investment</span>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field" style="grid-column: span 3;">
+        <label>Total cash available ($)</label>
+        <input class="shared-initial-cash" type="number" value="${sharedInitialInvestment}" />
+        <div class="helper-line">
+          Used as property down payment (and closing), and mirrored into ETF as initial lump sum.
+        </div>
+      </div>
+    </div>
+  `;
+      return block;
+    }
+
+    function createPropertyScenarioBlock() {
+      const d = DEFAULTS.property;
+      const block = document.createElement("div");
+      block.className = "scenario-block property-block";
+      block.setAttribute("data-type", "property");
+      block.innerHTML = `
+        <div class="scenario-header-row">
+          <div class="scenario-title">
+            <span class="scenario-title-text">Property 🏠</span>
+          </div>
+           <!-- 
+          <div class="helper-line" style="text-align:right;max-width:18rem;">
+            30-yr mortgage & operating costs. 
+          </div>
+          -->
+        </div>
+        
+       
+        <!-- derived purchase / mortgage / depreciation row -->
+        <div class="field-group">
+        
+         <div class="field down-combo-field">
+          <label>Down Payment ($)</label>
+
+          <div class="down-combo-row">
+            <!-- $ amount input -->
+            <div class="down-amount-wrap">
+              <input
+                class="prop-downamt"
+                type="number"
+                value="${d.downPayment}"
+              />
+            </div>
+
+            <!-- % input (33% width) + suffix label -->
+            <div class="down-percent-wrap">
+              <input
+                class="prop-downpct"
+                type="number"
+                value="${d.downPct}"
+                min="0"
+                max="100"
+              />
+              <span class="down-percent-suffix">%</span>
+            </div>
+          </div>
+
+          <!-- helper text stays the same -->
+          <div class="helper-line prop-down-helper">
+            Property value: —
+          </div>
+        </div>
+
+
+        
+          
+
+          <div class="field">
+            <label>30yr Fixed Interest Rate (%)</label>
+            <input class="prop-rate" type="number" value="${d.rate}" />
+
+            <!-- 🔥 New helper showing monthly mortgage -->
+            <div class="helper-line prop-rate-helper">
+              Monthly mortgage: —
+            </div>
+          </div>
+          
+          <div class="field">
+              <label>Closing Cost %</label>
+              <input class="prop-closepct" type="number" value="${d.closingPct}" />
+            </div>
+            
+            <div class="field">
+            <label>Property Value Appreciation %/yr</label>
+            <div class="stepper-row" data-step="1" data-unit="%" data-min="0">
+             <input class="prop-appreciation" type="number" value="${d.appreciation}" />
+            <button type="button" class="step-btn step-down">-1%</button>
+            <button type="button" class="step-btn step-up">+1%</button>
+          </div> 
+            <div class="helper-line">U.S. national avg property appreciation ~5.5% CAGR</div>
+          </div>
+
+<!--
+          <div class="readonly-field">
+            <label>Monthly Mortgage ($)</label>
+            <div class="readonly-value prop-mortgage-ro">-</div>
+            <div class="helper-line">30yr fixed P&I</div>
+          </div>
+          
+          
+          <div class="readonly-field">
+            <label>Property Value ($)</label>
+            <div class="readonly-value prop-purchase-ro">-</div>
+          </div>
+           
+          
+          <div class="readonly-field">
+            <label>Depreciation Shield ($/yr)</label>
+            <div class="readonly-value prop-depr-ro">-</div>
+            <div class="helper-line">Useful if rental taxable income > 0 and for PAL</div>
+          </div>
+          -->
+          
+           
+          
+           <!--
+            <div class="readonly-field">
+              <label>Initial Cash to Property ($)</label>
+              <div class="readonly-value prop-initialcash-ro">-</div>
+              <div class="helper-line">Down payment + closing cost</div>
+            </div>
+            -->
+          
+            
+        </div>
+
+
+
+        <div class="section-divider">
+          Expenses<span class="expense-inline-val">—/mo</span>
+        </div>
+
+
+        <!-- appreciation / tax / zillow toggle -->
+        <div class="field-group">
+          
+
+          <div class="field">
+            <label>Property Tax (% of Property Value)</label>
+            <input class="prop-taxpct" type="number" value="${d.taxPct}" />
+          </div>
+          
+          <div class="field">
+            <label>Insurance/mo ($)</label>
+            <input class="prop-insurance" type="number" value="${d.insuranceMonthly}" />
+          </div>
+
+          
+          
+          
+          <!-- TEMP DISABLED
+          <div class="field">
+            <label>Random fee $/mo</label>
+            <input class="prop-randomfee" type="number" value="${d.randomFeeMonthly || 0}" />
+            <div class="helper-line">
+              Unexpected random fees that surprise the hell out of you
+            </div>
+          </div>
+          -->
+
+          
+          <!--
+          <div class="checkbox-field zillow-toggle-block">
+            <div class="checkbox-row">
+              <input type="checkbox" class="prop-zillowtoggle" />
+              <label class="checkbox-label">Match Zillow numbers</label>
+            </div>
+            <div class="helper-line">
+              Turn off maintenance and management fee to simplify math
+            </div>
+          </div>
+          -->
+          
+
+          <div class="field hoa-combo-field">
+  <label>HOA/mo ($)</label>
+
+  <div class="hoa-combo-row">
+    <!-- HOA $/mo -->
+    <div class="hoa-amount-wrap">
+      <input
+        class="prop-hoa"
+        type="number"
+        value="${d.hoaMonthly}"
+      />
+    </div>
+
+    <!-- HOA increase %/yr (33% width) -->
+    <div class="hoa-growth-wrap">
+      <input
+        class="prop-hoagrowth"
+        type="number"
+        value="${d.hoaGrowth}"
+      />
+      <span class="hoa-growth-suffix">%/yr</span>
+    </div>
+  </div>
+
+  <div class="helper-line">
+    HOA fees increase CAGR between 3% - 5% annually
+  </div>
+</div>
+
+          
+          <div class="field">
+            <label>Maintenance Cost (% of property price)</label>
+            
+            <div class="stepper-row" data-step="1" data-unit="%" data-min="0">
+            <input class="prop-maintpct" type="number" value="${d.maintPct}" />
+            <button type="button" class="step-btn step-down">-1%</button>
+            <button type="button" class="step-btn step-up">+1%</button>
+          </div>
+          
+            <div class="helper-line">
+              A simple start is 1% of property price
+            </div>
+          </div>
+
+          <div class="field maint-advanced">
+            <label>Maint Growth %/yr</label>
+            <input class="prop-maintgrowth" type="number" value="${d.maintGrowth}" />
+          </div>
+          
+          
+          <div class="field">
+            <label>Management Fee (% of Rent)</label>
+            <input class="prop-mgmtpct" type="number" value="${d.mgmtPct}" />
+             <div class="helper-line">
+                Typically 8% to 12% of the rent for condos
+            </div>
+          </div>
+          
+          <!--
+          <div class="readonly-field">
+            <label>Monthly Expenses</label>
+            <div class="readonly-value prop-totalexp-ro">—</div>
+            <div class="helper-line">
+              Tax + HOA + maintenance + insurance + mgmt
+            </div>
+          </div>
+          -->
+   
+          
+        </div>
+
+
+        <div class="section-divider">Income</div>
+
+        <div class="field-group">
+         
+
+          <div class="field">
+            <label>Rent/mo ($)</label>
+            <input class="prop-rent" type="number" value="${d.rentMonthly}" />
+          </div>
+
+          <div class="field">
+            <label>Rent Growth/yr (%)</label>
+            <div class="stepper-row" data-step="1" data-unit="%" data-min="0">
+            <input class="prop-rentgrowth" type="number" value="${d.rentGrowth}" />
+            <button type="button" class="step-btn step-down">-1%</button>
+            <button type="button" class="step-btn step-up">+1%</button>
+          </div>
+            
+            
+            <div class="helper-line">
+              National rent increases average 3-5% annually
+            </div>
+            
+            
+          </div>
+          
+         <div class="field">
+            <label>Occupancy %</label>
+
+            <div class="stepper-row" data-step="1" data-unit="%" data-min="0">
+              <input class="prop-occ" type="number" value="${d.occupancyPct}" />
+
+              <!-- NEW Max button -->
+              <button type="button" class="step-btn prop-occ-max-btn">Max</button>
+            </div>
+
+            <div class="helper-line">
+              Long-term avg ~90–93% for stabilized properties
+            </div>
+          </div>
+
+
+          
+          <!--
+           <div class="readonly-field">
+            <label>Monthly Out of Pocket</label>
+            <div class="readonly-value prop-totalout-ro">—</div>
+            <div class="helper-line">
+              Monthly (Mortgage + Total Expense) 
+            </div>
+          </div>
+
+          <div class="readonly-field">
+            <label>Monthly Cash Flow</label>
+            <div class="readonly-value prop-monthlycash-ro">—</div>
+            <div class="helper-line">
+              Effective Rent – Monthly Out of Pocket
+            </div>
+          </div>
+          -->
+          
+          
+        </div> <!-- field-group ends -->
+
+      `;
+      return block;
+    }
+
+    function createComparisonSnapshotBlock() {
+      const block = document.createElement("div");
+      block.className = "scenario-block comparison-snapshot-block";
+      block.innerHTML = `
+    <div class="scenario-header-row">
+      <div class="scenario-title">
+        <span class="scenario-title-text">Comparison snapshot</span>
+      </div>
+    </div>
+
+    <div class="field-group comparison-grid">
+      <!-- Property column -->
+      <div class="comparison-column">
+        <!-- 🔥 changed from helper-line to section-divider -->
+        <div class="snapshot-title">Property 🏠</div>
+
+        <div class="field">
+          <label>Initial Cash to Property ($)</label>
+          <div class="readonly-value snapshot-prop-initial">-</div>
+          <div class="helper-line snapshot-prop-initial-helper">
+            <!-- filled from JS -->
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Monthly Cash Flow ($)</label>
+          <div class="readonly-value snapshot-prop-cf">-</div>
+          <div class="helper-line snapshot-prop-cf-helper">
+            <!-- [effective rent] – [mortgage] – [expenses] -->
+          </div>
+          </div>
+        </div>
+    
+    
+      <!-- ETF column -->
+      <div class="comparison-column">
+        <!-- 🔥 changed from helper-line to section-divider -->
+        <div class="snapshot-title">ETF 📈</div>
+
+        <div class="field">
+          <label>Initial Cash to ETF ($)</label>
+          <div class="readonly-value snapshot-etf-initial">-</div>
+          <div class="helper-line snapshot-etf-monthly-helper">
+            Property downpayment + closing cost
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Monthly Contribution to ETF ($)</label>
+          <div class="readonly-value snapshot-etf-monthly">-</div>
+          <div class="helper-line snapshot-etf-monthly-helper">
+            Mirrors property's monthly out-of-pocket (Year 1)
+          </div>
+        </div>
+      </div>
+
+      
+      
+    </div>
+  `;
+      return block;
+    }
+
+    function setupMaintenanceGrowthToggle() {
+      const propDom = scenarioEditorContainer.querySelector(".property-block");
+      if (!propDom) return;
+      const maintPctInput = propDom.querySelector(".prop-maintpct");
+      const advEl = propDom.querySelector(".maint-advanced");
+      if (!maintPctInput || !advEl) return;
+      // when hide animation ends, fully remove from layout
+      advEl.addEventListener("transitionend", (e) => {
+        if (!advEl.classList.contains("maint-advanced--animating-out")) return;
+        if (e.propertyName !== "opacity" && e.propertyName !== "max-height") return;
+        advEl.classList.add("maint-advanced--hidden");
+        advEl.classList.remove("maint-advanced--animating-out");
+      });
+
+      function showMaint() {
+        if (advEl.classList.contains("maint-advanced--visible")) return;
+        advEl.classList.remove("maint-advanced--hidden");
+        advEl.classList.remove("maint-advanced--animating-out");
+        // force reflow so transition runs
+        void advEl.offsetHeight;
+        advEl.classList.add("maint-advanced--visible");
+      }
+
+      function hideMaint() {
+        if (!advEl.classList.contains("maint-advanced--visible")) {
+          advEl.classList.add("maint-advanced--hidden");
+          return;
+        }
+        advEl.classList.remove("maint-advanced--visible");
+        advEl.classList.add("maint-advanced--animating-out");
+      }
+
+      function updateMaintVisibility() {
+        const v = parseFloat(maintPctInput.value) || 0;
+        if (v > 0) {
+          showMaint();
+        } else {
+          hideMaint();
+        }
+      }
+      maintPctInput.addEventListener("input", updateMaintVisibility);
+      updateMaintVisibility(); // set initial state based on current value
+    }
+    /* ---------- renderers ---------- */
+    function renderETFMode() {
+      scenarioEditorContainer.innerHTML = "";
+      addScenarioBtn.disabled = false;
+      addScenarioBtn.style.display = "";
+      const firstETF = createETFScenarioBlock(1, null, false, false, 0);
+      scenarioEditorContainer.appendChild(firstETF);
+    }
+
+    function renderPropertyMode() {
+      scenarioEditorContainer.innerHTML = "";
+      addScenarioBtn.disabled = true;
+      addScenarioBtn.style.display = "none";
+      const propBlock = createPropertyScenarioBlock();
+      scenarioEditorContainer.appendChild(propBlock);
+      const etfBlock = createETFScenarioBlock(
+        1, {
+          name: "SCHD",
+          initialInvestment: sharedInitialInvestment,
+          leveragePct: 0,
+          constantLeverage: true,
+          marginRate: 5,
+          etfGrowth: 5,
+          divGrowth: 7,
+          startingYield: 4
+        },
+        false, // removable
+        true, // compareMode (Property vs ETF)
+        0 // monthlyContributionROVal placeholder, will update
+      );
+      scenarioEditorContainer.appendChild(etfBlock);
+      etfBlock.querySelector(".scenario-title-text").textContent = "ETF 📈";
+      etfBlock.querySelector(".scenario-remove-btn").disabled = true;
+      // 🆕 Comparison snapshot panel under ETF but above the button row
+      const snapshotBlock = createComparisonSnapshotBlock();
+      scenarioEditorContainer.appendChild(snapshotBlock);
+      // After rendering, calculate derived property numbers & update UI
+      setupMaintenanceGrowthToggle();
+      recalcPropertyDerivedAndSyncUI();
+    }
+    /* ---------- renumber ETF blocks after removal (ETF vs ETF mode) ---------- */
+    function renumberEtfBlocks() {
+      const blocks = [...scenarioEditorContainer.querySelectorAll(".etf-block")];
+      blocks.forEach((block, i) => {
+        const idx = i + 1;
+        block.setAttribute("data-index", idx);
+        const titleEl = block.querySelector(".scenario-title-text");
+        // only rename if not in property mode (in prop mode it's literally called "ETF")
+        if (appMode === "etfEtf") {
+          titleEl.textContent = `ETF Scenario ${idx}`;
+        }
+        const removeBtn = block.querySelector(".scenario-remove-btn");
+        removeBtn.disabled = (idx === 1);
+      });
+    }
+    /* ---------- read inputs ---------- */
+    // ETF scenarios from DOM (for both modes)
+    function readEtfScenariosFromDOM() {
+      const blocks = [...scenarioEditorContainer.querySelectorAll(".etf-block")];
+      // Global initial investment for ETF vs ETF mode
+      let globalInitial = 0;
+      if (initialInvestmentGlobalInput) {
+        const v = parseFloat(initialInvestmentGlobalInput.value);
+        if (Number.isFinite(v)) globalInitial = v;
+      }
+      return blocks.map(block => {
+        return {
+          name: block.querySelector(".sc-name").value.trim() || "Untitled ETF",
+          initialInvestment: globalInitial,
+          leveragePct: parseFloat(block.querySelector(".sc-levpct").value) || 0,
+          constantLeverage: block.querySelector(".sc-constlev")?.checked ?? false,
+          marginRate: parseFloat(block.querySelector(".sc-marginrate").value) || 0,
+          etfGrowth: parseFloat(block.querySelector(".sc-etfgrowth").value) || 0,
+          divGrowth: parseFloat(block.querySelector(".sc-divgrowth").value) || 0,
+          startingYield: parseFloat(block.querySelector(".sc-startyield").value) || 0,
+          retirementAccount: block.querySelector(".sc-retirement")?.checked ?? false
+        };
+      });
+    }
+    // Property inputs from DOM (property vs ETF mode)
+    function readPropertyScenarioFromDOM() {
+      const p = scenarioEditorContainer.querySelector(".property-block");
+      if (!p) return null;
+      return {
+        downPct: parseFloat(p.querySelector(".prop-downpct").value) || 0,
+        closingPct: parseFloat(p.querySelector(".prop-closepct").value) || 0,
+        rate: parseFloat(p.querySelector(".prop-rate").value) || 0,
+        appreciation: parseFloat(p.querySelector(".prop-appreciation").value) || 0,
+        taxPct: parseFloat(p.querySelector(".prop-taxpct").value) || 0,
+        maintPct: parseFloat(p.querySelector(".prop-maintpct").value) || 0,
+        maintGrowth: parseFloat(p.querySelector(".prop-maintgrowth").value) || 0,
+        hoaMonthly: parseFloat(p.querySelector(".prop-hoa").value) || 0,
+        hoaGrowth: parseFloat(p.querySelector(".prop-hoagrowth").value) || 0,
+        rentMonthly: parseFloat(p.querySelector(".prop-rent").value) || 0,
+        rentGrowth: parseFloat(p.querySelector(".prop-rentgrowth").value) || 0,
+        occupancyPct: parseFloat(p.querySelector(".prop-occ").value) || 0,
+        mgmtPct: parseFloat(p.querySelector(".prop-mgmtpct").value) || 0
+      };
+    }
+    // Shared initial investment block
+    function readSharedInitialInvestmentFromDOM() {
+      const sb = scenarioEditorContainer.querySelector(".shared-investment-block");
+      if (!sb) return sharedInitialInvestment;
+      const val = parseFloat(sb.querySelector(".shared-initial-cash").value);
+      return Number.isFinite(val) ? val : sharedInitialInvestment;
+    }
+    /* ---------- derived calc for Property vs ETF mode ---------- */
+    /*
+    Given:
+    - initialCash (sharedInitialInvestment)
+    - downPct
+    - rate
+
+    We compute:
+    purchasePrice = initialCash / downPct
+    mortgagePrincipal = purchasePrice - initialCash
+    monthlyMortgage = amortized P&I on that principal @rate for 30yrs
+    depreciationYearly = 0.8 * purchasePrice / 27.5
+    */
+    function calcPropertyDerived(initialCash, downPct, rate) {
+      const downFrac = downPct / 100;
+      if (downFrac <= 0) return {
+        purchasePrice: 0,
+        mortgagePrincipal: 0,
+        monthlyMortgage: 0,
+        depreciationYearly: 0
+      };
+      const purchasePrice = initialCash / downFrac;
+      const mortgagePrincipal = purchasePrice - initialCash;
+      const annualRate = rate / 100;
+      const monthlyRate = annualRate / 12;
+      const N = 30 * 12;
+      let monthlyMortgage = 0;
+      if (monthlyRate > 0) {
+        monthlyMortgage = mortgagePrincipal * (monthlyRate) / (1 - Math.pow(1 + monthlyRate, -N));
+      } else {
+        // 0% rate edge case
+        monthlyMortgage = mortgagePrincipal / N;
+      }
+      const buildingPortion = purchasePrice * 0.8;
+      const depreciationYearly = buildingPortion / 27.5;
+      return {
+        purchasePrice,
+        mortgagePrincipal,
+        monthlyMortgage,
+        depreciationYearly
+      };
+    }
+
+    function recalcPropertyDerivedAndSyncUI() {
+      if (appMode !== "propertyVsEtf") return;
+      const propDom = scenarioEditorContainer.querySelector(".property-block");
+      const etfDom = scenarioEditorContainer.querySelector(".etf-block");
+      if (!propDom || !etfDom) return;
+      // 1. Read user down payment $
+      const downPaymentCash =
+        parseFloat(propDom.querySelector(".prop-downamt")?.value) || 0;
+      // Keep sharedInitialInvestment aligned with down payment for now
+      sharedInitialInvestment = downPaymentCash;
+      // 2. Read % inputs
+      const downPct =
+        parseFloat(propDom.querySelector(".prop-downpct")?.value) || 0;
+      const rate =
+        parseFloat(propDom.querySelector(".prop-rate")?.value) || 0;
+      const closingPct =
+        parseFloat(propDom.querySelector(".prop-closepct")?.value) || 0;
+      // 3. Mortgage / price math
+      const derived = calcPropertyDerived(downPaymentCash, downPct, rate);
+      const purchasePrice = derived.purchasePrice;
+      // 🔥 Update helper under Down Payment
+      const downHelper = propDom.querySelector(".prop-down-helper");
+      if (downHelper) {
+        downHelper.textContent = `Property value: ${fmtNum(purchasePrice)}`;
+      }
+      // 4. Closing cost cash
+      const closingCostCash = purchasePrice * (closingPct / 100);
+      // 5. Initial cash invested = down payment + closing cost
+      const initialCashInvested = downPaymentCash + closingCostCash;
+      // --- Update UI fields ---
+      // Monthly Mortgage → now shown as helper under the rate field
+      const rateHelperEl = propDom.querySelector(".prop-rate-helper");
+      if (rateHelperEl) {
+        rateHelperEl.textContent =
+          `Monthly mortgage: ${fmtNum(derived.monthlyMortgage)}`;
+      }
+      // Depreciation shield
+      const deprEl = propDom.querySelector(".prop-depr-ro");
+      if (deprEl) {
+        deprEl.textContent = fmtNum(derived.depreciationYearly);
+      }
+      // 🔥 NEW: Initial cash invested ($)
+      const initCashEl = propDom.querySelector(".prop-initialcash-ro");
+      if (initCashEl) {
+        initCashEl.textContent = fmtNum(initialCashInvested);
+      }
+      // --- Expenses math (unchanged logic, just reordered a bit) ---
+      const taxPct =
+        parseFloat(propDom.querySelector(".prop-taxpct")?.value) / 100 || 0;
+      const maintPct =
+        parseFloat(propDom.querySelector(".prop-maintpct")?.value) / 100 || 0;
+      const mgmtPct =
+        parseFloat(propDom.querySelector(".prop-mgmtpct")?.value) / 100 || 0;
+      const hoaMonthly =
+        parseFloat(propDom.querySelector(".prop-hoa")?.value) || 0;
+      const insuranceMonthly =
+        parseFloat(propDom.querySelector(".prop-insurance")?.value) || 0;
+      const randomFeeMonthly =
+        parseFloat(propDom.querySelector(".prop-randomfee")?.value) || 0;
+      const rentMonthly =
+        parseFloat(propDom.querySelector(".prop-rent")?.value) || 0;
+      const propertyTaxAnnual = purchasePrice * taxPct;
+      const maintenanceAnnual = purchasePrice * maintPct;
+      const hoaAnnual = hoaMonthly * 12;
+      const insuranceAnnual = insuranceMonthly * 12;
+      const mgmtAnnual = rentMonthly * 12 * mgmtPct;
+      const randomFeeAnnual = randomFeeMonthly * 12;
+      const totalExpenseYear1 =
+        propertyTaxAnnual +
+        hoaAnnual +
+        maintenanceAnnual +
+        insuranceAnnual +
+        mgmtAnnual +
+        randomFeeAnnual;
+      const totalExpenseMonthly = totalExpenseYear1 / 12;
+      // 🔥 Update expense inline in the section divider
+      const expenseInline = propDom.querySelector(".expense-inline-val");
+      if (expenseInline) {
+        expenseInline.textContent = `${fmtNum(totalExpenseMonthly)}/mo`;
+      }
+      const monthlyMortgage = derived.monthlyMortgage;
+      const totalOutOfPocket = totalExpenseMonthly + monthlyMortgage;
+      const totalOutRO = propDom.querySelector(".prop-totalout-ro");
+      if (totalOutRO) {
+        totalOutRO.textContent = fmtNum(totalOutOfPocket);
+      }
+      // Cash flow math
+      const occ =
+        parseFloat(propDom.querySelector(".prop-occ")?.value) / 100 || 0;
+      const effectiveRentMonthly = rentMonthly * occ;
+      const monthlyCashFlow =
+        effectiveRentMonthly - (totalExpenseMonthly + monthlyMortgage);
+      const cashFlowRO = propDom.querySelector(".prop-monthlycash-ro");
+      if (cashFlowRO) {
+        cashFlowRO.textContent = fmtNum(monthlyCashFlow);
+      }
+      // Sync ETF mirrors (no more read-only tiles on the ETF panel)
+      // We only care about the number, not showing it inside the ETF block.
+      // Year-1 ETF monthly contribution is the net out-of-pocket:
+      //   (expenses + mortgage) − effective rent
+      // If that number is negative (property cash-flow positive),
+      // treat the ETF contribution as 0 for UI / schedule purposes.
+      let uiContribution = 0;
+      const netOutOfPocket =
+        (totalExpenseMonthly + monthlyMortgage) - effectiveRentMonthly;
+      uiContribution = Math.max(0, netOutOfPocket);
+      // 🆕 --- Update Comparison Snapshot panel ---
+      const snapshot = document.querySelector(".comparison-snapshot-block");
+      if (snapshot) {
+        // ETF side
+        const snapEtfInitial = snapshot.querySelector(".snapshot-etf-initial");
+        if (snapEtfInitial) {
+          snapEtfInitial.textContent = fmtNum(initialCashInvested);
+        }
+        const snapEtfMonthly = snapshot.querySelector(".snapshot-etf-monthly");
+        if (snapEtfMonthly) {
+          snapEtfMonthly.textContent = fmtNum(uiContribution);
+        }
+        // Property: down + closing
+        const snapPropInitial = snapshot.querySelector(".snapshot-prop-initial");
+        if (snapPropInitial) {
+          snapPropInitial.textContent = fmtNum(initialCashInvested);
+        }
+        const snapPropInitialHelper = snapshot.querySelector(
+          ".snapshot-prop-initial-helper"
+        );
+        if (snapPropInitialHelper) {
+          snapPropInitialHelper.textContent =
+            `${fmtNum(downPaymentCash)} downpayment + ` +
+            `${fmtNum(closingCostCash)} closing cost`;
+        }
+        // Property: monthly cash flow
+        const snapPropCF = snapshot.querySelector(".snapshot-prop-cf");
+        if (snapPropCF) {
+          snapPropCF.textContent = fmtNum(monthlyCashFlow);
+        }
+        const snapPropCFHelper = snapshot.querySelector(
+          ".snapshot-prop-cf-helper"
+        );
+        if (snapPropCFHelper) {
+          snapPropCFHelper.textContent =
+            `${fmtNum(effectiveRentMonthly)} effective rent \u2013 ` +
+            `${fmtNum(monthlyMortgage)} mortgage \u2013 ` +
+            `${fmtNum(totalExpenseMonthly)} expenses`;
+        }
+      }
+    }
+    /* ---------- simulations ---------- */
+    function simulateETFScenario(p, years, monthlyInflow) {
+      let debt = 0;
+      let totalValue = p.initialInvestment;
+      // Initial leverage
+      if (p.leveragePct > 0) {
+        const r = p.leveragePct / 100;
+        debt = (r * totalValue) / (1 - r);
+        totalValue += debt;
+      }
+      const rows = [];
+      for (let y = 1; y <= years; y++) {
+        const currentAnnualYield =
+          (p.startingYield / 100) * Math.pow(1 + p.divGrowth / 100, y - 1);
+        const monthlyGrowthFactor = Math.pow(1 + p.etfGrowth / 100, 1 / 12);
+        let yearDividendsTotal = 0;
+        for (let m = 1; m <= 12; m++) {
+          // Monthly contribution
+          totalValue += monthlyInflow;
+          // Price growth
+          totalValue *= monthlyGrowthFactor;
+          // Quarterly dividends (gross, reinvested)
+          if (m % 3 === 0) {
+            const quarterlyYield = currentAnnualYield / 4;
+            const divCash = totalValue * quarterlyYield;
+            yearDividendsTotal += divCash;
+            totalValue += divCash; // reinvest FULL dividend
+          }
+        }
+        // Margin interest = side cost, NOT taken out of totalValue
+        const interest = debt * (p.marginRate / 100);
+        // Constant leverage (rebalance based on portfolio value)
+        if (p.leveragePct > 0 && p.constantLeverage) {
+          const r = p.leveragePct / 100;
+          const targetDebt = (r * totalValue) / (1 - r);
+          totalValue += (targetDebt - debt);
+          debt = targetDebt;
+        }
+        const netAccountValue = totalValue - debt;
+        // Dividend tax = side cost, not subtracted from totalValue
+        const isRetirement = !!p.retirementAccount;
+        const divTaxRate = isRetirement ? 0 : 0.15;
+        const yearlyDivTax = yearDividendsTotal * divTaxRate;
+        rows.push({
+          year: y,
+          accountValue: netAccountValue,
+          yearlyDividend: yearDividendsTotal,
+          monthlyDividend: yearDividendsTotal / 12,
+          yearlyMarginInterest: interest,
+          divTax: yearlyDivTax
+        });
+      }
+      return rows;
+    }
+
+    function simulateETFScenarioWithSchedule(p, contributionSchedule, payoffYear) {
+      const years = contributionSchedule.length;
+      let debt = 0;
+      let totalValue = p.initialInvestment;
+      // Initial leverage (same as before)
+      if (p.leveragePct > 0) {
+        const r = p.leveragePct / 100;
+        debt = (r * totalValue) / (1 - r);
+        totalValue += debt;
+      }
+      const rows = [];
+      const payoffY = payoffYear || Infinity; // if not provided, treat as "never paid off"
+      for (let y = 1; y <= years; y++) {
+        const isPostPayoff = y >= payoffY;
+        const currentAnnualYield =
+          (p.startingYield / 100) * Math.pow(1 + p.divGrowth / 100, y - 1);
+        const monthlyGrowthFactor = Math.pow(1 + p.etfGrowth / 100, 1 / 12);
+        let yearDividendsTotal = 0;
+        let yearDividendsReinvested = 0;
+        let yearDividendsKept = 0;
+        const monthlyContribution = contributionSchedule[y - 1] || 0;
+        for (let m = 1; m <= 12; m++) {
+          // dynamic contribution
+          totalValue += monthlyContribution;
+          // price growth
+          totalValue *= monthlyGrowthFactor;
+          // quarterly dividends
+          if (m % 3 === 0) {
+            const quarterlyYield = currentAnnualYield / 4;
+            const divCash = totalValue * quarterlyYield;
+            yearDividendsTotal += divCash;
+            if (!isPostPayoff) {
+              // pre-payoff → DRIP
+              totalValue += divCash;
+              yearDividendsReinvested += divCash;
+            } else {
+              // post-payoff → keep dividends in cash pile (not added to totalValue)
+              yearDividendsKept += divCash;
+            }
+          }
+        }
+        // Margin interest = side cost, NOT taken out of totalValue
+        const interest = debt * (p.marginRate / 100);
+        // Constant leverage rebalance
+        if (p.leveragePct > 0 && p.constantLeverage) {
+          const r = p.leveragePct / 100;
+          const targetDebt = (r * totalValue) / (1 - r);
+          totalValue += targetDebt - debt;
+          debt = targetDebt;
+        }
+        const netAccountValue = totalValue - debt;
+        const isRetirement = !!p.retirementAccount;
+        const divTaxRate = isRetirement ? 0 : 0.15;
+        const yearlyDivTax = yearDividendsTotal * divTaxRate;
+        rows.push({
+          year: y,
+          accountValue: netAccountValue,
+          yearlyDividend: yearDividendsTotal,
+          monthlyDividend: yearDividendsTotal / 12,
+          yearlyMarginInterest: interest,
+          divTax: yearlyDivTax,
+          monthlyContribution,
+          divReinvested: yearDividendsReinvested, // 🆕
+          divKept: yearDividendsKept // 🆕
+        });
+      }
+      return rows;
+    }
+    // Property simulation (annual, 30 years, as before)
+    function simulatePropertyScenario(pProp, initialCash) {
+      const MAX_YEARS = 30;
+      // derive actual purchase price from initialCash & down%
+      const derived = calcPropertyDerived(initialCash, pProp.downPct, pProp.rate);
+      let propertyValue = derived.purchasePrice;
+      let mortgageBalance = derived.mortgagePrincipal;
+      const annualRate = pProp.rate / 100;
+      const monthlyRate = annualRate / 12;
+      let remainingMonths = 30 * 12;
+      let monthlyPmt = 0;
+      if (remainingMonths > 0 && mortgageBalance > 0) {
+        if (monthlyRate > 0) {
+          monthlyPmt =
+            mortgageBalance *
+            (monthlyRate) /
+            (1 - Math.pow(1 + monthlyRate, -remainingMonths));
+        } else {
+          monthlyPmt = mortgageBalance / remainingMonths;
+        }
+      }
+      const buildingPortion = derived.purchasePrice * 0.8;
+      const annualDepreciation = buildingPortion / 27.5;
+      let currentHOAmonthly = pProp.hoaMonthly;
+      let currentRentMonthly = pProp.rentMonthly;
+      let currentMaintPct = pProp.maintPct / 100;
+      const occ = pProp.occupancyPct / 100;
+      const mgmtPct = pProp.mgmtPct / 100;
+      const taxPct = pProp.taxPct / 100;
+      const appr = pProp.appreciation / 100;
+      const rentGrowth = pProp.rentGrowth / 100;
+      const hoaGrowth = pProp.hoaGrowth / 100;
+      const maintGrowth = pProp.maintGrowth / 100;
+      const rows = [];
+      let palCarryForward = 0; // running PAL carry over (≤ 0)
+      let payoffYear = null;
+      // If there is effectively no mortgage from day 1, mark payoff as year 1
+      if (mortgageBalance <= 0) {
+        payoffYear = 1;
+      }
+      for (let y = 1; y <= MAX_YEARS; y++) {
+        if (y > 1) {
+          propertyValue *= (1 + appr);
+          currentRentMonthly *= (1 + rentGrowth);
+          currentHOAmonthly *= (1 + hoaGrowth);
+          currentMaintPct *= (1 + maintGrowth);
+        }
+        const effectiveRentAnnual = currentRentMonthly * 12 * occ;
+        const propertyTaxAnnual = propertyValue * taxPct;
+        const maintenanceAnnual = propertyValue * currentMaintPct;
+        const hoaAnnual = currentHOAmonthly * 12;
+        const mgmtAnnual = effectiveRentAnnual * mgmtPct;
+        const insuranceAnnual = pProp.insuranceMonthly * 12;
+        // --- amortize this year with the CURRENT payment ---
+        let interestPaidThisYear = 0;
+        let principalPaidThisYear = 0;
+        if (mortgageBalance > 0 && remainingMonths > 0) {
+          const monthsThisYear = Math.min(12, remainingMonths);
+          for (let m = 0; m < monthsThisYear; m++) {
+            const interestPortion = mortgageBalance * monthlyRate;
+            let principalPortion = 0;
+            if (monthlyRate > 0) {
+              principalPortion = monthlyPmt - interestPortion;
+            } else {
+              principalPortion = mortgageBalance / (remainingMonths || 1);
+            }
+            if (principalPortion > mortgageBalance) {
+              principalPortion = mortgageBalance;
+            }
+            interestPaidThisYear += interestPortion;
+            principalPaidThisYear += principalPortion;
+            mortgageBalance -= principalPortion;
+            remainingMonths--;
+            if (mortgageBalance <= 0) {
+              mortgageBalance = 0;
+              remainingMonths = 0;
+              if (payoffYear === null) payoffYear = y;
+              break;
+            }
+          }
+        }
+        const yearlyDebtService = interestPaidThisYear + principalPaidThisYear;
+        // --- operating CF BEFORE "aggressive prepay" ---
+        const operatingAfterDebtYear =
+          effectiveRentAnnual -
+          propertyTaxAnnual -
+          maintenanceAnnual -
+          hoaAnnual -
+          mgmtAnnual -
+          insuranceAnnual -
+          yearlyDebtService;
+        // Use ALL positive CF to extra principal while there is a mortgage
+        let extraPrincipal = 0;
+        let cashFlowYearAfterPrepay = operatingAfterDebtYear;
+        if (operatingAfterDebtYear > 0 && mortgageBalance > 0) {
+          extraPrincipal = Math.min(operatingAfterDebtYear, mortgageBalance);
+          mortgageBalance -= extraPrincipal;
+          cashFlowYearAfterPrepay = operatingAfterDebtYear - extraPrincipal;
+          if (mortgageBalance <= 0 && payoffYear === null) {
+            payoffYear = y;
+            mortgageBalance = 0;
+          }
+        }
+        const cashFlowMonthlyAfterPrepay = cashFlowYearAfterPrepay / 12;
+        // taxes: depreciation shield is against the *operating* income before prepay
+        const cashFlowAfterDepr = operatingAfterDebtYear - annualDepreciation;
+        palCarryForward = Math.min(0, palCarryForward + cashFlowAfterDepr);
+        const equity = propertyValue - mortgageBalance;
+        rows.push({
+          year: y,
+          propertyValue,
+          rentCollected: effectiveRentAnnual / 12,
+          cashFlow: cashFlowMonthlyAfterPrepay, // monthly CF after prepay
+          cashFlowYear: cashFlowYearAfterPrepay, // yearly CF after prepay
+          cashFlowBeforePrepayYear: operatingAfterDebtYear,
+          cashFlowAfterDepr, // yearly CF after depreciation
+          palCarryOver: palCarryForward,
+          equity,
+          depreciationShield: annualDepreciation,
+          interestPaidThisYear, // 🆕 for summary
+          extraPrincipalPrepay: extraPrincipal // 🆕 CF used to pay down principal
+        });
+        // Recalculate payment after any prepayment / recast
+        if (mortgageBalance > 0 && remainingMonths > 0) {
+          if (monthlyRate > 0) {
+            monthlyPmt =
+              mortgageBalance *
+              (monthlyRate) /
+              (1 - Math.pow(1 + monthlyRate, -remainingMonths));
+          } else {
+            monthlyPmt = mortgageBalance / remainingMonths;
+          }
+        } else {
+          monthlyPmt = 0;
+        }
+      }
+      // If we never got a payoffYear and there was a loan, set it to MAX_YEARS
+      if (payoffYear === null) {
+        payoffYear = MAX_YEARS;
+      }
+      return {
+        rows,
+        payoffYear
+      };
+    }
+    /* ---------- table builders ---------- */
+    function buildTableETFvsETF(simResultsPerScenario) {
+      // Clear summary (ETF vs ETF uses no summary box)
+      if (summaryWrapperEl) {
+        summaryWrapperEl.innerHTML = "";
+      }
+      if (!simResultsPerScenario.length) {
+        resultsHeadEl.innerHTML = "";
+        resultsBodyEl.innerHTML = "";
+        noResultsMsgEl.style.display = "block";
+        const tableEl = document.querySelector("table");
+        if (tableEl) {
+          tableEl.classList.remove("etf-mode", "property-mode");
+        }
+        return;
+      }
+      noResultsMsgEl.style.display = "none";
+      const yearsCount = simResultsPerScenario[0].rows.length;
+      // decide if we show margin + tax columns
+      const showMarginCol = simResultsPerScenario.some(s =>
+        s.rows.some(r => Math.abs(r.yearlyMarginInterest || 0) > 1e-6)
+      );
+      const showTaxCol = simResultsPerScenario.some(s =>
+        s.rows.some(r => Math.abs(r.divTax || 0) > 1e-6)
+      );
+      // ---- HEADER ROWS ----
+      let row1 = `<tr>
+    <th class="sticky-left" rowspan="2">Yr</th>`;
+      simResultsPerScenario.forEach(s => {
+        // base 3 columns + optional margin + optional tax
+        let colSpan = 3;
+        if (showMarginCol) colSpan++;
+        if (showTaxCol) colSpan++;
+        row1 += `<th colspan="${colSpan}">${escapeHtml(s.name)}</th>`;
+      });
+      row1 += `</tr>`;
+      let row2 = `<tr>`;
+      simResultsPerScenario.forEach(() => {
+        row2 += `
+      <th>Account Value ($)</th>
+      <th>Dividend/yr ($)</th>
+      <th>Dividend/mo ($)</th>
+    `;
+        if (showMarginCol) {
+          row2 += `<th>Margin Interest ($)</th>`;
+        }
+        if (showTaxCol) {
+          row2 += `<th>Div Tax/yr ($)</th>`;
+        }
+      });
+      row2 += `</tr>`;
+      resultsHeadEl.innerHTML = row1 + row2;
+      // ---- BODY ROWS ----
+      let bodyHtml = "";
+      for (let i = 0; i < yearsCount; i++) {
+        bodyHtml += `<tr>`;
+        bodyHtml += `<td class="sticky-left">${i + 1}</td>`;
+        simResultsPerScenario.forEach(s => {
+          const r = s.rows[i];
+          bodyHtml += `
+        <td>${fmtNum(r.accountValue)}</td>
+        <td>${fmtNum(r.yearlyDividend)}</td>
+        <td>${fmtNum(r.monthlyDividend)}</td>
+      `;
+          if (showMarginCol) {
+            bodyHtml += `<td>${fmtNum(r.yearlyMarginInterest)}</td>`;
+          }
+          if (showTaxCol) {
+            bodyHtml += `<td>${fmtNum(r.divTax)}</td>`;
+          }
+        });
+        bodyHtml += `</tr>`;
+      }
+      resultsBodyEl.innerHTML = bodyHtml;
+      // 👇 mark table as ETF-mode (for narrower columns + scroll)
+      const tableEl = document.querySelector("table");
+      if (tableEl) {
+        tableEl.classList.add("etf-mode");
+        tableEl.classList.remove("property-mode");
+      }
+    }
+
+    function buildTablePropertyVsETF(etfRows, propRows, etfInput) {
+      if (!etfRows || !propRows) {
+        resultsHeadEl.innerHTML = "";
+        resultsBodyEl.innerHTML = "";
+        noResultsMsgEl.style.display = "block";
+        if (summaryWrapperEl) summaryWrapperEl.innerHTML = "";
+        const tableEl = document.querySelector("table");
+        if (tableEl) {
+          tableEl.classList.remove("etf-mode", "property-mode");
+        }
+        return;
+      }
+      noResultsMsgEl.style.display = "none";
+      const yearsCount = Math.min(etfRows.length, propRows.length);
+      // 👇 decide which extra ETF columns should be shown
+      const showMarginCol = etfRows.some(
+        r => Math.abs(r.yearlyMarginInterest || 0) > 1e-6
+      );
+      const showTaxCol = etfRows.some(
+        r => Math.abs(r.divTax || 0) > 1e-6
+      );
+      // base ETF columns: Account Value, Div/mo, Contribution/mo
+      // + optional Margin Interest
+      // + optional Dividend Tax
+      const etfColSpan = 3 + (showMarginCol ? 1 : 0) + (showTaxCol ? 1 : 0);
+      // ✅ HEADER ROWS (Property first, ETF second)
+      const row1 = `
+  <tr>
+    <th class="sticky-left" rowspan="2">Yr</th>
+    <th colspan="5">Property 🏠</th>
+    <th colspan="${etfColSpan}">ETF 📈</th>
+  </tr>
+`;
+      const row2 = `
+  <tr>
+    <!-- Property columns -->
+    <th>Equity ($)</th>
+    <th>Cash Flow/mo ($)</th>
+    <th>Property Value ($)</th>
+    <th>Cashflow after depreciation ($/yr)</th>
+    <th>PAL carry over ($)</th>
+
+    <!-- ETF columns -->
+    <th class="property-divider">Account Value ($)</th>
+    <th>Dividend/mo ($)</th>
+    <th>Contribution/mo ($)</th>
+    ${showMarginCol ? `<th>Margin Interest ($)</th>` : ""}
+    ${showTaxCol ? `<th>Dividend Tax/yr ($)</th>` : ""}
+  </tr>
+`;
+      resultsHeadEl.innerHTML = row1 + row2;
+      // ✅ BODY ROWS (Property cells first, ETF cells second)
+      let bodyHtml = "";
+      for (let i = 0; i < yearsCount; i++) {
+        const e = etfRows[i];
+        const p = propRows[i];
+        bodyHtml += `
+    <tr>
+      <td class="sticky-left">${i + 1}</td>
+
+      <!-- Property cells -->
+      <td>${fmtNum(p.equity)}</td>
+      <td class="${p.cashFlow < 0 ? "negative" : ""}">
+        ${fmtNum(p.cashFlow)}
+      </td>
+      <td>${fmtNum(p.propertyValue)}</td>
+      <td class="${p.cashFlowAfterDepr < 0 ? "negative" : ""}">
+        ${fmtNum(p.cashFlowAfterDepr)}
+      </td>
+      <td class="${p.palCarryOver < 0 ? "negative" : ""}">
+        ${fmtNum(p.palCarryOver)}
+      </td>
+
+      <!-- ETF cells -->
+      <td class="property-divider">${fmtNum(e.accountValue)}</td>
+      <td>${fmtNum(e.monthlyDividend)}</td>
+      <td>${fmtNum(e.monthlyContribution)}</td>
+      ${showMarginCol ? `<td>${fmtNum(e.yearlyMarginInterest)}</td>` : ""}
+      ${showTaxCol ? `<td>${fmtNum(e.divTax)}</td>` : ""}
+    </tr>
+  `;
+      }
+      resultsBodyEl.innerHTML = bodyHtml;
+      // keep table mode class
+      const tableEl = document.querySelector("table");
+      if (tableEl) {
+        tableEl.classList.remove("etf-mode");
+        tableEl.classList.add("property-mode");
+      }
+      // 🆕 --- Build the small ETF vs Property summary under the table ---
+      if (!summaryWrapperEl) return;
+      // ---------- ETF aggregates ----------
+      const totalDivReinvested = etfRows.reduce(
+        (sum, r) => sum + (r.divReinvested || 0),
+        0
+      );
+      const totalDivKept = etfRows.reduce(
+        (sum, r) => sum + (r.divKept || 0),
+        0
+      );
+      const reinvestYears =
+        etfRows.filter(r => (r.divReinvested || 0) > 1e-6).length || 0;
+      const keptDivYears =
+        etfRows.filter(r => (r.divKept || 0) > 1e-6).length || 0;
+      const totalDivTaxRaw = etfRows.reduce(
+        (sum, r) => sum + (r.divTax || 0),
+        0
+      );
+      const anyDivTax = etfRows.some(r => Math.abs(r.divTax || 0) > 1e-6);
+      const totalMarginRaw = etfRows.reduce(
+        (sum, r) => sum + (r.yearlyMarginInterest || 0),
+        0
+      );
+      const anyMargin = etfRows.some(
+        r => Math.abs(r.yearlyMarginInterest || 0) > 1e-6
+      );
+      const finalRow = etfRows[yearsCount - 1] || {};
+      const finalAccountValue = finalRow.accountValue || 0;
+      const effectiveDivTax = anyDivTax ? totalDivTaxRaw : 0;
+      const effectiveMargin = anyMargin ? totalMarginRaw : 0;
+      // "True ETF wealth" = account - running costs + dividends you kept in cash
+      const netOfRunningCosts =
+        finalAccountValue - effectiveDivTax - effectiveMargin + totalDivKept;
+      // ---------- Property aggregates ----------
+      // CF used to pay down principal (prepay)
+      const totalPositivePropCFToPrepay = propRows.reduce(
+        (sum, r) => sum + Math.max(r.extraPrincipalPrepay || 0, 0),
+        0
+      );
+      const prepayYears =
+        propRows.filter(r => (r.extraPrincipalPrepay || 0) > 1e-6).length || 0;
+      // CF actually kept (after property is paid off / or when not used for prepay)
+      const totalPositivePropCFKept = propRows.reduce((sum, r) => {
+        const cfYear = Math.max(r.cashFlowYear || 0, 0);
+        const usedForPrepay = Math.max(r.extraPrincipalPrepay || 0, 0);
+        const kept = Math.max(cfYear - usedForPrepay, 0);
+        return sum + kept;
+      }, 0);
+      const keptCFYears =
+        propRows.filter(r => {
+          const cfYear = Math.max(r.cashFlowYear || 0, 0);
+          const usedForPrepay = Math.max(r.extraPrincipalPrepay || 0, 0);
+          return cfYear - usedForPrepay > 1e-6;
+        }).length || 0;
+      // total "positive" CF before tax (used + kept)
+      const totalPositivePropCashFlow =
+        totalPositivePropCFToPrepay + totalPositivePropCFKept;
+      // simple rental tax model (same as before, but based on all positive CF)
+      const rentalTaxRate = 0.30;
+      const totalRentalTax = totalPositivePropCashFlow * rentalTaxRate;
+      // total mortgage interest paid (gross, pre-tax) + years with interest
+      const totalMortgageInterestPaid = propRows.reduce(
+        (sum, r) => sum + (r.interestPaidThisYear || 0),
+        0
+      );
+      const interestYears =
+        propRows.filter(r => (r.interestPaidThisYear || 0) > 1e-6).length || 0;
+      // Property wealth = final equity + kept CF after rental tax
+      const finalPropRow = propRows[yearsCount - 1] || {};
+      const finalEquity = finalPropRow.equity || 0;
+      const propertyTotalAssetValue =
+        finalEquity + (totalPositivePropCFKept - totalRentalTax);
+      summaryWrapperEl.innerHTML = `
+  <table class="summary-table">
+    <colgroup>
+      <col style="width: 35%;">
+      <col style="width: 15%;">
+      <col style="width: 35%;">
+      <col style="width: 15%;">
+    </colgroup>
+    <thead>
+  <tr>
+    <th colspan="2" class="summary-col-header property-col">
+      If you invest in the Property 🏠
+    </th>
+    <th colspan="2" class="summary-col-header etf-col">
+      If you invest same amount in the ETF 📈
+    </th>
+  </tr>
+</thead>
+
+    <tbody>
+
+      <tr>
+        <td>Total positive cash flow to pay down principal (${prepayYears || yearsCount} yrs)</td>
+        <td>
+          <span class="summary-value" title="${fmtFull(totalPositivePropCFToPrepay)}">
+            ${fmtShort(totalPositivePropCFToPrepay)}
+          </span>
+        </td>
+        <td class="summary-sublabel">
+          Total dividends reinvested (${reinvestYears || yearsCount} yrs)
+        </td>
+        <td>
+          <span class="summary-value" title="${fmtFull(totalDivReinvested)}">
+            ${fmtShort(totalDivReinvested)}
+          </span>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Total positive cash flow kept (${keptCFYears} yrs)</td>
+        <td>
+          <span class="summary-value" title="${fmtFull(totalPositivePropCFKept)}">
+            ${fmtShort(totalPositivePropCFKept)}
+          </span>
+        </td>
+        <td class="summary-sublabel">
+          Total dividends kept (${keptDivYears} yrs)
+        </td>
+        <td>
+          <span class="summary-value" title="${fmtFull(totalDivKept)}">
+            ${fmtShort(totalDivKept)}
+          </span>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Total rental income tax (${yearsCount} yrs)</td>
+        <td>
+          <span class="summary-value" title="${fmtFull(totalRentalTax)}">
+            ${fmtShort(totalRentalTax)}
+          </span>
+        </td>
+        <td class="summary-sublabel">
+          Total div tax paid (${yearsCount} yrs)
+        </td>
+        <td>
+          ${
+            etfInput && etfInput.retirementAccount
+              ? `<span class="summary-value">0 (retirement account)</span>`
+              : anyDivTax
+                ? `<span class="summary-value" title="${fmtFull(totalDivTaxRaw)}">
+                     ${fmtShort(totalDivTaxRaw)}
+                   </span>`
+                : `-`
+          }
+        </td>
+      </tr>
+
+      <tr>
+        <td>Total mortgage interest paid (${interestYears} yrs)</td>
+        <td>
+          <span class="summary-value" title="${fmtFull(totalMortgageInterestPaid)}">
+            ${fmtShort(totalMortgageInterestPaid)}
+          </span>
+        </td>
+        <td class="summary-sublabel">
+          Total margin interest paid (${yearsCount} yrs)
+        </td>
+        <td>
+          ${
+            anyMargin
+              ? `<span class="summary-value" title="${fmtFull(totalMarginRaw)}">
+                   ${fmtShort(totalMarginRaw)}
+                 </span>`
+              : `-`
+          }
+        </td>
+      </tr>
+
+      <tr class="summary-wealth-row">
+        <td>
+          Wealth<br>
+          (Property equity + cash flow kept – rental tax)
+        </td>
+        <td>
+          <span class="summary-value" title="${fmtFull(propertyTotalAssetValue)}">
+            ${fmtShort(propertyTotalAssetValue)}
+          </span>
+        </td>
+        <td class="summary-sublabel">
+          Wealth<br>
+          (ETF value + div kept – div tax – margin interest)
+        </td>
+        <td>
+          <span class="summary-value" title="${fmtFull(netOfRunningCosts)}">
+            ${fmtShort(netOfRunningCosts)}
+          </span>
+        </td>
+      </tr>
+
+    </tbody>
+  </table>
+`;
+    }
+    /* ---------- interactions ---------- */
+    // add new ETF scenario (ETF vs ETF mode only)
+    addScenarioBtn.addEventListener("click", () => {
+      if (appMode !== "etfEtf") return;
+      const blocks = scenarioEditorContainer.querySelectorAll(".etf-block");
+      if (blocks.length >= 3) return;
+      const lastData = readEtfScenariosFromDOM()[blocks.length - 1];
+      const newBlock = createETFScenarioBlock(blocks.length + 1, lastData, true, false, 0);
+      scenarioEditorContainer.appendChild(newBlock);
+      renumberEtfBlocks();
+      initCustomSteppers();
+    });
+    // run simulation
+    // run simulation
+    runSimBtn.addEventListener("click", () => {
+      // 🎉 Burst emojis
+      burstPhysicsEmojis(runSimBtn);
+      // --- 1) Your existing logic stays the same ---
+      if (appMode === "etfEtf") {
+        // ✅ reveal results panel in ETF vs ETF mode too
+        if (resultsPanelEl) {
+          resultsPanelEl.classList.remove("results-panel-hidden");
+          void resultsPanelEl.offsetHeight; // force reflow so transition plays
+          resultsPanelEl.classList.add("results-panel-visible");
+        }
+        const years = parseInt(yearsInput.value, 10) || 30;
+        const monthlyInflow = parseFloat(monthlyInflowInput.value) || 0;
+        const etfScenarios = readEtfScenariosFromDOM();
+        if (!etfScenarios.length) {
+          resultsHeadEl.innerHTML = "";
+          resultsBodyEl.innerHTML = "";
+          noResultsMsgEl.style.display = "block";
+          return;
+        }
+        const results = etfScenarios.map(s => ({
+          name: s.name,
+          rows: simulateETFScenario(s, years, monthlyInflow),
+        }));
+        buildTableETFvsETF(results);
+      } else {
+        // property vs ETF mode:
+        if (resultsPanelEl) {
+          resultsPanelEl.classList.remove("results-panel-hidden");
+          // force reflow for the transition
+          void resultsPanelEl.offsetHeight;
+          resultsPanelEl.classList.add("results-panel-visible");
+        }
+        recalcPropertyDerivedAndSyncUI();
+        const propInputs = getFullPropertyInputsForSim();
+        const etfInputs = getEtfInputForPropCompare();
+        if (!propInputs || !etfInputs) {
+          resultsHeadEl.innerHTML = "";
+          resultsBodyEl.innerHTML = "";
+          noResultsMsgEl.style.display = "block";
+          return;
+        }
+        const propResult = simulatePropertyScenario(
+          propInputs,
+          sharedInitialInvestment
+        );
+        const propRows = propResult.rows;
+        const payoffYear = propResult.payoffYear;
+        const contributionSchedule = propRows.map(r => {
+          const cfMonthly = r.cashFlow; // after extra principal payments
+          return cfMonthly < 0 ? -cfMonthly : 0;
+        });
+        const etfRows = simulateETFScenarioWithSchedule(
+          etfInputs,
+          contributionSchedule,
+          payoffYear
+        );
+        buildTablePropertyVsETF(etfRows, propRows, etfInputs);
+      }
+      // --- 2) AFTER layout changes, scroll so the button is ~2rem from top ---
+      setTimeout(() => {
+        const rootFontSize =
+          parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+        const offset = 2 * rootFontSize; // 2rem in px
+        const rect = runSimBtn.getBoundingClientRect();
+        const targetY = rect.top + window.scrollY - offset;
+        const autoScrollDuration = 750;
+        smoothScrollTo(Math.max(0, targetY), autoScrollDuration);
+      }, 1000); // tiny delay so animations/layout can update
+    });
+
+    function smoothScrollTo(targetY, duration = 600) {
+      const startY = window.scrollY;
+      const distance = targetY - startY;
+      let startTime = null;
+
+      function easing(t) {
+        // smooth ease-in-out
+        return t < 0.5 ?
+          2 * t * t :
+          -1 + (4 - 2 * t) * t;
+      }
+
+      function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        const progress = (timestamp - startTime) / duration;
+        const pct = Math.min(progress, 1);
+        const eased = easing(pct);
+        window.scrollTo(0, startY + distance * eased);
+        if (pct < 1) {
+          requestAnimationFrame(step);
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
+    function attachZeroSelectOnFocus() {
+      document.addEventListener("focusin", (e) => {
+        const el = e.target;
+        if (!(el instanceof HTMLInputElement)) return;
+        // apply to all numeric fields + ETF name fields
+        const isNumeric = el.type === "number";
+        const isEtfName = el.classList.contains("sc-name");
+        if (!isNumeric && !isEtfName) return;
+        // always select the whole value on focus
+        setTimeout(() => {
+          if (document.activeElement === el) {
+            el.select();
+          }
+        }, 0);
+      });
+    }
+    // helper to gather property inputs for sim (after live sync)
+    function getFullPropertyInputsForSim() {
+      const p = scenarioEditorContainer.querySelector(".property-block");
+      if (!p) return null;
+      return {
+        downPct: parseFloat(p.querySelector(".prop-downpct").value) || 0,
+        closingPct: parseFloat(p.querySelector(".prop-closepct").value) || 0,
+        rate: parseFloat(p.querySelector(".prop-rate").value) || 0,
+        appreciation: parseFloat(p.querySelector(".prop-appreciation").value) || 0,
+        taxPct: parseFloat(p.querySelector(".prop-taxpct").value) || 0,
+        maintPct: parseFloat(p.querySelector(".prop-maintpct").value) || 0,
+        maintGrowth: parseFloat(p.querySelector(".prop-maintgrowth").value) || 0,
+        insuranceMonthly: parseFloat(p.querySelector(".prop-insurance")?.value) || 0,
+        hoaMonthly: parseFloat(p.querySelector(".prop-hoa").value) || 0,
+        hoaGrowth: parseFloat(p.querySelector(".prop-hoagrowth").value) || 0,
+        rentMonthly: parseFloat(p.querySelector(".prop-rent").value) || 0,
+        rentGrowth: parseFloat(p.querySelector(".prop-rentgrowth").value) || 0,
+        occupancyPct: parseFloat(p.querySelector(".prop-occ").value) || 0,
+        mgmtPct: parseFloat(p.querySelector(".prop-mgmtpct").value) || 0,
+        randomFeeMonthly: parseFloat(p.querySelector(".prop-randomfee")?.value) || 0
+      };
+    }
+    // helper to gather ETF inputs in property compare mode
+    // helper to gather ETF inputs in property compare mode
+    function getEtfInputForPropCompare() {
+      const e = scenarioEditorContainer.querySelector(".etf-block");
+      if (!e) return null;
+      // --- Name ---
+      const nameEl = e.querySelector(".sc-name");
+      const nameVal = nameEl ? nameEl.value.trim() : "ETF";
+      // --- Initial investment: derived from the property inputs ---
+      const propDom = scenarioEditorContainer.querySelector(".property-block");
+      let initialInvestmentVal = 0;
+      if (propDom) {
+        const downPaymentCash =
+          parseFloat(propDom.querySelector(".prop-downamt")?.value) || 0;
+        const downPct =
+          parseFloat(propDom.querySelector(".prop-downpct")?.value) || 0;
+        const rate =
+          parseFloat(propDom.querySelector(".prop-rate")?.value) || 0;
+        const closingPct =
+          parseFloat(propDom.querySelector(".prop-closepct")?.value) || 0;
+        // Use the same helper as recalcPropertyDerivedAndSyncUI
+        const derived = calcPropertyDerived(downPaymentCash, downPct, rate);
+        const purchasePrice = derived.purchasePrice;
+        const closingCostCash = purchasePrice * (closingPct / 100);
+        // ETF initial = downpayment + closing cost
+        initialInvestmentVal = downPaymentCash + closingCostCash;
+      }
+      const levEl = e.querySelector(".sc-levpct");
+      const constLevEl = e.querySelector(".sc-constlev");
+      const marginEl = e.querySelector(".sc-marginrate");
+      const growthEl = e.querySelector(".sc-etfgrowth");
+      const divGrowthEl = e.querySelector(".sc-divgrowth");
+      const startYieldEl = e.querySelector(".sc-startyield");
+      const retireEl = e.querySelector(".sc-retirement");
+      return {
+        name: nameVal,
+        initialInvestment: initialInvestmentVal,
+        leveragePct: parseFloat(levEl ? levEl.value : 0) || 0,
+        constantLeverage: constLevEl ? !!constLevEl.checked : false,
+        marginRate: parseFloat(marginEl ? marginEl.value : 0) || 0,
+        etfGrowth: parseFloat(growthEl ? growthEl.value : 0) || 0,
+        divGrowth: parseFloat(divGrowthEl ? divGrowthEl.value : 0) || 0,
+        startingYield: parseFloat(startYieldEl ? startYieldEl.value : 0) || 0,
+        retirementAccount: retireEl ? !!retireEl.checked : false
+      };
+    }
+    /* ---------- live updates for derived fields in property mode ---------- */
+    function attachPropertyModeListeners() {
+      const container = scenarioEditorContainer;
+      // any change to shared initial cash, down %, rate should recalc mortgage/purchase/depr + ETF RO display
+      container.addEventListener("input", e => {
+        if (appMode !== "propertyVsEtf") return;
+        const cls = e.target.className || "";
+        // live recalc for things that affect mortgage / out of pocket / cashflow
+        if (
+          cls.includes("prop-downamt") ||
+          cls.includes("prop-downpct") ||
+          cls.includes("prop-rate") ||
+          cls.includes("prop-taxpct") ||
+          cls.includes("prop-hoa") ||
+          cls.includes("prop-insurance") ||
+          cls.includes("prop-maintpct") ||
+          cls.includes("prop-mgmtpct") ||
+          cls.includes("prop-occ") ||
+          cls.includes("prop-rent")
+        ) {
+          recalcPropertyDerivedAndSyncUI();
+        }
+        // cache user's "real" values ONLY if Zillow mode is OFF
+        //         const propDom = scenarioEditorContainer.querySelector(".property-block");
+        //         if (!propDom) return;
+        //         const toggleEl = propDom.querySelector(".prop-zillowtoggle");
+        //         if (!toggleEl || toggleEl.checked) {
+        //           return; // don't overwrite saved values while we're in Zillow mode
+        //         }
+        //         if (cls.includes("prop-maintpct")) {
+        //           lastUserMaintPct = e.target.value;
+        //         }
+        //         if (cls.includes("prop-mgmtpct")) {
+        //           lastUserMgmtPct = e.target.value;
+        //         }
+        //         if (cls.includes("prop-maintgrowth")) {
+        //           lastUserMaintGrowth = e.target.value;
+        //         }
+      });
+      const initField = document.getElementById("initialInvestmentGlobalInput");
+      if (initField) {
+        initField.addEventListener("input", () => {
+          if (appMode === "propertyVsEtf") {
+            recalcPropertyDerivedAndSyncUI();
+          }
+        });
+      }
+      const fieldsToWatch = [
+        ".prop-downamt",
+        ".prop-closepct",
+        ".prop-downpct",
+        ".prop-rate",
+        ".prop-taxpct",
+        ".prop-hoa",
+        ".prop-maintpct",
+        ".prop-insurance",
+        ".prop-mgmtpct",
+        ".prop-rent",
+        ".prop-occ",
+        ".prop-randomfee"
+      ];
+      fieldsToWatch.forEach(sel => {
+        const el = scenarioEditorContainer.querySelector(sel);
+        if (el) el.addEventListener("input", recalcPropertyDerivedAndSyncUI);
+      });
+      // 🆕 Zillow toggle listener
+      // const zillowToggle = scenarioEditorContainer.querySelector(".prop-zillowtoggle");
+      // if (zillowToggle) {
+      //   zillowToggle.addEventListener("change", () => {
+      //     if (appMode !== "propertyVsEtf") return;
+      //     applyZillowToggleState();
+      //     // recalcPropertyDerivedAndSyncUI() is already called at end of applyZillowToggleState
+      //   });
+      // }
+    } //attachPropertyModeListeners() ends
+    function attachClickableCheckboxBlocks() {
+      // Find every .checkbox-field in the current UI
+      const blocks = scenarioEditorContainer.querySelectorAll(".checkbox-field");
+      blocks.forEach(block => {
+        // find the actual <input type="checkbox"> inside
+        const box = block.querySelector('input[type="checkbox"]');
+        if (!box) return;
+        // make the whole block clickable
+        block.style.cursor = "pointer";
+        block.addEventListener("click", (e) => {
+          // If the user directly clicked the checkbox itself, let the browser do its normal toggle
+          if (e.target === box) return;
+          // Otherwise, manually toggle the checkbox
+          box.checked = !box.checked;
+          // Fire a "change" event so any listeners (like Zillow logic) still run
+          const changeEvt = new Event("change", {
+            bubbles: true
+          });
+          box.dispatchEvent(changeEvt);
+        });
+      });
+    }
+    /* ---------- mode switching ---------- */
+    function setMode(newMode) {
+      appMode = newMode;
+      // toggle on off for mode specific elements
+      const futuresTitleEl = document.querySelector(".results-panel .scenario-header-row");
+      if (futuresTitleEl) {
+        futuresTitleEl.style.display = (newMode === "propertyVsEtf") ? "" : "none";
+      }
+      const assumptionsEl = document.getElementById("assumptionsUnderTable");
+      if (assumptionsEl) {
+        assumptionsEl.style.display =
+          newMode === "propertyVsEtf" ? "" : "none";
+      }
+      // toggle active button styles
+      if (newMode === "etfEtf") {
+        modeEtfBtn.classList.add("active");
+        modePropBtn.classList.remove("active");
+      } else {
+        modePropBtn.classList.add("active");
+        modeEtfBtn.classList.remove("active");
+      }
+      const editorPanelEl = document.getElementById("editorPanel");
+      // render correct editor UI
+      if (newMode === "etfEtf") {
+        // ---------- ETF vs ETF ----------
+        renderETFMode();
+        // editor is NOT a panel in ETF vs ETF mode
+        if (editorPanelEl) editorPanelEl.classList.remove("panel");
+        // refs that MAY OR MAY NOT EXIST depending on what you've commented out
+        const yearsEditableField = document.getElementById("yearsEditableField");
+        const yearsReadonlyField = document.getElementById("yearsReadonlyField"); // might not exist
+        const yearsReadonlyValue = document.getElementById("yearsReadonlyValue"); // might not exist
+        const initInvestField = document.getElementById("initialInvestmentGlobalField");
+        const monthlyInflowInputEl = document.getElementById("monthlyInflowInput");
+        const inflowField = monthlyInflowInputEl ?
+          monthlyInflowInputEl.closest(".field") :
+          null;
+        // years is editable
+        if (yearsEditableField) yearsEditableField.style.display = "";
+        if (yearsReadonlyField) yearsReadonlyField.style.display = "none";
+        yearsInput.disabled = false;
+        // ✅ SHOW global initial investment in ETF vs ETF mode
+        if (initInvestField) initInvestField.style.display = "";
+        // show monthly inflow
+        if (inflowField) inflowField.style.display = "";
+        // body class
+        document.body.classList.remove("property-mode");
+        // change run button label
+        if (runSimBtn) {
+          runSimBtn.textContent = "Run Simulation";
+        }
+        // hide empty-state message in ETF mode
+        if (noResultsMsgEl) {
+          noResultsMsgEl.style.display = "none";
+        }
+        // hide summary box in ETF mode
+        if (summaryWrapperEl) {
+          summaryWrapperEl.style.display = "none";
+          summaryWrapperEl.innerHTML = "";
+        }
+        // 👉 in ETF vs ETF mode, results panel behaves normally (no special animation)
+        if (resultsPanelEl) {
+          resultsPanelEl.classList.add("results-panel-hidden");
+          resultsPanelEl.classList.remove("results-panel-visible");
+        }
+      } else {
+        // ---------- Property vs ETF ----------
+        renderPropertyMode();
+        // editor IS a panel in Property vs ETF mode
+        if (editorPanelEl) editorPanelEl.classList.add("panel");
+        // refs that MAY OR MAY NOT EXIST depending on what you've commented out
+        const yearsEditableField = document.getElementById("yearsEditableField");
+        const yearsReadonlyField = document.getElementById("yearsReadonlyField"); // might not exist
+        const yearsReadonlyValue = document.getElementById("yearsReadonlyValue"); // might not exist
+        const initInvestField = document.getElementById("initialInvestmentGlobalField");
+        const monthlyInflowInputEl = document.getElementById("monthlyInflowInput");
+        const inflowField = monthlyInflowInputEl ?
+          monthlyInflowInputEl.closest(".field") :
+          null;
+        // lock years to 30 in UI
+        if (yearsEditableField) yearsEditableField.style.display = "none";
+        if (yearsReadonlyField) yearsReadonlyField.style.display = "";
+        if (yearsReadonlyValue) yearsReadonlyValue.textContent = "30";
+        yearsInput.value = "30";
+        yearsInput.disabled = true;
+        // 🚫 HIDE global initial investment in Property vs ETF mode
+        if (initInvestField) initInvestField.style.display = "none";
+        // hide monthly inflow (ETF gets mortgage instead)
+        if (inflowField) inflowField.style.display = "none";
+        // add body class so CSS can hide ETF name field, etc.
+        document.body.classList.add("property-mode");
+        // restore FU button label
+        if (runSimBtn) {
+          runSimBtn.textContent = 'See Your F*uck U Money Future 💰🔮';
+        }
+        // show + reset empty-state message
+        if (noResultsMsgEl) {
+          noResultsMsgEl.textContent =
+            'Add your nums and click "See Your F*uck U Money Future 💰🔮"';
+          noResultsMsgEl.style.display = "block";
+        }
+        // show summary box container (content will be filled by buildTablePropertyVsETF)
+        if (summaryWrapperEl) {
+          summaryWrapperEl.style.display = "";
+          summaryWrapperEl.innerHTML = "";
+        }
+        // 👉 in Property vs ETF, hide the results panel until user runs the sim
+        if (resultsPanelEl) {
+          resultsPanelEl.classList.add("results-panel-hidden");
+          resultsPanelEl.classList.remove("results-panel-visible");
+        }
+      }
+      // attach listeners now that fresh DOM is rendered
+      attachPropertyModeListeners();
+      attachClickableCheckboxBlocks();
+      initCustomSteppers();
+      // reset table itself (but NOT the empty-state visibility – that's handled above)
+      resultsHeadEl.innerHTML = "";
+      resultsBodyEl.innerHTML = "";
+    }
+    //setMode() ends
+    modeEtfBtn.addEventListener("click", () => setMode("etfEtf"));
+    modePropBtn.addEventListener("click", () => setMode("propertyVsEtf"));
+
+    function applyZillowToggleState() {
+      const propDom = scenarioEditorContainer.querySelector(".property-block");
+      if (!propDom) return;
+      const toggleEl = propDom.querySelector(".prop-zillowtoggle");
+      const maintPctEl = propDom.querySelector(".prop-maintpct"); // "Maintenance % of value"
+      const maintGrowthEl = propDom.querySelector(".prop-maintgrowth"); // "Maint growth %/yr"
+      const mgmtPctEl = propDom.querySelector(".prop-mgmtpct"); // "Mgmt fee % of rent"
+      if (!toggleEl || !maintPctEl || !maintGrowthEl || !mgmtPctEl) return;
+      if (toggleEl.checked) {
+        //
+        // ✅ Zillow comparison mode ON
+        //
+        // store user's last-entered values before we override/lock,
+        // but only if we haven't already captured them
+        if (lastUserMaintPct === null) {
+          lastUserMaintPct = maintPctEl.value;
+        }
+        if (lastUserMgmtPct === null) {
+          lastUserMgmtPct = mgmtPctEl.value;
+        }
+        if (lastUserMaintGrowth === null) {
+          lastUserMaintGrowth = maintGrowthEl.value;
+        }
+        // force maint % and mgmt fee % to zero
+        maintPctEl.value = "0";
+        mgmtPctEl.value = "0";
+        // lock all three fields (maint %, maint growth, mgmt %)
+        maintPctEl.readOnly = true;
+        maintGrowthEl.readOnly = true;
+        mgmtPctEl.readOnly = true;
+        maintPctEl.classList.add("readonly-lock");
+        maintGrowthEl.classList.add("readonly-lock");
+        mgmtPctEl.classList.add("readonly-lock");
+      } else {
+        //
+        // 🔓 Zillow comparison mode OFF
+        //
+        // restore previous user values if we have them
+        if (lastUserMaintPct !== null) {
+          maintPctEl.value = lastUserMaintPct;
+        }
+        if (lastUserMgmtPct !== null) {
+          mgmtPctEl.value = lastUserMgmtPct;
+        }
+        if (lastUserMaintGrowth !== null) {
+          maintGrowthEl.value = lastUserMaintGrowth;
+        }
+        // unlock all three
+        maintPctEl.readOnly = false;
+        maintGrowthEl.readOnly = false;
+        mgmtPctEl.readOnly = false;
+        maintPctEl.classList.remove("readonly-lock");
+        maintGrowthEl.classList.remove("readonly-lock");
+        mgmtPctEl.classList.remove("readonly-lock");
+      }
+      // After toggling, recompute downstream totals
+      recalcPropertyDerivedAndSyncUI();
+    }
+    /* fun animation */
+    function burstPhysicsEmojis(btnEl) {
+      const {
+        Engine,
+        Render,
+        World,
+        Bodies,
+        Body,
+        Runner
+      } = Matter;
+      // Create engine once globally (so emojis pile up)
+      if (!window._emojiEngine) {
+        const canvas = document.getElementById("emojiCanvas");
+        const engine = Engine.create();
+        engine.gravity.y = 1; // gravity strength
+        const render = Render.create({
+          engine,
+          canvas,
+          options: {
+            width: window.innerWidth,
+            height: window.innerHeight,
+            wireframes: false,
+            background: "transparent"
+          }
+        });
+        const wallThickness = 100;
+        // Ground so emojis don't fall forever
+        const ground = Bodies.rectangle(
+          window.innerWidth / 2,
+          window.innerHeight + 50,
+          window.innerWidth + wallThickness * 2, // a little wider than screen
+          100, {
+            isStatic: true
+          }
+        );
+        // Left & right walls so they stay in viewport horizontally
+        const leftWall = Bodies.rectangle(
+          -wallThickness / 2,
+          window.innerHeight / 2,
+          wallThickness,
+          window.innerHeight * 2, {
+            isStatic: true
+          }
+        );
+        const rightWall = Bodies.rectangle(
+          window.innerWidth + wallThickness / 2,
+          window.innerHeight / 2,
+          wallThickness,
+          window.innerHeight * 2, {
+            isStatic: true
+          }
+        );
+        World.add(engine.world, [ground, leftWall, rightWall]);
+        const runner = Runner.create();
+        Runner.run(runner, engine);
+        Render.run(render);
+        // Save references so we can update them on resize
+        window._emojiEngine = engine;
+        window._emojiRender = render;
+        window._emojiGround = ground;
+        window._emojiLeftWall = leftWall;
+        window._emojiRightWall = rightWall;
+        window._emojiWallThickness = wallThickness;
+        // 🔁 Keep canvas + walls in sync with window size
+        window.addEventListener("resize", () => {
+          const w = window.innerWidth;
+          const h = window.innerHeight;
+          // Resize canvas / render
+          render.canvas.width = w;
+          render.canvas.height = h;
+          render.options.width = w;
+          render.options.height = h;
+          const gt = window._emojiGround;
+          const lw = window._emojiLeftWall;
+          const rw = window._emojiRightWall;
+          const wt = window._emojiWallThickness;
+          // --- ground ---
+          Body.setPosition(gt, {
+            x: w / 2,
+            y: h + 50
+          });
+          const groundWidth = gt.bounds.max.x - gt.bounds.min.x;
+          const targetGroundWidth = w + wt * 2;
+          if (groundWidth > 0) {
+            Body.scale(gt, targetGroundWidth / groundWidth, 1);
+          }
+          // --- walls ---
+          const targetWallHeight = h * 2;
+          const wallHeight = lw.bounds.max.y - lw.bounds.min.y;
+          if (wallHeight > 0) {
+            const scaleY = targetWallHeight / wallHeight;
+            Body.scale(lw, 1, scaleY);
+            Body.scale(rw, 1, scaleY);
+          }
+          Body.setPosition(lw, {
+            x: -wt / 2,
+            y: h / 2
+          });
+          Body.setPosition(rw, {
+            x: w + wt / 2,
+            y: h / 2
+          });
+        });
+      }
+      const engine = window._emojiEngine;
+      const EMOJIS = ["💰", "🔮", "💵", "🖕🏻"];
+      // Where to spawn emojis
+      const rect = btnEl.getBoundingClientRect();
+      const originX = rect.left + rect.width / 2;
+      const originY = rect.top + rect.height / 2;
+      const burstSize = 16;
+      for (let i = 0; i < burstSize; i++) {
+        const emoji = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+        const body = Bodies.circle(originX, originY, 20, {
+          restitution: 0.6, // bounciness
+          render: {
+            sprite: {
+              texture: emojiToPNG(emoji),
+              xScale: 0.8,
+              yScale: 0.8
+            },
+            opacity: 1
+          }
+        });
+        // Give each emoji a random push
+        Body.setVelocity(body, {
+          x: (Math.random() - 0.5) * 8,
+          y: -Math.random() * 8
+        });
+        World.add(engine.world, body);
+        // 🕒 After 5s, fade over 0.2s, then remove
+        setTimeout(() => {
+          const fadeDuration = 200;
+          const steps = 8;
+          const stepTime = fadeDuration / steps;
+          let currentStep = 0;
+          const fadeInterval = setInterval(() => {
+            currentStep++;
+            const t = currentStep / steps;
+            body.render.opacity = Math.max(0, 1 - t);
+            if (currentStep >= steps) {
+              clearInterval(fadeInterval);
+              World.remove(engine.world, body);
+            }
+          }, stepTime);
+        }, 5000);
+      }
+    }
+
+    function burstPhysicsLingeringEmojis(btnEl) {
+      const {
+        Engine,
+        Render,
+        World,
+        Bodies,
+        Body
+      } = Matter;
+      // Create engine once globally (so emojis pile up)
+      if (!window._emojiEngine) {
+        const canvas = document.getElementById("emojiCanvas");
+        const engine = Engine.create();
+        engine.gravity.y = 1; // gravity strength
+        const render = Render.create({
+          engine,
+          canvas,
+          options: {
+            width: window.innerWidth,
+            height: window.innerHeight,
+            wireframes: false,
+            background: "transparent"
+          }
+        });
+        // Ground so emojis don't fall forever
+        const ground = Bodies.rectangle(
+          window.innerWidth / 2,
+          window.innerHeight + 50,
+          window.innerWidth,
+          100, {
+            isStatic: true
+          }
+        );
+        World.add(engine.world, [ground]);
+        Engine.run(engine);
+        Render.run(render);
+        window._emojiEngine = engine;
+      }
+      const engine = window._emojiEngine;
+      const EMOJIS = ["💰", "🔮", "💵", "🖕🏻"];
+      // Where to spawn emojis
+      const rect = btnEl.getBoundingClientRect();
+      const originX = rect.left + rect.width / 2;
+      const originY = rect.top + rect.height / 2;
+      for (let i = 0; i < 12; i++) {
+        const emoji = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+        const body = Bodies.circle(originX, originY, 20, {
+          restitution: 0.6, // bounciness
+          render: {
+            sprite: {
+              texture: emojiToPNG(emoji),
+              xScale: 0.8,
+              yScale: 0.8
+            }
+          }
+        });
+        // Give each emoji a random push
+        Body.setVelocity(body, {
+          x: (Math.random() - 0.5) * 10,
+          y: -Math.random() * 12
+        });
+        World.add(engine.world, body);
+      }
+    }
+
+    function emojiToPNG(emoji) {
+      const canvas = document.createElement("canvas");
+      canvas.width = canvas.height = 64;
+      const ctx = canvas.getContext("2d");
+      ctx.font = "48px serif";
+      ctx.fillText(emoji, 8, 48);
+      return canvas.toDataURL();
+    }
+
+    function initCustomSteppers() {
+      const rows = document.querySelectorAll(".stepper-row");
+      rows.forEach(row => {
+        // ✅ don't double-bind listeners on rows we've already wired
+        if (row.dataset.stepperInit === "1") return;
+        const input = row.querySelector("input[type='number']");
+        if (!input) return;
+        const step = parseFloat(row.dataset.step) || 1;
+        const unit = row.dataset.unit || "";
+        const min =
+          row.dataset.min !== undefined ?
+          parseFloat(row.dataset.min) :
+          -Infinity;
+        const downBtn = row.querySelector(".step-down");
+        const upBtn = row.querySelector(".step-up");
+        // label buttons from data-step/unit (optional, but nice)
+        if (downBtn) downBtn.textContent = `-${step}${unit}`;
+        if (upBtn) upBtn.textContent = `+${step}${unit}`;
+
+        function getValue() {
+          const v = parseFloat(input.value);
+          return Number.isFinite(v) ? v : 0;
+        }
+
+        function updateDisabled() {
+          const v = getValue();
+          if (downBtn && Number.isFinite(min)) {
+            if (v <= min) {
+              downBtn.disabled = true;
+              downBtn.classList.add("step-btn-disabled");
+            } else {
+              downBtn.disabled = false;
+              downBtn.classList.remove("step-btn-disabled");
+            }
+          }
+        }
+
+        function setValue(newVal) {
+          if (Number.isFinite(min)) {
+            newVal = Math.max(min, newVal);
+          }
+          input.value = newVal;
+          // Trigger your existing logic (recalcPropertyDerivedAndSyncUI etc)
+          input.dispatchEvent(new Event("input", {
+            bubbles: true
+          }));
+          updateDisabled();
+        }
+        if (downBtn) {
+          downBtn.addEventListener("click", e => {
+            e.preventDefault();
+            setValue(getValue() - step);
+          });
+        }
+        if (upBtn) {
+          upBtn.addEventListener("click", e => {
+            e.preventDefault();
+            setValue(getValue() + step);
+          });
+        }
+        input.addEventListener("input", updateDisabled);
+        updateDisabled();
+        // ✅ mark this row as initialized so we don't attach again
+        row.dataset.stepperInit = "1";
+      });
+    }
+    document.addEventListener("click", (e) => {
+      if (!e.target.classList.contains("prop-occ-max-btn")) return;
+      const input = e.target.closest(".stepper-row").querySelector("input.prop-occ");
+      if (!input) return;
+      input.value = 100;
+      // trigger normal update logic
+      input.dispatchEvent(new Event("input", {
+        bubbles: true
+      }));
+    });
+    /* ---------- init ---------- */
+    (function init() {
+      document.documentElement.style.setProperty("--scale", uiScaleRange.value);
+      sharedInitialInvestment = DEFAULTS.property.downPayment;
+      setMode("propertyVsEtf");
+      attachZeroSelectOnFocus(); // 👈 new behavior
+    })();
+  </script>
+
+  <canvas id="emojiCanvas" style="position: fixed; top: 0; left: 0; pointer-events:none; z-index:100;">
+  </canvas>
+
+</body>
+
+<style>
+  :root {
+  --scale: 1.2; /* global scale for header / top elements only */
+  --panel-scale: var(--scale);
+  --radius-lg: 20px;
+  --radius-sm: 10px;
+
+  /*   --font-stack: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", "Helvetica Neue", Arial, "Noto Sans", sans-serif; */
+  --font-stack: "Google Sans Flex", sans-serif;
+}
+
+/* original color */
+/* :root {
+  --bg: #0f172a;
+  --panel: #1e253a;
+  --border: #2f394f;
+  --divider: #ffffff;
+  --text-primary: #f8fafc;
+  --text-dim: #94a3b8;
+  --accent: #38bdf8;
+  --accent-bg: rgba(56, 189, 248, 0.15);
+  --accent-hover-bg: rgba(56, 189, 248, 0.25);
+} */
+
+/* deep money green */
+:root {
+  --bg: #0f2413;
+  --panel: #1e3a24;
+  --panelOnPanel: #0f2413dd;
+  --border: #304f2f;
+  --divider: #ffffff;
+  --text-primary: #f8fafc;
+  --text-dim: #a2b894;
+  --accent: rgba(171, 248, 56, 1);
+  --accent-bg: rgba(171, 248, 56, 0.15);
+  --accent-hover-bg: rgba(171, 248, 56, 0.25);
+}
+
+.instrument-serif-regular {
+  font-family: "Instrument Serif", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.instrument-serif-regular-italic {
+  font-family: "Instrument Serif", serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.google-sans-flex-<uniquifier > {
+  font-family: "Google Sans Flex", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
+  font-variation-settings: "slnt" 0, "wdth" 100, "GRAD" 0, "ROND" 0;
+}
+
+/* Panels have their own independent scale variable */
+.panel {
+  --panel-scale: var(--scale);
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-stack);
+  line-height: 1.4;
+  padding: calc(2rem * var(--scale)) 16px;
+  display: flex;
+  flex-direction: column;
+  gap: calc(2rem * var(--scale));
+  box-sizing: border-box;
+}
+
+header.app-header {
+  display: flex;
+  flex-direction: column;
+  gap: calc(1rem * var(--scale));
+  align-items: stretch;
+}
+
+h1 {
+  /*   font-size: calc(2.4rem * var(--scale)); for san serif */
+  font-size: calc(3.6rem * var(--scale));
+  font-weight: 600;
+  text-align: center;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.top-controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(1rem * var(--scale)) calc(2rem * var(--scale));
+  align-items: flex-start;
+  justify-content: center;
+}
+
+/* Segmented control (mode) */
+.segmented-control {
+  background-color: var(--panelOnPanel);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  overflow: hidden;
+}
+
+.segmented-control button {
+  min-width: calc(9rem * var(--scale));
+  height: calc(3.5rem * var(--scale));
+
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  padding: calc(0.8rem * var(--scale)) calc(1rem * var(--scale));
+  cursor: pointer;
+  transition: background-color 0.12s, filter 0.12s;
+  font-size: calc(1.1rem * var(--scale));
+  font-weight: 600;
+  line-height: 1.2;
+}
+.segmented-control button:hover {
+  background-color: rgba(56, 189, 248, 0.07);
+}
+.segmented-control button:active {
+  filter: brightness(1.2);
+}
+.segmented-control button.active {
+  background-color: var(--accent-bg);
+  color: var(--accent);
+  font-weight: 700;
+}
+.segmented-control button.active:hover {
+  background-color: var(--accent-hover-bg);
+}
+
+/* UI scale control */
+.scale-control {
+  height: calc(3.5rem * var(--scale));
+  display: flex;
+  align-items: center;
+  gap: calc(0.75rem * var(--scale));
+  background-color: var(--panelOnPanel);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0 calc(1rem * var(--scale));
+  color: var(--text-primary);
+}
+
+.scale-control label {
+  white-space: nowrap;
+  font-size: calc(1.1rem * var(--scale));
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.scale-control input[type="range"] {
+  width: calc(8rem * var(--scale));
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.scale-control input[type="range"]:active {
+  filter: brightness(1.2);
+}
+
+/* Panel container */
+section.panel {
+  background-color: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: calc(2rem * var(--panel-scale));
+  display: flex;
+  flex-direction: column;
+}
+
+section#editorPanel{
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.global-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: calc(1.5rem * var(--panel-scale));
+}
+@media (max-width: 900px) {
+  .global-row { grid-template-columns: 1fr; }
+
+  table { min-width: 0; }              /* don’t force every table wide */
+  .scroll-wrapper table { min-width: 900px; }  /* only the 30yr table */
+}
+
+/* container holding scenario header/blocks */
+#scenarioEditorContainer {
+  display: flex;
+  flex-direction: column;
+  gap: calc(24px * var(--panel-scale));
+}
+
+.scenario-block,
+.shared-block {
+  background-color: rgba(148, 163, 184, 0.07);
+  /*   border: 2px solid var(--border); */
+  border-radius: var(--radius-lg);
+  padding: calc(1.5rem * var(--panel-scale));
+  display: flex;
+  flex-direction: column;
+  gap: calc(1.5rem * var(--panel-scale));
+}
+
+.scenario-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  row-gap: calc(1rem * var(--panel-scale));
+}
+
+.scenario-title {
+  font-size: calc(2rem * var(--panel-scale));
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: calc(0.75rem * var(--panel-scale));
+}
+
+.scenario-remove-btn {
+  background: transparent;
+  color: var(--text-primary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: calc(1rem * var(--panel-scale));
+  font-weight: 600;
+  padding: calc(0.6rem * var(--panel-scale)) calc(1rem * var(--panel-scale));
+  cursor: pointer;
+  line-height: 1.2;
+  transition: background-color 0.12s, filter 0.12s;
+}
+.scenario-remove-btn:hover:not([disabled]) {
+  background-color: rgba(255, 255, 255, 0.07);
+}
+.scenario-remove-btn:active:not([disabled]) {
+  filter: brightness(1.2);
+}
+.scenario-remove-btn[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.field-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: calc(1.5rem * var(--panel-scale));
+}
+
+@media (max-width: 900px) {
+  .field-group {
+    grid-template-columns: 1fr;
+  }
+}
+
+.field,
+.checkbox-field,
+.readonly-field {
+  display: flex;
+  flex-direction: column;
+  gap: calc(0.6rem * var(--panel-scale));
+  background-color: var(--panelOnPanel);
+  /*   border: 2px solid var(--border); */
+  border-radius: var(--radius-sm);
+  padding: calc(1.2rem * var(--panel-scale));
+}
+
+.down-combo-field .down-combo-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* tweak as you like */
+}
+
+/* $ amount takes ~67% */
+.down-combo-field .down-amount-wrap {
+  flex: 0 0 67%;
+}
+
+/* % input takes ~33% and keeps the % label attached */
+.down-combo-field .down-percent-wrap {
+  flex: 0 0 33%;
+  display: flex;
+  align-items: center;
+}
+
+.down-combo-field .down-percent-wrap input {
+  width: 100%;
+}
+
+.down-combo-field .down-percent-suffix {
+  margin-left: 0.25rem;
+  font-size: 0.9em;
+  opacity: 0.7; /* or use your dim text token */
+}
+
+.prop-downpct,
+.prop-hoagrowth{
+  text-align: right;
+}
+
+.hoa-combo-field .hoa-combo-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* adjust as you like */
+}
+
+/* HOA amount ~67% */
+.hoa-combo-field .hoa-amount-wrap {
+  flex: 0 0 67%;
+}
+
+/* HOA growth ~33% with suffix label */
+.hoa-combo-field .hoa-growth-wrap {
+  flex: 0 0 33%;
+  display: flex;
+  align-items: center;
+}
+
+.hoa-combo-field .hoa-growth-wrap input {
+  width: 100%;
+}
+
+.hoa-combo-field .hoa-growth-suffix {
+  margin-left: 0.25rem;
+  font-size: 0.9em;
+  opacity: 0.7; /* or use your dim-text token */
+}
+
+
+
+
+/* Assumption box collapsible */
+#assumptionBox {
+  padding: 12px;
+  border-radius: var(--radius-sm);
+
+  background-color: rgba(148, 163, 184, 0.07);
+}
+
+/* Make the header clickable and aligned */
+.assumption-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.assumption-title {
+  font-size: calc(1.2rem * var(--panel-scale));
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+
+.assumptions-under-table {
+  margin: 2rem 0rem;
+}
+
+.assumptions-under-table .scenario-header-row {
+  margin-bottom: 0.75rem;
+}
+
+.assumptions-content {
+  opacity: 0.9;
+  line-height: 1.5;
+  font-size: calc(1rem * var(--panel-scale));
+}
+
+.assumptions-bullets {
+  margin-top: 0.75rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+
+.field input[disabled] {
+  opacity: 1; /* remove grayed-out browser style */
+  background-color: transparent; /* same as .readonly-field */
+  color: var(--accent); /* same bright text as readonly values */
+  border-color: transparent;
+  cursor: not-allowed;
+  padding-left: 0;
+  padding-top: 0;
+}
+
+label,
+.checkbox-label {
+  font-size: calc(1.2rem * var(--panel-scale));
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.helper-line {
+  font-size: calc(1rem * var(--panel-scale));
+  font-weight: 400;
+  color: var(--text-dim);
+  line-height: 1.4;
+}
+
+.readonly-value {
+  font-size: calc(1.2rem * var(--panel-scale));
+  font-weight: 600;
+  color: var(--accent);
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+input,
+select,
+textarea {
+  caret-color: var(--accent);
+}
+
+/* base state */
+input,
+select {
+  width: 100%;
+  background-color: var(--bg);
+  color: var(--text-primary);
+  border-width: 2px;
+  border-style: solid;
+  border-color: var(--border);
+  border-radius: var(--radius-sm);
+  padding: calc(1rem * var(--panel-scale));
+  font-size: calc(1.5rem * var(--panel-scale));
+  min-height: calc(3rem * var(--panel-scale));
+  box-sizing: border-box;
+  height: calc(3.5rem * var(--panel-scale));
+}
+
+/* Keep the spacing fix */
+select {
+  height: auto;
+  min-height: calc(3rem * var(--panel-scale));
+  padding-top: calc(0.8rem * var(--panel-scale));
+  padding-bottom: calc(0.8rem * var(--panel-scale));
+  padding-right: calc(3rem * var(--panel-scale));
+}
+
+/* Custom Material Symbols arrow for dropdowns */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* Inline Material Symbols keyboard_arrow_down (white color) */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'><path d='M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z'/></svg>");
+  background-repeat: no-repeat;
+
+  /* Move arrow left (adjust the spacing here) */
+  background-position: right calc(1.4rem * var(--panel-scale)) center;
+  background-size: calc(1.4rem * var(--panel-scale));
+
+  /* Add proper padding so text doesn't collide with arrow */
+  padding-right: calc(3rem * var(--panel-scale));
+
+  /* Keep your earlier styling fixes */
+  height: auto;
+  min-height: calc(3rem * var(--panel-scale));
+  padding-top: calc(0.8rem * var(--panel-scale));
+  padding-bottom: calc(0.8rem * var(--panel-scale));
+  color: var(--text-primary);
+}
+
+
+
+/* focus state – no outline, no size change */
+input:focus,
+select:focus {
+  outline: none; /* remove blue outline */
+  border-color: #94a3b8; /* gray highlight border */
+  box-shadow: none; /* no outer glow */
+}
+
+input:hover,
+select:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+input.sc-name {
+  background-color: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 1rem;
+  font-size: inherit;
+  min-width: 12rem;
+  color: var(--text-primary);
+}
+
+
+
+/* Hide tiny number steppers (Chrome, Safari, Edge, Opera) */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Hide number steppers (Firefox) */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Row: input + two stepper buttons */
+.stepper-row {
+  display: flex;
+  gap: calc(0.75rem * var(--panel-scale));
+  align-items: stretch;
+  width: 100%;
+}
+
+/* Input grows to fill; same height as buttons */
+.stepper-row input[type="number"] {
+  flex: 1 1 auto;
+}
+
+/* Step buttons: same visual height as input */
+.step-btn {
+  border: 1px solid var(--border);
+  background-color: var(--panel);
+  color: var(--text-primary);
+  font-size: calc(1rem * var(--panel-scale));
+  padding: 0 0.9rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  line-height: 1;
+  white-space: nowrap;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Make them stretch to input height */
+  /* The row's height is defined by the tallest child, so matching padding + flex-center is enough */
+}
+
+.step-btn:hover:not([disabled]) {
+  background-color: rgba(148, 163, 184, 0.25);
+}
+
+.step-btn:active:not([disabled]) {
+  background-color: rgba(148, 163, 184, 0.35);
+}
+
+/* Disabled / grayed out */
+.step-btn[disabled],
+.step-btn.step-btn-disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.step-btn:hover:not([disabled]) {
+  background-color: rgba(148, 163, 184, 0.25);
+}
+
+.step-btn:active:not([disabled]) {
+  background-color: rgba(148, 163, 184, 0.35);
+}
+
+/* disabled / grayed out */
+.step-btn[disabled],
+.step-btn.step-btn-disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.checkbox-row {
+  display: flex;
+  /*   align-items: flex-start; */
+  align-items: center;
+  gap: calc(0.8rem * var(--panel-scale));
+  font-size: calc(1.2rem * var(--panel-scale));
+}
+
+.checkbox-row input[type="checkbox"] {
+  width: calc(1.5rem * var(--panel-scale));
+  height: calc(1.5rem * var(--panel-scale));
+  accent-color: var(--accent);
+  margin-top: calc(0.25rem * var(--panel-scale));
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.checkbox-field {
+  cursor: pointer; /* lets user know they can tap anywhere */
+  transition: background-color 0.12s, filter 0.12s;
+}
+
+.checkbox-field {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* ✅ vertically centers everything */
+  gap: calc(0.4rem * var(--panel-scale));
+  background-color: var(--panelOnPanel);
+  /*   border: 2px solid var(--border); */
+  border-radius: var(--radius-sm);
+  padding: calc(1rem * var(--panel-scale)) calc(1.2rem * var(--panel-scale));
+}
+
+.checkbox-field:hover {
+  background-color: rgba(255, 255, 255, 0.07);
+}
+
+.field .checkbox-field{
+  padding: 0;
+  padding-left: 0.5rem;
+  margin:0;
+  gap:0;
+  height: auto;
+}
+
+.field .checkbox-field:hover{
+  background-color: none;
+}
+
+.field .checkbox-field input {
+  height: auto;
+  padding:0;
+  margin:0;
+}
+
+
+
+
+/* Base advanced blocks (margin + maintenance growth) */
+.leverage-advanced,
+.maint-advanced {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: max-height 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;       /* no hover/click while hidden or animating out */
+}
+
+/* Fully visible (takes space, animated in) */
+.leverage-advanced--visible,
+.maint-advanced--visible {
+  max-height: 500px;          /* just needs to be > actual content height */
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;       /* clickable again */
+}
+
+/* After fade-out, we mark it fully hidden so grid reflows */
+.leverage-advanced--hidden,
+.maint-advanced--hidden {
+  display: none;              /* removes it from layout entirely */
+}
+
+/* While animating out (before we apply --hidden) */
+.leverage-advanced--animating-out,
+.maint-advanced--animating-out {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+}
+
+
+
+
+
+button.action-btn {
+  background-color: var(--accent);
+  color: #0f172a;
+  border: 2px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: calc(1rem * var(--panel-scale)) calc(1.4rem * var(--panel-scale));
+  font-weight: 700;
+  cursor: pointer;
+  font-size: calc(1.5rem * var(--panel-scale));
+  line-height: 1.5;
+  transition: background-color 0.12s, filter 0.12s;
+}
+button.action-btn:hover:not([disabled]) {
+  background-color: var(--accent-hover-bg);
+  color: var(--accent);
+  filter: brightness(1.15);
+}
+button.action-btn:active:not([disabled]) {
+  filter: brightness(1.3);
+}
+button.run-btn {
+  /*   background-color: #4ade80;
+  color: #0f172a;
+  border-color: #4ade80; */
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+button.run-btn:hover:not([disabled]) {
+  background-color: rgba(74, 222, 128, 0.15);
+  color: var(--accent);
+}
+button.run-btn:active:not([disabled]) {
+  filter: brightness(1.3);
+}
+button.action-btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.scroll-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+}
+
+
+
+
+
+
+
+.results-empty {
+  font-size: calc(1.2rem * var(--panel-scale));
+  color: var(--text-dim);
+  text-align: center;
+  padding: calc(1rem * var(--panel-scale)) 0;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: calc(1.1rem * var(--panel-scale));
+  table-layout: fixed;
+}
+
+th,
+td {
+  border: 2px solid var(--border);
+  padding: calc(0.8rem * var(--panel-scale)) calc(1rem * var(--panel-scale));
+  text-align: right;
+  color: var(--text-primary);
+  white-space: normal; /* allow wrapping */
+  word-break: break-word; /* break long text */
+  background-clip: padding-box;
+}
+
+th {
+  background-color: var(--panel);
+  color: var(--accent);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+th.sticky-left,
+td.sticky-left {
+  position: sticky;
+  left: 0;
+  background-color: var(--panel);
+  text-align: left;
+  z-index: 3;
+  width: 24px;
+  min-width: 24px;
+  max-width: 24px;
+  padding-left: calc(0.5rem * var(--panel-scale));
+  padding-right: calc(0.5rem * var(--panel-scale));
+  border: 2px solid var(--border); /* 👈 add this */
+}
+
+/* tbody tr:nth-child(even) td {
+  background-color: rgba(148,163,184,0.08);
+} */
+
+tbody tr:nth-child(odd) td {
+  background-color: var(--panel);
+}
+
+tbody tr:nth-child(even) td {
+  background-color: var(--panelOnPanel);
+}
+
+
+/* --- ETF vs ETF table: more compact, not forced full-width --- */
+table.etf-mode {
+  width: 100%;              /* don't stretch to fill panel */
+  min-width: 0;             /* allow it to shrink */
+  max-width: 100%;          /* never overflow panel */
+  table-layout: auto;       /* columns fit their content */
+  margin-inline: auto;      /* center the narrower table */
+}
+
+/* slightly tighter cell padding in ETF mode so columns feel less chunky */
+table.etf-mode th,
+table.etf-mode td {
+  padding: calc(0.6rem * var(--panel-scale))
+           calc(0.6rem * var(--panel-scale));
+}
+
+table.etf-mode thead th {
+  text-align: center;
+}
+
+
+.property-mode th[colspan] {
+  text-align: center;
+}
+
+.section-divider, snapshot-title{
+  display: flex;
+  align-items: center;
+  gap: calc(1rem * var(--panel-scale));
+  margin: calc(1.6rem * var(--panel-scale)) 0 calc(1rem * var(--panel-scale));
+  margin-bottom: 0px;
+}
+
+.section-divider span {
+  font-size: calc(1.2rem * var(--panel-scale));
+/*   font-weight: 900; */
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.section-divider::after {
+  content: "";
+  flex: 1;
+  height: 0.5px;
+  background-color: var(--divider);
+  opacity: 0.3;
+}
+
+body.property-mode .sc-name {
+  display: none !important;
+}
+
+body.property-mode #editorPanel {
+  background-color: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+}
+
+body #editorPanel .actions-row {
+  justify-content: center;
+}
+
+/* add button press animation */
+/* make the actions-row a positioning context */
+#editorPanel .actions-row {
+  position: relative;
+}
+
+
+
+/* each emoji particle */
+.emoji-pop {
+  position: absolute;
+  font-size: 4.5rem; /* size of emoji */
+  pointer-events: none; /* don't block clicks */
+  animation: emoji-rain-650 800ms linear;
+  z-index: 100;
+}
+
+/* keyframes for the float / rain */
+@keyframes emoji-rain-500 {
+  0% {
+    transform: translateY(0px);
+  }
+  25% {
+    transform: translateY(31px);
+  }
+  50% {
+    transform: translateY(125px);
+  }
+  75% {
+    transform: translateY(282px);
+  }
+  100% {
+    transform: translateY(500px);
+  }
+}
+
+@keyframes emoji-rain-650 {
+  0% {
+    transform: translateY(0px);
+  }
+  25% {
+    transform: translateY(41px);
+  }
+  50% {
+    transform: translateY(112px);
+  }
+  75% {
+    transform: translateY(314px);
+  }
+  100% {
+    transform: translateY(600px);
+  }
+}
+
+@keyframes emoji-rain-800 {
+  0% {
+    transform: translateY(0px);
+  }
+  25% {
+    transform: translateY(50px);
+  }
+  50% {
+    transform: translateY(200px);
+  }
+  75% {
+    transform: translateY(450px);
+  }
+  100% {
+    transform: translateY(800px);
+  }
+}
+
+.readonly-lock {
+  background-color: rgba(148, 163, 184, 0.15) !important;
+  color: var(--text-dim) !important;
+  border-color: var(--border) !important;
+  cursor: not-allowed !important;
+}
+.readonly-lock::placeholder {
+  color: var(--text-dim);
+}
+/* ===============================
+   SUMMARY TABLE — RESPONSIVE SCROLL (MOBILE)
+   Goal: <900px => table becomes 900px wide and scrolls horizontally only
+   =============================== */
+
+/* Make sure the SUMMARY wrapper is the scroll container */
+#summaryWrapper {
+  width: 100%;
+  display: block;
+
+  /* only horizontal scroll */
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+
+  /* prevent vertical clipping from any parent constraints */
+  height: auto !important;
+  max-height: none !important;
+
+  -webkit-overflow-scrolling: touch;
+
+  /* keeps scrollbar from sitting on content */
+  margin: 1.5rem 0;
+  
+}
+
+/* IMPORTANT: remove any sticky behavior in summary header/left col */
+#summaryWrapper .summary-table thead th,
+#summaryWrapper .summary-table th.sticky-left,
+#summaryWrapper .summary-table td.sticky-left {
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  z-index: auto !important;
+}
+
+/* Keep table sane + prevent “cram-to-fit” behavior */
+#summaryWrapper .summary-table {
+  width: 100%;
+  table-layout: fixed;          /* keep your column sizing consistent */
+  height: auto !important;
+}
+
+/* < 900px: force summary table to be 900px wide and scroll horizontally */
+@media (max-width: 600px) {
+  #summaryWrapper .summary-table {
+    min-width: 700px !important;
+  }
+
+  /* avoid weird wrapping explosions on small screens */
+  #summaryWrapper .summary-table th,
+  #summaryWrapper .summary-table td {
+    white-space: normal;        /* allow wrapping within a 900px table */
+    word-break: break-word;
+  }
+}
+
+
+
+
+/* ===============================
+   SUMMARY TABLE — CLEAN BASELINE
+   =============================== */
+
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  box-sizing: border-box;
+
+  /* typography baseline */
+  font-size: calc(1.05rem * var(--panel-scale));
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* ===============================
+   SUMMARY TABLE — MOBILE
+   =============================== */
+
+@media (max-width: 900px) {
+  .summary-table {
+    font-size: 0.95rem; /* slightly tighter on mobile */
+  }
+
+  .summary-table th,
+  .summary-table td {
+    padding: 0.5rem 0.5rem;
+  }
+
+  /* Keep headers readable but not huge */
+  .summary-table thead th {
+    font-size: 0.95rem;
+  }
+
+  /* Wealth numbers still pop, just scaled down */
+/*   .summary-wealth-row .summary-value {
+    font-size: 1.2rem;
+  } */
+}
+
+
+/* ALL cells behave the same */
+.summary-table th,
+.summary-table td {
+  padding: .75rem;
+  border: 1px solid var(--border);
+  background: transparent;
+  text-align: left;
+  vertical-align: middle;
+
+  /* kill browser <th> defaults */
+  font-weight: inherit;
+  font-size: inherit;
+}
+
+/* ===============================
+   HEADER ROW (Property / ETF)
+   =============================== */
+
+.summary-table thead th {
+  background: var(--panelOnPanel);
+  color: var(--accent);
+  font-weight: 700;
+  text-align: center;
+}
+
+/* ===============================
+   LABEL COLUMNS (dimmed text)
+   =============================== */
+
+.summary-table tbody td:nth-child(1),
+.summary-table tbody td:nth-child(3) {
+  font-weight: 300;
+  font-size: calc(1.1rem * var(--panel-scale));
+}
+
+/* ===============================
+   VALUE CELLS
+   =============================== */
+
+.summary-value {
+  font-weight: 700;
+}
+
+.summary-wealth-row .summary-value {
+  font-size: 1.2rem;
+  line-height: 1.1;
+  color: var(--accent);
+}
+
+/* --- Results panel reveal animation --- */
+.results-panel {
+  transition:
+    max-height 0.25s ease,
+    opacity 0.25s ease,
+    transform 0.25s ease,
+    padding-top 0.25s ease,
+    padding-bottom 0.25s ease,
+    margin-top 0.25s ease,
+    border-width 0.25s ease;
+  overflow: hidden; /* so content doesn't peek out while collapsed */
+}
+
+/* Hidden state used in Property vs ETF mode before first run */
+.results-panel-hidden {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(8px);
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: 0;
+  border-width: 0; /* visually remove the panel */
+  pointer-events: none; /* can't interact while hidden */
+}
+
+/* Explicit visible state once we've animated it in */
+.results-panel-visible {
+  max-height: none !important;
+  overflow: visible !important;
+  opacity: 1;
+  transform: translateY(0);
+  border-width: 1px; /* match your .panel border */
+  pointer-events: auto;
+}
+
+
+/* default divider between ETF and Property */
+.property-mode td.property-divider,
+.property-mode th.property-divider {
+  border-left: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+.negative {
+  color: #f87171 !important; /* Tailwind 'red-400' vibe */
+  font-weight: 500;
+}
+
+
+/* etf vs etf */
+.global-row > .field {
+  background-color: none;
+  border: 2px solid var(--panel);
+}
+
+/* ETF name autocomplete */
+.field.etf-name-field {
+  position: relative; /* anchor dropdown */
+}
+
+.etf-suggestions {
+  position: absolute;
+  top: 82px;
+  left: 14px;
+  right: 0;
+  margin-top: 4px;
+  max-height: 14rem;
+  max-width: calc(100% - 28px);
+  overflow-y: auto;
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  z-index: 30;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+.etf-suggestion-item {
+  padding: calc(0.6rem * var(--panel-scale))
+           calc(0.9rem * var(--panel-scale));
+  font-size: calc(1.1rem * var(--panel-scale));
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.etf-suggestion-item-ticker {
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.etf-suggestion-item-name {
+  flex: 1;
+  text-align: right;
+  color: var(--text-dim);
+}
+
+.etf-suggestion-item:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Snapshot panel layout: 2-column grid */
+.comparison-snapshot-block .comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 1.5rem;   /* horizontal space between ETF / Property */
+  row-gap: 1.25rem;     /* vertical spacing between rows if it ever wraps */
+  align-items: flex-start;
+}
+
+/* Make the ETF + Property columns behave like normal field stacks */
+.comparison-snapshot-block .comparison-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem; /* matches the vertical spacing between fields in other panels */
+}
+
+/* Optional: tighten helper lines so it feels like your other blocks */
+.comparison-snapshot-block .field .helper-line {
+  margin-top: 0.25rem;
+}
+
+/* Snapshot titles match section-divider */
+.comparison-snapshot-block .comparison-title {
+  font-family: var(--font-stack);
+  font-size: 1.05rem;
+  font-weight: 600;
+  opacity: 0.85;
+  margin: 1.2rem 0 0.6rem;
+  letter-spacing: 0.2px;
+}
+
+
+  
+</style>
+
+</html>
