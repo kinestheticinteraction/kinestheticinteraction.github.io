@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <!-- <meta name="theme-color" content="#0b120c" /> -->
+    <title>Justified PE Modeling</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=Instrument+Sans:wght@400;600;700&family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-page: #fbfbfb;
+            --bg-card: #0b120c;
+            --accent: #9CFF19;
+            --text-main: #ffffff;
+            --text-dim: rgba(255, 255, 255, 0.45);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        html,
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            background: var(--bg-page);
+            margin: 0;
+            padding: 0;
+            width: 100%;
+        }
+
+        body {
+            font-family: 'Instrument Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        @media (min-width: 600px) {
+            html {
+                background: var(--bg-page);
+            }
+        }
+
+        .main-container {
+            background: var(--bg-card);
+            color: var(--text-main);
+            width: 100%;
+            max-width: 440px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            position: relative;
+            justify-content: flex-start;
+            overflow-x: hidden;
+        }
+
+        .content-area-wrap {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding-top: 8vh;
+            /* Centering the baseline initially */
+            width: 100%;
+            padding-bottom: 24px;
+        }
+
+        .bottom-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding: 0;
+            margin-top: auto;
+        }
+
+        @media (min-width: 600px) {
+            html {
+                background: var(--bg-page);
+            }
+
+            .main-container {
+                min-height: 720px;
+                height: auto;
+                width: 560px;
+                border-radius: 24px;
+                box-shadow: 0 40px 100px rgba(0, 0, 0, 0.15);
+                margin: 40px auto;
+                overflow: visible;
+            }
+        }
+
+        h1 {
+            font-family: 'Instrument Serif', serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 36px;
+            text-align: center;
+            margin: 0;
+            padding: 32px 12px;
+            letter-spacing: -0.01em;
+        }
+
+        /* Tickers */
+        .ticker-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            /* Removed align-items: center to allow full width */
+        }
+
+        .ticker-row {
+            display: grid;
+            grid-template-rows: repeat(2, auto);
+            grid-auto-flow: column;
+            gap: 8px;
+            overflow-x: auto;
+            justify-content: start;
+            /* Hide scrollbar */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            width: 100%;
+            padding: 0 16px;
+            /* Spacing handled inside scroll container */
+        }
+
+        .ticker-row::-webkit-scrollbar {
+            display: none;
+        }
+
+        .ticker-btn {
+            background: transparent;
+            border: 1px solid var(--text-dim);
+            color: var(--text-main);
+            padding: 8px 14px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: none;
+            white-space: nowrap;
+        }
+
+        .ticker-btn:not(.active):hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .ticker-btn.active {
+            background: var(--text-main);
+            color: #000;
+        }
+
+        /* Modeling Table */
+        .modeling-grid {
+            display: grid;
+            grid-template-columns: 78px 78px auto 78px;
+            column-gap: 12px;
+            row-gap: 12px;
+            align-items: center;
+            width: 100%;
+            padding: 0 12px;
+            justify-content: center;
+            transition: grid-template-columns 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .modeling-grid.no-ttm {
+            grid-template-columns: 85px 85px auto 0px;
+            column-gap: 24px;
+        }
+
+        .header-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .jpe-column {
+            transition: margin-left 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .ttm-row {
+            opacity: 1;
+            transform: translateX(0);
+            transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            white-space: nowrap;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .no-ttm .ttm-row {
+            opacity: 0;
+            transform: translateX(40px);
+            /* Tighter offset so it appears within the grid context */
+            pointer-events: none;
+        }
+
+        .no-ttm .divider {
+            display: none;
+        }
+
+        .pill-wrap {
+            height: 48px;
+            width: 100%;
+            max-width: 85px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px solid transparent;
+            transition: background 0.5s ease;
+        }
+
+        .pill-wrap.inactive:hover {
+            border-color: var(--accent);
+        }
+
+        /* State management for pills */
+        .pill-wrap.inactive {
+            background: #252a26;
+            pointer-events: none;
+        }
+
+        .pill-wrap.active {
+            background: var(--accent);
+            pointer-events: auto;
+        }
+
+        .pill-input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: transparent;
+            text-align: center;
+            font-family: 'Google Sans Flex', sans-serif;
+            font-size: 24px;
+            font-weight: 500;
+            outline: none;
+            padding: 0;
+            transition: color 0.5s ease;
+        }
+
+        .pill-wrap.inactive .pill-input {
+            color: var(--text-main);
+        }
+
+        .pill-wrap.inactive:hover .pill-input {
+            color: var(--accent);
+            transition: none;
+        }
+
+        .pill-wrap.active .pill-input {
+            color: #000;
+        }
+
+        .value-large {
+            font-family: 'Google Sans Flex', sans-serif;
+            font-size: 32px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .delta {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .delta.up {
+            color: var(--accent);
+        }
+
+        .delta.down {
+            color: #ff4d4d;
+        }
+
+        .ttm-pe {
+            font-family: 'Google Sans Flex', sans-serif;
+            font-size: 24px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .divider {
+            grid-column: 1 / -1;
+            height: 1px;
+            background: var(--border);
+            margin: 0;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .add-btn {
+            background: transparent;
+            border: 1px solid var(--text-dim);
+            color: var(--text-main);
+            padding: 10px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .add-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        #deleteScenarioBtn:hover {
+            border-color: #ff4d4d;
+            color: #ff4d4d;
+        }
+
+        .footnote {
+            font-size: 10px;
+            color: var(--text-dim);
+            line-height: 1.5;
+            text-align: left;
+            margin-top: 0;
+            padding: 0 16px 16px 16px;
+        }
+
+        .footnote a {
+            color: var(--text-dim);
+            text-decoration: underline;
+        }
+
+        .footnote a:hover {
+            color: var(--accent);
+            text-decoration: underline;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .scenario-row {
+            display: contents;
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-container">
+        <h1>Justified PE modeling</h1>
+
+        <div class="ticker-section">
+            <div class="ticker-row">
+                <button class="ticker-btn active" data-type="custom">🎨 Custom</button>
+                <button class="ticker-btn" data-ticker="NFLX" data-roic="50%" data-growth="23%"
+                    data-trailing="33.1">NFLX</button>
+                <button class="ticker-btn" data-ticker="ABNB" data-roic="50%" data-growth="11%"
+                    data-trailing="31.4">ABNB</button>
+                <button class="ticker-btn" data-ticker="DUOL" data-roic="13%" data-growth="40%"
+                    data-trailing="53.2">DUOL</button>
+                <button class="ticker-btn" data-ticker="BKNG" data-roic="33%" data-growth="15%"
+                    data-trailing="31.0">BKNG</button>
+                <button class="ticker-btn" data-ticker="NVDA" data-roic="87%" data-growth="30%"
+                    data-trailing="46.2">NVDA</button>
+                <button class="ticker-btn" data-ticker="GOOG" data-roic="24%" data-growth="15%"
+                    data-trailing="32.1">GOOG</button>
+                <button class="ticker-btn" data-ticker="META" data-roic="28%" data-growth="10%"
+                    data-trailing="28.4">META</button>
+                <button class="ticker-btn" data-ticker="APP" data-roic="49%" data-growth="45%"
+                    data-trailing="64.7">APP</button>
+                <button class="ticker-btn" data-ticker="CMG" data-roic="36%" data-growth="15%"
+                    data-trailing="35.7">CMG</button>
+                <button class="ticker-btn" data-ticker="COST" data-roic="21%" data-growth="10%"
+                    data-trailing="53.1">COST</button>
+                <button class="ticker-btn" data-ticker="AVGO" data-roic="16%" data-growth="25%"
+                    data-trailing="67.0">AVGO</button>
+            </div>
+        </div>
+
+        <div class="content-area-wrap">
+            <div class="modeling-grid no-ttm" id="modelingGrid">
+                <div class="header-label">ROIIC</div>
+                <div class="header-label">EPS Growth</div>
+                <div class="header-label">Justified PE</div>
+                <div class="header-label ttm-row" style="text-align: center;">TTM PE</div>
+
+                <div class="baseline-row" style="display: contents;">
+                    <div class="pill-wrap active" id="roicBaseWrap">
+                        <input id="roicBase" class="pill-input" inputmode="decimal" value="12%">
+                    </div>
+                    <div class="pill-wrap active" id="growthBaseWrap">
+                        <input id="growthBase" class="pill-input" inputmode="decimal" value="7%">
+                    </div>
+                    <div class="value-large">
+                        <span id="peBase">—</span>
+                        <span id="deltaBase" class="delta" style="display:none;"></span>
+                    </div>
+                    <div class="ttm-pe ttm-row" id="ttmBase">—</div>
+                </div>
+
+                <div class="divider" style="display: none;"></div>
+                <div id="scenariosContainer" style="display: contents;"></div>
+            </div>
+        </div>
+
+        <div class="bottom-area">
+            <div class="btn-group">
+                <button class="add-btn" id="deleteScenarioBtn" style="display: none;">Delete Last</button>
+                <button class="add-btn" id="addScenarioBtn">+ Add Scenario</button>
+            </div>
+            <div class="footnote">
+                This model is based upon bilinear interpolation of the ROIIC x EPS growth x P/E grid outlined in the
+                research
+                by Credit Suisse <a
+                    href="https://strawman.com/member/uploads/objects/a9/41159492407c5bf57c2e67861056bed2decf7d.pdf"
+                    target="_blank">What Does a Price-Earnings Multiple Mean?</a> Assume all equity financed; 8% cost of
+                capital; 15-year forecast period.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function peFromRoicGrowth(roic, growth) {
+            const R = [0.04, 0.08, 0.16, 0.24], G = [0.04, 0.06, 0.08, 0.10],
+                P = [[7.1, 12.5, 15.2, 16.1], [3.3, 12.5, 17.1, 18.6], [null, 12.5, 19.4, 21.8], [null, 12.5, 22.4, 25.7]];
+            const parse = x => { let n = parseFloat(String(x).replace('%', '')); return n / 100; };
+            const r = parse(roic), g = parse(growth);
+            if (isNaN(r) || isNaN(g)) return null;
+            let best = null;
+            for (let j = 0; j < G.length - 1; j++) {
+                for (let i = 0; i < R.length - 1; i++) {
+                    if ([P[j][i], P[j][i + 1], P[j + 1][i], P[j + 1][i + 1]].some(v => v == null)) continue;
+                    const d2 = (val, a, b) => val < a ? (a - val) ** 2 : (val > b ? (val - b) ** 2 : 0);
+                    const dist = d2(r, R[i], R[i + 1]) + d2(g, G[j], G[j + 1]);
+                    if (best === null || dist < best.d2) best = { i, j, d2: dist };
+                }
+            }
+            if (!best) return 12.5;
+            const { i, j } = best;
+            const t = (r - R[i]) / (R[i + 1] - R[i]), u = (g - G[j]) / (G[j + 1] - G[j]);
+            return (1 - t) * (1 - u) * P[j][i] + t * (1 - u) * P[j][i + 1] + (1 - t) * u * P[j + 1][i] + t * u * P[j + 1][i + 1];
+        }
+
+        let isCustom = true;
+        let scenarios = [];
+
+        function formatVal(v) {
+            let c = v.replace(/[^0-9.-]/g, "");
+            const p = c.split("."); if (p.length > 2) c = p[0] + "." + p.slice(1).join("");
+            if (c === "" || c === "-" || c.endsWith(".")) return c + "%";
+            let n = parseFloat(c); if (isNaN(n)) return "0%";
+            return (n > 200 ? 200 : (n < -400 ? -400 : n)) + "%";
+        }
+
+        function setupInput(el, onUpdate) {
+            let m = false;
+            el.addEventListener("mousedown", () => { if (document.activeElement !== el) m = true; });
+            el.addEventListener("focus", () => { if (!m) el.setSelectionRange(0, el.value.length - 1); });
+            el.addEventListener("mouseup", (e) => { if (m) { e.preventDefault(); el.setSelectionRange(0, el.value.length - 1); m = false; } });
+            el.addEventListener("input", () => {
+                let start = el.selectionStart, old = el.value.length;
+                el.value = formatVal(el.value.replace('%', ''));
+                let cur = start >= old ? el.value.length - 1 : start;
+                el.setSelectionRange(cur, cur);
+                onUpdate();
+            });
+        }
+
+        function renderAll() {
+            const grid = document.getElementById('modelingGrid');
+            const roiB = document.getElementById('roicBase').value;
+            const groB = document.getElementById('growthBase').value;
+            const ttm = isCustom ? 0 : parseFloat(document.getElementById('ttmBase').textContent);
+
+            // Update baseline inputs styling
+            document.getElementById('roicBaseWrap').className = isCustom ? 'pill-wrap active' : 'pill-wrap inactive';
+            document.getElementById('growthBaseWrap').className = isCustom ? 'pill-wrap active' : 'pill-wrap inactive';
+            grid.className = isCustom ? 'modeling-grid no-ttm' : 'modeling-grid';
+            document.getElementById('addScenarioBtn').style.display = (isCustom || scenarios.length >= 3) ? 'none' : 'block';
+            document.getElementById('deleteScenarioBtn').style.display = scenarios.length > 0 ? 'block' : 'none';
+
+            const peBaseVal = peFromRoicGrowth(roiB, groB);
+            const baseDisplay = (peBaseVal !== null && !isNaN(peBaseVal)) ? peBaseVal.toFixed(1) : "—";
+            document.getElementById('peBase').textContent = baseDisplay;
+
+            document.querySelector('.divider').style.display = scenarios.length > 0 ? 'block' : 'none';
+
+            const deltaBase = document.getElementById('deltaBase');
+            if (ttm > 0 && peBaseVal !== null && !isNaN(peBaseVal)) {
+                const d = ((peBaseVal / ttm) - 1) * 100;
+                deltaBase.textContent = (d >= 0 ? '+' : '') + Math.round(d) + '%';
+                deltaBase.className = 'delta ' + (d >= 0 ? 'up' : 'down');
+                deltaBase.style.display = 'block';
+            } else {
+                deltaBase.style.display = 'none';
+            }
+
+            const container = document.getElementById('scenariosContainer');
+
+            // Only rebuild DOM if the number of rows has changed (Add/Delete/Reset)
+            if (container.children.length !== scenarios.length) {
+                container.innerHTML = '';
+                scenarios.forEach((s, idx) => {
+                    const row = document.createElement('div');
+                    row.className = 'scenario-row';
+                    row.innerHTML = `
+                        <div class="pill-wrap active">
+                            <input class="pill-input s-roic" value="${s.roic}">
+                        </div>
+                        <div class="pill-wrap active">
+                            <input class="pill-input s-growth" value="${s.growth}">
+                        </div>
+                        <div class="value-large"></div>
+                        <div class="ttm-pe ttm-row"></div>
+                    `;
+                    container.appendChild(row);
+                    setupInput(row.querySelector('.s-roic'), () => { scenarios[idx].roic = row.querySelector('.s-roic').value; renderAll(); });
+                    setupInput(row.querySelector('.s-growth'), () => { scenarios[idx].growth = row.querySelector('.s-growth').value; renderAll(); });
+                });
+            }
+
+            // Update calculated values for all rows without destroying inputs
+            Array.from(container.children).forEach((row, idx) => {
+                const s = scenarios[idx];
+                const peVal = peFromRoicGrowth(s.roic, s.growth);
+                const isValid = peVal !== null && !isNaN(peVal);
+                const d = (ttm > 0 && isValid) ? ((peVal / ttm) - 1) * 100 : 0;
+
+                const valueLarge = row.querySelector('.value-large');
+                valueLarge.innerHTML = `
+                    <span>${isValid ? peVal.toFixed(1) : "—"}</span>
+                    ${(ttm > 0 && isValid) ? `<span class="delta ${d >= 0 ? 'up' : 'down'}">${d >= 0 ? '+' : ''}${Math.round(d)}%</span>` : ''}
+                `;
+
+                const ttmCol = row.querySelector('.ttm-pe');
+                ttmCol.style.color = 'var(--text-dim)';
+                ttmCol.style.border = 'none';
+                ttmCol.textContent = isCustom ? '' : ttm.toFixed(1);
+            });
+        }
+
+        document.querySelectorAll('.ticker-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.ticker-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                scenarios = []; // Reset scenarios on ticker change
+
+                if (btn.dataset.type === 'custom') {
+                    isCustom = true;
+                    document.getElementById('ttmBase').textContent = '—';
+                    document.getElementById('roicBase').readOnly = false;
+                    document.getElementById('growthBase').readOnly = false;
+                } else {
+                    isCustom = false;
+                    document.getElementById('roicBase').value = btn.dataset.roic;
+                    document.getElementById('growthBase').value = btn.dataset.growth;
+                    document.getElementById('ttmBase').textContent = btn.dataset.trailing;
+                    document.getElementById('roicBase').readOnly = true;
+                    document.getElementById('growthBase').readOnly = true;
+                }
+                renderAll();
+            });
+        });
+
+        document.getElementById('addScenarioBtn').addEventListener('click', () => {
+            if (scenarios.length >= 3) return;
+            const r = document.getElementById('roicBase').value;
+            const g = document.getElementById('growthBase').value;
+            scenarios.push({ roic: r, growth: g });
+            renderAll();
+        });
+
+        // Delete Scenario
+        document.getElementById('deleteScenarioBtn').addEventListener('click', () => {
+            scenarios.pop();
+            renderAll();
+        });
+
+        setupInput(document.getElementById('roicBase'), renderAll);
+        setupInput(document.getElementById('growthBase'), renderAll);
+        renderAll();
+
+        // ---------------------------------------------------------
+        // LIVE DATA FETCHING (Yahoo Finance via CORS Proxy)
+        // ---------------------------------------------------------
+        async function updateMarketData() {
+            // Using a public CORS proxy to bypass browser restrictions
+            const corsProxy = "https://corsproxy.io/?";
+            const getUrl = (symbol) =>
+                `${corsProxy}${encodeURIComponent(`https://query1.finance.yahoo.com/v10/finance/quoteSummary/${symbol}?modules=summaryDetail`)}`;
+
+            const buttons = document.querySelectorAll('.ticker-btn[data-ticker]');
+
+            for (const btn of buttons) {
+                const ticker = btn.dataset.ticker;
+
+                try {
+                    const response = await fetch(getUrl(ticker));
+                    if (!response.ok) throw new Error('Network response was not ok');
+
+                    const data = await response.json();
+                    const summary = data.quoteSummary?.result?.[0]?.summaryDetail;
+
+                    if (summary?.trailingPE?.raw) {
+                        const newPe = summary.trailingPE.raw.toFixed(1);
+
+                        // Update the data attribute
+                        btn.dataset.trailing = newPe;
+
+                        // If this button is currently active, update the displayed value immediately
+                        if (btn.classList.contains('active')) {
+                            document.getElementById('ttmBase').textContent = newPe;
+                            renderAll(); // Rerender to update deltas
+                        }
+                    }
+                } catch (error) {
+                    console.warn(`Could not fetch data for ${ticker}:`, error);
+                }
+            }
+        }
+
+        // Trigger the fetch
+        updateMarketData();
+    </script>
+</body>
+
+</html>
