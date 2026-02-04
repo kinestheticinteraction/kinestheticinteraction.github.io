@@ -163,8 +163,8 @@
         /* Modeling Table */
         .modeling-grid {
             display: grid;
-            grid-template-columns: 78px 78px auto 78px;
-            column-gap: 12px;
+            grid-template-columns: 78px 78px auto 64px;
+            column-gap: 8px;
             row-gap: 12px;
             align-items: center;
             width: 100%;
@@ -174,8 +174,8 @@
         }
 
         .modeling-grid.no-ttm {
-            grid-template-columns: 85px 85px auto 0px;
-            column-gap: 24px;
+            grid-template-columns: 84px 84px auto 0px;
+            column-gap: 12px;
         }
 
         .header-label {
@@ -527,10 +527,10 @@
                     row.className = 'scenario-row';
                     row.innerHTML = `
                         <div class="pill-wrap active">
-                            <input class="pill-input s-roic" value="${s.roic}">
+                            <input class="pill-input s-roic" inputmode="decimal" value="${s.roic}">
                         </div>
                         <div class="pill-wrap active">
-                            <input class="pill-input s-growth" value="${s.growth}">
+                            <input class="pill-input s-growth" inputmode="decimal" value="${s.growth}">
                         </div>
                         <div class="value-large"></div>
                         <div class="ttm-pe ttm-row"></div>
