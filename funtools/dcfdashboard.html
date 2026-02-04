@@ -97,6 +97,8 @@
     <div id="refresh-label">
         Table will auto-refresh every 60s
         <span style="margin: 0 5px;">•</span>
+        <span id="current-date"></span>
+        <span style="margin: 0 5px;">•</span>
         <span id="market-status"></span>
     </div>
     <div class="panel-container">
@@ -171,7 +173,7 @@
             TSLA: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Tesla_T_symbol.svg/771px-Tesla_T_symbol.svg.png',
             FICO: 'https://upload.wikimedia.org/wikipedia/commons/9/9a/FICO_logo.svg',
             ASML: 'https://1000logos.net/wp-content/uploads/2022/05/ASML-Logo.png',
-            IBKR: 'https://companieslogo.com/img/orig/IBKR-2f730041.png?'
+            IBKR: 'https://companieslogo.com/img/orig/IBKR-2f730041.png?t=1720244492'
         };
         let currentPadding = '4px';
         let currentOpacity = 1;
@@ -665,6 +667,16 @@
             marketStatusLabel.textContent = marketStatusText;
         }
 
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { month: 'short', day: 'numeric', year: 'numeric' };
+            const formattedDate = now.toLocaleDateString('en-US', options);
+            const dateLabel = document.getElementById('current-date');
+            if (dateLabel) {
+                dateLabel.textContent = formattedDate;
+            }
+        }
+
         function sendAlertToDiscord() {
             const webhookURL = "https://discord.com/api/webhooks/1402747123509760040/xQj8_NlaXDOdWFycxcX5pF2V5IcIgqco7HaY4YNEQ_6aoDGtcTkiS2nMgyY331DceUBf";
 
@@ -814,7 +826,11 @@
                 option.addEventListener('click', handlePaddingChange);
             });
             updateMarketStatus();
-            setInterval(updateMarketStatus, 60000);
+            updateCurrentDate();
+            setInterval(() => {
+                updateMarketStatus();
+                updateCurrentDate();
+            }, 60000);
             opacitySlider.addEventListener('input', function () {
                 const opacityValue = this.value / 100;
                 dataContainer.style.opacity = opacityValue;
