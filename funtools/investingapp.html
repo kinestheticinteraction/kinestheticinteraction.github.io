@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Investing Apps | Justeen Lee</title>
+    <meta name="description" content="Investing App">
+    <meta name="keywords"
+        content="interaction design, user experience, UX, make fuck you money, product design, justeen, san francisco, hong kong" />
+    <link rel="shortcut icon" href="../assets/favicon.ico" />
+
+    <link rel="stylesheet" href="../css/newstructure.css?v=202304041731">
+    <link rel="stylesheet" href="../css/2colText_Image_Layout.css">
+
+    <script src="../js/jquery-1.11.1.min.js"></script>
+    <script src="../js/overall.js" defer></script>
+
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-58728717-1', 'auto');
+        ga('send', 'pageview');
+
+    </script>
+</head>
+
+<body>
+    <div id="backButton" onclick="window.history.back()"></div>
+    <!--intro panel------------------------------>
+    <div id="intro-panel">
+        <h1>Investing Apps</h1>
+        <h2>Product design, Interaction Prototyping, Vibe Coding</h2>
+        <div class="flex-container">
+            <div>Designing for friends, like-minded investors, and myself, I vibe coded a few apps:
+                <br>• <a class="text-highlight" href="https://justeenlee.com/funtools/pemodeling" target="_blank">P/E
+                    calculator</a> (Justified PE modeling)
+                <br>• <a class="text-highlight" href="https://justeenlee.com/funtools/dcfdashboard" target="_blank">DCF
+                    Upside Dashboard</a> (Make Take The Edge Off Money - 5M)
+                <br>• <a class="text-highlight" href="https://justeenlee.com/funtools/fumoney.html"
+                    target="_blank">Property vs ETF Return Simulator</a> (Make F*ck U Money - 20M)
+
+            </div>
+            <div>This is an ongoing project aiming to build out a set of robust apps that help people visualize and
+                eventually make more informed investment decisions based on their individual risk tolerance and
+                investment goals.
+            </div>
+        </div>
+    </div>
+    <div id="product-panel">
+        <iframe src="https://justeenlee.com/funtools/pemodeling" width="100%" height="800px"></iframe>
+        <iframe src="https://justeenlee.com/funtools/dcfdashboard" width="100%" height="800px"></iframe>
+        <iframe src="https://justeenlee.com/funtools/fumoney.html" width="100%" height="800px"></iframe>
+    </div>
+    <div id="backButtonEnd" onclick="window.history.back()">BACK</div>
+
+    <!--body ends + footer ------------------------->
+    <footer>
+        <span class="author"></span>
+        <span class="copyright"></span>
+    </footer>
+</body>
+
+<style>
+    iframe {
+        position: relative;
+        margin-bottom: 20px;
+        border: 1px #333 solid;
+        border: none;
+        border-radius: 12px;
+        box-shadow: none;
+    }
+
+    a.text-highlight {
+        color: rgba(171, 248, 56, 1);
+
+    }
+</style>
+
+</html>
