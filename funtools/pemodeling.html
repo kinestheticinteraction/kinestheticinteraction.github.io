@@ -348,10 +348,10 @@
             text-decoration: underline;
         }
 
-        @keyframes fadeIn {
+        @keyframes slideIn {
             from {
                 opacity: 0;
-                transform: translateY(8px);
+                transform: translateY(12px);
             }
 
             to {
@@ -360,9 +360,28 @@
             }
         }
 
+        @keyframes slideOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateY(-12px);
+            }
+        }
+
         .scenario-row {
             display: contents;
-            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        .scenario-row>* {
+            animation: slideIn 0.35s cubic-bezier(0.32, 0, 0, 1) forwards;
+        }
+
+        .scenario-row.exiting>* {
+            animation: slideOut 0.15s cubic-bezier(0.32, 0, 0, 1) forwards;
         }
     </style>
 </head>
@@ -519,10 +538,21 @@
 
             const container = document.getElementById('scenariosContainer');
 
-            // Only rebuild DOM if the number of rows has changed (Add/Delete/Reset)
-            if (container.children.length !== scenarios.length) {
+            // Synchronize scenario rows with scenarios array to allow animations
+            if (scenarios.length === 0) {
                 container.innerHTML = '';
-                scenarios.forEach((s, idx) => {
+            } else {
+                // If ticker reset or other major change happened, rows might be mismatched
+                // but usually we just append or let the delete logic handle removals.
+                // We ensure we don't have MORE rows than scenarios (after animation)
+                while (container.children.length > scenarios.length) {
+                    container.removeChild(container.lastElementChild);
+                }
+
+                // Add missing rows
+                while (container.children.length < scenarios.length) {
+                    const idx = container.children.length;
+                    const s = scenarios[idx];
                     const row = document.createElement('div');
                     row.className = 'scenario-row';
                     row.innerHTML = `
@@ -536,9 +566,19 @@
                         <div class="ttm-pe ttm-row"></div>
                     `;
                     container.appendChild(row);
-                    setupInput(row.querySelector('.s-roic'), () => { scenarios[idx].roic = row.querySelector('.s-roic').value; renderAll(); });
-                    setupInput(row.querySelector('.s-growth'), () => { scenarios[idx].growth = row.querySelector('.s-growth').value; renderAll(); });
-                });
+
+                    const roicInput = row.querySelector('.s-roic');
+                    const growthInput = row.querySelector('.s-growth');
+
+                    setupInput(roicInput, () => {
+                        scenarios[idx].roic = roicInput.value;
+                        renderAll();
+                    });
+                    setupInput(growthInput, () => {
+                        scenarios[idx].growth = growthInput.value;
+                        renderAll();
+                    });
+                }
             }
 
             // Update calculated values for all rows without destroying inputs
@@ -592,10 +632,18 @@
             renderAll();
         });
 
-        // Delete Scenario
+        // Delete Scenario with animation
         document.getElementById('deleteScenarioBtn').addEventListener('click', () => {
-            scenarios.pop();
-            renderAll();
+            const container = document.getElementById('scenariosContainer');
+            const lastRow = container.lastElementChild;
+            if (lastRow && !lastRow.classList.contains('exiting')) {
+                lastRow.classList.add('exiting');
+                // The animation is on children, so we listen for animationend (it bubbles)
+                lastRow.addEventListener('animationend', () => {
+                    scenarios.pop();
+                    renderAll();
+                }, { once: true });
+            }
         });
 
         setupInput(document.getElementById('roicBase'), renderAll);
