@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>testing</title>
+    <meta name="description" content="Get instant, AI-powered insights on why stocks are moving today.">
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&family=Space+Grotesk:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+</head>
+
+<body>
+    <div class="bg-gradient"></div>
+    <div class="container">
+        <header class="sticky-header">
+            <div class="top-banner"></div>
+            <div class="app-title">Daily Snapshot</div>
+            <div class="search-container">
+                <button id="backBtn" class="back-btn">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                </button>
+                <div class="input-wrapper">
+                    <span class="material-symbols-outlined search-icon">search</span>
+                    <input type="text" id="tickerInput" placeholder="AAPL, NFLX, DUOL..." aria-label="Ticker Symbol"
+                        autocomplete="off" enterkeyhint="search">
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div id="landingContent">
+                <section id="recentSection" class="recent-section hidden">
+                    <div class="section-header">
+                        <h2>Recent</h2>
+                        <button id="clearRecentBtn" class="clear-btn">Clear all</button>
+                    </div>
+                    <div class="ticker-grid" id="recentTickerGrid">
+                    </div>
+                </section>
+
+                <section class="popular-section">
+                    <h2>Mag 7</h2>
+                    <div class="ticker-grid">
+                        <button class="ticker-pill loading" data-ticker="NVDA">NVDA</button>
+                        <button class="ticker-pill loading" data-ticker="GOOG">GOOG</button>
+                        <button class="ticker-pill loading" data-ticker="META">META</button>
+                        <button class="ticker-pill loading" data-ticker="TSLA">TSLA</button>
+                        <button class="ticker-pill loading" data-ticker="AAPL">AAPL</button>
+                        <button class="ticker-pill loading" data-ticker="AMZN">AMZN</button>
+                        <button class="ticker-pill loading" data-ticker="MSFT">MSFT</button>
+                    </div>
+                </section>
+
+                <section class="portfolio-section">
+                    <h2>My Portfolio</h2>
+                    <div class="ticker-grid">
+                        <button class="ticker-pill" data-ticker="AAPL">AAPL</button>
+                        <button class="ticker-pill" data-ticker="META">META</button>
+                        <button class="ticker-pill" data-ticker="GOOG">GOOG</button>
+                        <button class="ticker-pill" data-ticker="NFLX">NFLX</button>
+                        <button class="ticker-pill" data-ticker="ABNB">ABNB</button>
+                        <button class="ticker-pill" data-ticker="NVDA">NVDA</button>
+                        <button class="ticker-pill" data-ticker="AVGO">AVGO</button>
+                        <button class="ticker-pill" data-ticker="DUOL">DUOL</button>
+                        <button class="ticker-pill" data-ticker="APP">APP</button>
+                        <button class="ticker-pill" data-ticker="FICO">FICO</button>
+                        <button class="ticker-pill" data-ticker="WSM">WSM</button>
+                        <button class="ticker-pill" data-ticker="HOOD">HOOD</button>
+                        <button class="ticker-pill" data-ticker="BKNG">BKNG</button>
+                        <button class="ticker-pill" data-ticker="AZO">AZO</button>
+                        <button class="ticker-pill" data-ticker="CMG">CMG</button>
+                    </div>
+                </section>
+
+                <section class="discover-section">
+                    <h2>Discover</h2>
+                    <div class="ticker-grid">
+                        <button class="ticker-pill" data-ticker="COST">COST</button>
+                        <button class="ticker-pill" data-ticker="UBER">UBER</button>
+                        <button class="ticker-pill" data-ticker="MA">MA</button>
+                        <button class="ticker-pill" data-ticker="KLAC">KLAC</button>
+                        <button class="ticker-pill" data-ticker="HSY">HSY</button>
+                        <button class="ticker-pill" data-ticker="NDAQ">NDAQ</button>
+                    </div>
+                </section>
+            </div>
+
+            <div id="resultCard" class="result-card hidden">
+                <div class="card-top">
+                    <span id="resultTicker" class="ticker-label">AVGO</span>
+                    <button id="refreshBtn" class="refresh-btn" aria-label="Refresh">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 2v6h-6"></path>
+                            <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
+                            <path d="M3 22v-6h6"></path>
+                            <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="price-section">
+                    <h2 id="resultPrice">$331.94</h2>
+                    <div id="movementBadge" class="movement-pill">
+                        <svg class="trend-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                            <polyline points="17 6 23 6 23 12"></polyline>
+                        </svg>
+                        <span class="percent">+5.57%</span>
+                    </div>
+                </div>
+
+                <div id="reasonText" class="reason-text">
+                    <!-- Text will be inserted here -->
+                </div>
+
+                <div class="card-footer">
+                    <span id="timestamp">Last update 3:31PM PST</span>
+                </div>
+            </div>
+            <p id="legalText" class="legal-text hidden">Daily Snapshot uses generative AI to summarize recent news and
+                market information relating to a stock you select. The snapshot is not financial advice, research, or a
+                recommendation to buy, sell, or hold that stock. <a href="#">Learn more</a></p>
+
+            <div id="skeletonCard" class="result-card skeleton-card hidden">
+                <div class="card-top">
+                    <div class="skeleton skeleton-ticker"></div>
+                </div>
+
+                <div class="price-section">
+                    <div class="skeleton skeleton-price"></div>
+                </div>
+
+                <div class="summary-box">
+                    <div class="skeleton skeleton-text"></div>
+                    <div class="skeleton skeleton-text"></div>
+                    <div class="skeleton skeleton-text"></div>
+                    <div class="skeleton skeleton-text"></div>
+                    <div class="skeleton skeleton-text"></div>
+                </div>
+
+                <div class="card-footer">
+                    <div class="skeleton skeleton-footer"></div>
+                </div>
+            </div>
+        </main>
+
+
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
