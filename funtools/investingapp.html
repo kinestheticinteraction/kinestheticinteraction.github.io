@@ -13,6 +13,7 @@
 
     <link rel="stylesheet" href="../css/newstructure.css?v=202304041731">
     <link rel="stylesheet" href="../css/2colText_Image_Layout.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Icons+Round" />
 
     <script src="../js/jquery-1.11.1.min.js"></script>
     <script src="../js/overall.js" defer></script>
@@ -64,10 +65,21 @@
     <div id="product-panel">
         <iframe src="https://serve-dot-zipline.appspot.com/asset/6d9f7a8e-fa15-55ec-b7ee-25a5c4f305b9/zpc/m56yrpeytl2/"
             width="100%" height="960px"></iframe>
+        <a href="https://serve-dot-zipline.appspot.com/asset/6d9f7a8e-fa15-55ec-b7ee-25a5c4f305b9/zpc/m56yrpeytl2/"
+            target="_blank" class="open-in-new-btn">Open in new tab <span
+                class="material-icons-round">open_in_new</span></a>
 
-        <iframe src="https://justeenlee.com/funtools/pemodeling" width="100%" height="800px"></iframe>
+        <iframe src="https://justeenlee.com/funtools/pemodeling" width="100%" height="960px"></iframe>
+        <a href="https://justeenlee.com/funtools/pemodeling" target="_blank" class="open-in-new-btn">Open in new tab
+            <span class="material-icons-round">open_in_new</span></a>
+
         <iframe src="https://justeenlee.com/funtools/dcfdashboard" width="100%" height="800px"></iframe>
+        <a href="https://justeenlee.com/funtools/dcfdashboard" target="_blank" class="open-in-new-btn">Open in new tab
+            <span class="material-icons-round">open_in_new</span></a>
+
         <iframe src="https://justeenlee.com/funtools/fumoney.html" width="100%" height="800px"></iframe>
+        <a href="https://justeenlee.com/funtools/fumoney.html" target="_blank" class="open-in-new-btn">Open in new tab
+            <span class="material-icons-round">open_in_new</span></a>
     </div>
     <div id="backButtonEnd" onclick="window.history.back()">BACK</div>
 
@@ -81,7 +93,8 @@
 <style>
     iframe {
         position: relative;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
+        /* Reduced margin to bring button closer */
         border: 1px #333 solid;
         border: none;
         border-radius: 12px;
@@ -90,7 +103,25 @@
 
     a.text-highlight {
         color: rgba(171, 248, 56, 1);
+    }
 
+    .open-in-new-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        color: rgba(171, 248, 56, 1);
+        text-decoration: none;
+        font-size: 14px;
+        margin-bottom: 40px;
+        /* Space before next iframe */
+    }
+
+    .open-in-new-btn:hover {
+        text-decoration: underline;
+    }
+
+    .open-in-new-btn .material-icons-round {
+        font-size: 16px;
     }
 </style>
 
