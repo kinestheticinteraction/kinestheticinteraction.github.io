@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <!-- <meta name="theme-color" content="#0b120c" /> -->
     <title>Justified PE Modeling</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,12 +19,17 @@
             --text-main: #ffffff;
             --text-dim: rgba(255, 255, 255, 0.45);
             --border: rgba(255, 255, 255, 0.1);
+            --content-top: 64px;
         }
 
         html,
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            min-height: 100%;
         }
 
         html,
@@ -38,41 +43,145 @@
         body {
             font-family: 'Instrument Sans', sans-serif;
             min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 2rem 1rem;
             overflow-x: hidden;
         }
 
-        @media (min-width: 600px) {
-            html {
-                background: var(--bg-page);
-            }
+        button,
+        input {
+            font: inherit;
         }
 
-        .main-container {
-            background: var(--bg-card);
-            color: var(--text-main);
+        button {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html.custom-cursor-enabled,
+        html.custom-cursor-enabled * {
+            cursor: none !important;
+        }
+
+        .custom-cursor {
+            width: 44px;
+            height: 44px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 9999;
+            border: 1px solid rgba(50, 50, 50, 0.05);
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.62);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            transition: transform 0.05s ease-out, opacity 0.12s ease-out;
+        }
+
+        .custom-cursor.visible {
+            opacity: 1;
+        }
+
+        .custom-cursor.clicking {
+            transform: translate(-50%, -50%) scale(0.85);
+        }
+
+        .app-shell {
             width: 402px;
-            height: 872px;
+            height: 874px;
             max-width: 100%;
             max-height: calc(100vh - 4rem);
+            max-height: calc(100dvh - 4rem);
+            position: relative;
+            overflow: hidden;
+            background: var(--bg-card);
+            border-radius: 54px;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.18);
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .app-shell * {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .app-shell input {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+
+        .status-bar {
+            width: 100%;
+            height: 60px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 5;
+            display: flex;
+            justify-content: center;
+            padding-top: 11px;
+            pointer-events: none;
+        }
+
+        .dynamic-island {
+            width: 126px;
+            height: 37px;
+            border-radius: 100px;
+            background: #000000;
+        }
+
+        .stage {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            background: var(--bg-card);
+        }
+
+        .screen {
+            width: min(402px, 100%);
+            height: 100%;
+            position: relative;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            padding: 0;
+            background: var(--bg-card);
+            color: var(--text-main);
+        }
+
+        .screen-content {
+            width: 100%;
+            height: 100%;
             position: relative;
+            display: flex;
+            flex-direction: column;
             justify-content: flex-start;
-            overflow-x: hidden;
-            border-radius: 24px;
-            outline: 1px solid #fff;
+            overflow: hidden;
+        }
+
+        .header-block {
+            margin-top: var(--content-top);
+            flex-shrink: 0;
+        }
+
+        .table-gap {
+            height: 48px;
+            flex-shrink: 0;
         }
 
         .content-area-wrap {
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
-            padding-top: 8vh;
-            /* Centering the baseline initially */
             width: 100%;
             padding-bottom: 24px;
         }
@@ -86,22 +195,61 @@
             margin-top: auto;
         }
 
-        @media (min-width: 600px) {
-            .main-container {
-                border-radius: 24px;
-                box-shadow: 0 40px 100px rgba(0, 0, 0, 0.15);
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
             }
         }
 
         @media (max-width: 440px), (max-height: 956px) {
-            .main-container {
-                width: 100% !important;
-                height: 100vh !important;
-                max-width: 100% !important;
-                max-height: 100vh !important;
-                border-radius: 0 !important;
-                border: none !important;
-                outline: none !important;
+            :root {
+                --content-top: 32px;
+            }
+
+            html {
+                height: 100%;
+                overflow: hidden;
+            }
+
+            html,
+            body {
+                height: 100dvh;
+                min-height: 100dvh;
+                padding: 0;
+                background: var(--bg-page);
+                overflow: hidden;
+                overscroll-behavior: none;
+            }
+
+            .app-shell {
+                width: 100%;
+                height: 100vh;
+                height: 100dvh;
+                max-width: 100%;
+                max-height: 100vh;
+                max-height: 100dvh;
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            .status-bar {
+                display: none;
+            }
+
+            .stage,
+            .screen,
+            .screen-content {
+                height: 100vh;
+                height: 100dvh;
+            }
+
+            .screen {
+                padding-top: env(safe-area-inset-top, 0px);
             }
         }
 
@@ -393,7 +541,15 @@
 </head>
 
 <body>
-    <div class="main-container">
+    <div class="app-shell">
+        <main class="stage" aria-label="Justified PE modeling">
+            <section class="screen">
+                <div class="status-bar" aria-hidden="true">
+                    <div class="dynamic-island"></div>
+                </div>
+
+                <div class="screen-content">
+                <div class="header-block">
         <h1>Justified PE modeling</h1>
 
         <div class="ticker-section">
@@ -423,6 +579,9 @@
                     data-trailing="67.0">AVGO</button>
             </div>
         </div>
+                </div>
+
+                <div class="table-gap" aria-hidden="true"></div>
 
         <div class="content-area-wrap">
             <div class="modeling-grid no-ttm" id="modelingGrid">
@@ -464,6 +623,9 @@
                 capital; 15-year forecast period.
             </div>
         </div>
+                </div>
+            </section>
+        </main>
     </div>
 
     <script>
@@ -697,6 +859,129 @@
 
         // Trigger the fetch
         updateMarketData();
+
+        function initCustomCursor() {
+            const isDesktopPointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+            const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+
+            if (!isDesktopPointer || isCoarsePointer) return;
+
+            document.documentElement.classList.add('custom-cursor-enabled');
+
+            const oldCursor = document.querySelector('.custom-cursor');
+            if (oldCursor) oldCursor.remove();
+
+            const cursor = document.createElement('div');
+            cursor.className = 'custom-cursor';
+            document.body.appendChild(cursor);
+
+            document.addEventListener('mousemove', (event) => {
+                cursor.style.left = `${event.clientX}px`;
+                cursor.style.top = `${event.clientY}px`;
+                cursor.classList.add('visible');
+            });
+
+            document.addEventListener('mousedown', () => {
+                cursor.classList.add('clicking');
+            });
+
+            document.addEventListener('mouseup', () => {
+                cursor.classList.remove('clicking');
+            });
+
+            document.addEventListener('mouseleave', () => {
+                cursor.classList.remove('visible');
+            });
+
+            document.addEventListener('mouseenter', () => {
+                cursor.classList.add('visible');
+            });
+        }
+
+        function setButtonFeedback(button, isActive) {
+            if (isActive) {
+                button.style.setProperty('opacity', '0.75', 'important');
+                button.style.setProperty('filter', 'opacity(0.75)', 'important');
+                return;
+            }
+
+            button.style.removeProperty('opacity');
+            button.style.removeProperty('filter');
+        }
+
+        function initPressFeedback() {
+            const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+            const feedbackButtons = Array.from(document.querySelectorAll('button'));
+
+            function setHoveredButton(target) {
+                if (!canHover) return;
+
+                const hoveredButton = target ? target.closest('button') : null;
+
+                feedbackButtons.forEach((button) => {
+                    const isHovered = button === hoveredButton;
+                    button.classList.toggle('is-hovered', isHovered);
+                    if (!button.classList.contains('is-pressed')) {
+                        setButtonFeedback(button, isHovered);
+                    }
+                });
+            }
+
+            feedbackButtons.forEach((button) => {
+                function clearInteractionState(event) {
+                    const isHoverPointer = canHover && event.pointerType && event.pointerType !== 'touch';
+                    const shouldKeepHover = isHoverPointer && button.matches(':hover');
+
+                    button.classList.remove('is-pressed');
+                    button.classList.toggle('is-hovered', shouldKeepHover);
+                    setButtonFeedback(button, shouldKeepHover);
+                }
+
+                button.addEventListener('pointerenter', (event) => {
+                    if (!canHover || event.pointerType === 'touch') return;
+
+                    button.classList.add('is-hovered');
+                    setButtonFeedback(button, true);
+                });
+
+                button.addEventListener('pointerleave', (event) => {
+                    if (!canHover || event.pointerType === 'touch') {
+                        button.classList.remove('is-hovered');
+                        if (!button.classList.contains('is-pressed')) {
+                            setButtonFeedback(button, false);
+                        }
+                        return;
+                    }
+
+                    button.classList.remove('is-hovered');
+                    if (!button.classList.contains('is-pressed')) {
+                        setButtonFeedback(button, false);
+                    }
+                });
+
+                button.addEventListener('pointerdown', (event) => {
+                    if (!canHover || event.pointerType === 'touch') {
+                        button.classList.remove('is-hovered');
+                    }
+
+                    button.classList.add('is-pressed');
+                    setButtonFeedback(button, true);
+                });
+
+                ['pointerup', 'pointercancel', 'pointerleave', 'blur'].forEach((eventName) => {
+                    button.addEventListener(eventName, clearInteractionState);
+                });
+            });
+
+            if (canHover) {
+                document.addEventListener('mousemove', (event) => {
+                    setHoveredButton(document.elementFromPoint(event.clientX, event.clientY));
+                });
+            }
+        }
+
+        initCustomCursor();
+        initPressFeedback();
     </script>
 </body>
 
