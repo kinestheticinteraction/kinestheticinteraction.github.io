@@ -2,6 +2,7 @@
 <html>
 
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DCF Upside Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -9,6 +10,26 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Instrument+Serif:ital@0;1&display=swap"
         rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+        rel="stylesheet">
+    <script>
+        const GA_MEASUREMENT_ID = 'G-BQHQLFKB9M';
+        const analyticsHostnames = new Set(['justeenlee.com', 'www.justeenlee.com']);
+        window.dcfAnalyticsEnabled = analyticsHostnames.has(window.location.hostname);
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+            window.dataLayer.push(arguments);
+        }
+        if (window.dcfAnalyticsEnabled) {
+            const analyticsScript = document.createElement('script');
+            analyticsScript.async = true;
+            analyticsScript.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+            document.head.appendChild(analyticsScript);
+            gtag('js', new Date());
+            gtag('config', GA_MEASUREMENT_ID);
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
 
 </head>
@@ -82,6 +103,27 @@
         <button id="send-alert-button">Send Alert</button>
         <button id="refresh-button">Refresh</button>
 
+        <div class="portfolio-select-control">
+            <button id="portfolio-select" type="button" aria-haspopup="listbox" aria-expanded="false"
+                aria-controls="portfolio-menu">
+                <span id="portfolio-select-label">J15 + watchlist</span>
+                <span class="portfolio-select-icon material-symbols-outlined"
+                    aria-hidden="true">arrow_drop_down</span>
+            </button>
+            <div id="portfolio-menu" role="listbox" aria-label="Portfolio" hidden>
+                <button class="portfolio-option" type="button" role="option" data-value="j15"
+                    aria-selected="false">
+                    <span>Justeen15</span>
+                    <span class="portfolio-check-icon material-symbols-outlined" aria-hidden="true">check</span>
+                </button>
+                <button class="portfolio-option" type="button" role="option" data-value="watchlist"
+                    aria-selected="true">
+                    <span>J15 + watchlist</span>
+                    <span class="portfolio-check-icon material-symbols-outlined" aria-hidden="true">check</span>
+                </button>
+            </div>
+        </div>
+
         <div class="segmented-control padding-segment">
             <button class="padding-option" data-padding="2px">2px</button>
             <button class="padding-option active" data-padding="4px">4px</button>
@@ -95,7 +137,7 @@
     </div>
 
     <div id="refresh-label">
-        Table will auto-refresh every 60s
+        Table auto-refreshes every 60s while the market is open
         <span style="margin: 0 5px;">•</span>
         <span id="current-date"></span>
         <span style="margin: 0 5px;">•</span>
@@ -116,6 +158,18 @@
         const dataContainer = document.getElementById('data-container');
         const refreshButton = document.getElementById('refresh-button');
         const sendAlertButton = document.getElementById('send-alert-button');
+        const portfolioSelect = document.getElementById('portfolio-select');
+        const portfolioSelectLabel = document.getElementById('portfolio-select-label');
+        const portfolioMenu = document.getElementById('portfolio-menu');
+        const portfolioOptions = document.querySelectorAll('.portfolio-option');
+        let selectedPortfolio = 'watchlist';
+        const JUSTEEN15_TICKERS = new Set([
+            'WSM', 'AAPL', 'BKNG', 'ABNB', 'FICO',
+            'NFLX', 'DUOL', 'AZO', 'GOOG', 'HOOD',
+            'AVGO', 'ASML', 'META', 'APP', 'NVDA',
+            'VOO', 'CASH'
+        ]);
+        let latestTableValues = [];
         const dcfUpsideHeader = 'DCF upside';
         const dcfUpsideTooltipText = 'Stock upside based on discounted cash flow model';
         const fcfPercentHeader = 'FCF %';
@@ -177,6 +231,81 @@
         };
         let currentPadding = '4px';
         let currentOpacity = 1;
+        const analyticsSessionKey = 'dcfDashboardAnalyticsSession';
+        const defaultAnalyticsCounts = {
+            sendAlert: 0,
+            refresh: 0,
+            portfolioMenu: 0,
+            portfolioChange: 0,
+            densityChange: 0,
+            opacityChange: 0
+        };
+
+        function loadAnalyticsCounts() {
+            try {
+                const saved = JSON.parse(sessionStorage.getItem(analyticsSessionKey) || '{}');
+                return { ...defaultAnalyticsCounts, ...(saved.counts || {}) };
+            } catch (error) {
+                return { ...defaultAnalyticsCounts };
+            }
+        }
+
+        const analyticsCounts = loadAnalyticsCounts();
+
+        function getDashboardAnalyticsState() {
+            return {
+                portfolio: selectedPortfolio,
+                density: currentPadding,
+                opacity: Math.round(currentOpacity * 100)
+            };
+        }
+
+        function saveAnalyticsSession() {
+            try {
+                sessionStorage.setItem(analyticsSessionKey, JSON.stringify({
+                    counts: analyticsCounts,
+                    state: getDashboardAnalyticsState()
+                }));
+            } catch (error) {
+                // Analytics should never interfere with dashboard controls.
+            }
+        }
+
+        function trackDashboardEvent(eventName, countKey, parameters = {}) {
+            if (countKey) {
+                analyticsCounts[countKey] += 1;
+            }
+            const state = getDashboardAnalyticsState();
+            saveAnalyticsSession();
+
+            if (window.dcfAnalyticsEnabled) {
+                gtag('event', eventName, {
+                    ...state,
+                    ...parameters,
+                    interaction_count: countKey ? analyticsCounts[countKey] : 0
+                });
+            }
+        }
+
+        function trackDashboardSessionSummary() {
+            saveAnalyticsSession();
+            if (!window.dcfAnalyticsEnabled) return;
+
+            const state = getDashboardAnalyticsState();
+            gtag('event', 'dashboard_session_summary', {
+                final_portfolio: state.portfolio,
+                final_density: state.density,
+                final_opacity: state.opacity,
+                send_alert_count: analyticsCounts.sendAlert,
+                refresh_count: analyticsCounts.refresh,
+                portfolio_menu_count: analyticsCounts.portfolioMenu,
+                portfolio_change_count: analyticsCounts.portfolioChange,
+                density_change_count: analyticsCounts.densityChange,
+                opacity_change_count: analyticsCounts.opacityChange,
+                transport_type: 'beacon'
+            });
+        }
+
         async function fetchData() {
             dataContainer.classList.add('fading');
             const startOpacity = currentOpacity;
@@ -186,7 +315,8 @@
             try {
                 const response = await fetch(url);
                 const data = await response.json();
-                displayData(data.values);
+                latestTableValues = Array.isArray(data.values) ? data.values : [];
+                displayData(getSelectedPortfolioValues(latestTableValues));
             } catch (error) {
                 console.error('Error fetching data:', error);
                 dataContainer.innerText = 'Error loading data.';
@@ -200,6 +330,76 @@
                 }, 100);
             }
             fetchAllKPI();
+        }
+
+        function getSelectedPortfolioValues(values) {
+            if (!Array.isArray(values) || values.length === 0 || selectedPortfolio === 'watchlist') {
+                return values;
+            }
+
+            const headers = values[0];
+            const tickerColumnIndex = headers.indexOf(tickerColumnHeader);
+            if (tickerColumnIndex === -1) return values;
+
+            return [
+                headers,
+                ...values.slice(1).filter(row => {
+                    const ticker = String(row[tickerColumnIndex] || '').trim().toUpperCase();
+                    return JUSTEEN15_TICKERS.has(ticker);
+                })
+            ];
+        }
+
+        function setPortfolioMenuOpen(isOpen) {
+            portfolioSelect.setAttribute('aria-expanded', String(isOpen));
+            portfolioMenu.hidden = !isOpen;
+        }
+
+        function selectPortfolio(value) {
+            const selectedOption = Array.from(portfolioOptions)
+                .find(option => option.dataset.value === value);
+            if (!selectedOption) return;
+
+            selectedPortfolio = value;
+            portfolioSelectLabel.textContent = selectedOption.querySelector('span').textContent;
+            portfolioOptions.forEach(option => {
+                option.setAttribute('aria-selected', String(option === selectedOption));
+            });
+            trackDashboardEvent('dashboard_portfolio_change', 'portfolioChange', {
+                selected_portfolio: selectedPortfolio
+            });
+            displayData(getSelectedPortfolioValues(latestTableValues));
+            setPortfolioMenuOpen(false);
+        }
+
+        function setupPortfolioDropdown() {
+            portfolioSelect.addEventListener('click', () => {
+                const willOpen = portfolioSelect.getAttribute('aria-expanded') !== 'true';
+                setPortfolioMenuOpen(willOpen);
+                if (willOpen) {
+                    trackDashboardEvent('dashboard_portfolio_menu', 'portfolioMenu');
+                }
+            });
+
+            portfolioOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    selectPortfolio(option.dataset.value);
+                    portfolioSelect.focus();
+                });
+            });
+
+            document.addEventListener('click', event => {
+                if (!event.target.closest('.portfolio-select-control')) {
+                    setPortfolioMenuOpen(false);
+                }
+            });
+
+            document.addEventListener('keydown', event => {
+                if (event.key === 'Escape' && portfolioSelect.getAttribute('aria-expanded') === 'true') {
+                    setPortfolioMenuOpen(false);
+                    portfolioSelect.focus();
+                }
+            });
         }
 
         function renderTickerCell(td, tickerRaw) {
@@ -233,6 +433,50 @@
             wrapper.appendChild(text);
 
             td.appendChild(wrapper);
+        }
+
+        function getMedianDisplay(rows, columnIndex, header) {
+            const values = rows
+                .map(row => {
+                    const display = String(row[columnIndex] ?? '').trim();
+                    const numeric = parseFloat(display.replace(/[%,$]/g, ''));
+                    return { display, numeric };
+                })
+                .filter(item => item.display && Number.isFinite(item.numeric))
+                .sort((a, b) => a.numeric - b.numeric);
+
+            if (values.length === 0) return '';
+
+            const midpoint = Math.floor(values.length / 2);
+            if (values.length % 2 === 1) {
+                return values[midpoint].display;
+            }
+
+            const median = (values[midpoint - 1].numeric + values[midpoint].numeric) / 2;
+            if (values.some(item => item.display.includes('%'))) {
+                const decimals = header === 'FCF %' ? 1 : 0;
+                return `${median.toFixed(decimals)}%`;
+            }
+            return median.toFixed(header === 'PE' ? 1 : 0);
+        }
+
+        function createPortfolioMedianRow(headers, rows, tickerColumnIndex) {
+            const portfolioRows = rows.filter(row => {
+                const ticker = String(row[tickerColumnIndex] || '').trim().toUpperCase();
+                return ticker !== 'VOO' && ticker !== 'CASH' && JUSTEEN15_TICKERS.has(ticker);
+            });
+            const medianHeaders = new Set([
+                'FCF %', 'PE', 'FCF G', 'EPS G', 'Rev G', 'BB %',
+                'ROCE', 'Gross Margin', 'Operating Margin', 'Cash Conversion', 'Interest Cover'
+            ]);
+
+            return headers.map((header, index) => {
+                if (index === tickerColumnIndex) return 'This Portfolio';
+                if (medianHeaders.has(header)) {
+                    return getMedianDisplay(portfolioRows, index, header);
+                }
+                return '';
+            });
         }
 
 
@@ -453,9 +697,41 @@
                     }
                 }
 
-                for (let i = 1; i < values.length; i++) {
+                const rowsToRender = values.slice(1).map(rowData => ({
+                    rowData,
+                    isSpacer: false,
+                    isSummary: false
+                }));
+
+                if (selectedPortfolio === 'j15') {
+                    rowsToRender.push({
+                        rowData: [],
+                        isSpacer: true,
+                        isSummary: false
+                    });
+                    rowsToRender.push({
+                        rowData: createPortfolioMedianRow(headers, values.slice(1), tickerColumnIndex),
+                        isSpacer: false,
+                        isSummary: true
+                    });
+                }
+
+                for (let i = 0; i < rowsToRender.length; i++) {
                     const dataRow = document.createElement('tr');
-                    const rowData = values[i];
+                    const { rowData, isSpacer, isSummary } = rowsToRender[i];
+
+                    if (isSpacer) {
+                        dataRow.classList.add('portfolio-summary-spacer');
+                        const spacerCell = document.createElement('td');
+                        spacerCell.colSpan = headers.length;
+                        dataRow.appendChild(spacerCell);
+                        tbody.appendChild(dataRow);
+                        continue;
+                    }
+
+                    if (isSummary) {
+                        dataRow.classList.add('portfolio-summary-row');
+                    }
 
                     let isVooRow = false;
                     if (tickerColumnIndex !== -1 && rowData[tickerColumnIndex]) {
@@ -481,7 +757,12 @@
 
                         if (index === tickerColumnIndex) {
                             td.style.textAlign = 'left';
-                            renderTickerCell(td, cellData);
+                            if (isSummary) {
+                                td.textContent = 'This Portfolio';
+                                td.classList.add('portfolio-summary-label');
+                            } else {
+                                renderTickerCell(td, cellData);
+                            }
                         } else {
                             td.textContent = cellData;
                             td.style.textAlign = 'right';
@@ -615,10 +896,136 @@
 
 
 
+        function dateKey(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function observedFixedHoliday(year, monthIndex, day) {
+            const holiday = new Date(year, monthIndex, day);
+            if (holiday.getDay() === 6) holiday.setDate(holiday.getDate() - 1);
+            if (holiday.getDay() === 0) holiday.setDate(holiday.getDate() + 1);
+            return holiday;
+        }
+
+        function nthWeekdayOfMonth(year, monthIndex, weekday, occurrence) {
+            const date = new Date(year, monthIndex, 1);
+            const offset = (weekday - date.getDay() + 7) % 7;
+            date.setDate(1 + offset + (occurrence - 1) * 7);
+            return date;
+        }
+
+        function lastWeekdayOfMonth(year, monthIndex, weekday) {
+            const date = new Date(year, monthIndex + 1, 0);
+            date.setDate(date.getDate() - ((date.getDay() - weekday + 7) % 7));
+            return date;
+        }
+
+        function getEasterSunday(year) {
+            const a = year % 19;
+            const b = Math.floor(year / 100);
+            const c = year % 100;
+            const d = Math.floor(b / 4);
+            const e = b % 4;
+            const f = Math.floor((b + 8) / 25);
+            const g = Math.floor((b - f + 1) / 3);
+            const h = (19 * a + b - d - g + 15) % 30;
+            const i = Math.floor(c / 4);
+            const k = c % 4;
+            const l = (32 + 2 * e + 2 * i - h - k) % 7;
+            const m = Math.floor((a + 11 * h + 22 * l) / 451);
+            const month = Math.floor((h + l - 7 * m + 114) / 31);
+            const day = ((h + l - 7 * m + 114) % 31) + 1;
+            return new Date(year, month - 1, day);
+        }
+
+        function getNyseHolidayKeys(year) {
+            const goodFriday = getEasterSunday(year);
+            goodFriday.setDate(goodFriday.getDate() - 2);
+
+            return new Set([
+                dateKey(observedFixedHoliday(year, 0, 1)),
+                dateKey(nthWeekdayOfMonth(year, 0, 1, 3)),
+                dateKey(nthWeekdayOfMonth(year, 1, 1, 3)),
+                dateKey(goodFriday),
+                dateKey(lastWeekdayOfMonth(year, 4, 1)),
+                dateKey(observedFixedHoliday(year, 5, 19)),
+                dateKey(observedFixedHoliday(year, 6, 4)),
+                dateKey(nthWeekdayOfMonth(year, 8, 1, 1)),
+                dateKey(nthWeekdayOfMonth(year, 10, 4, 4)),
+                dateKey(observedFixedHoliday(year, 11, 25))
+            ]);
+        }
+
+        function isNyseHoliday(date) {
+            const key = dateKey(date);
+            const year = date.getFullYear();
+            return [year - 1, year, year + 1]
+                .some(holidayYear => getNyseHolidayKeys(holidayYear).has(key));
+        }
+
+        function isNyseEarlyClose(date) {
+            const key = dateKey(date);
+            const year = date.getFullYear();
+            const officialEarlyCloses = new Set([
+                '2026-11-27',
+                '2026-12-24',
+                '2027-11-26',
+                '2028-07-03',
+                '2028-11-24'
+            ]);
+
+            if (year >= 2026 && year <= 2028) {
+                return officialEarlyCloses.has(key);
+            }
+
+            const thanksgiving = nthWeekdayOfMonth(year, 10, 4, 4);
+            const dayAfterThanksgiving = new Date(thanksgiving);
+            dayAfterThanksgiving.setDate(dayAfterThanksgiving.getDate() + 1);
+            const isChristmasEve = date.getMonth() === 11 &&
+                date.getDate() === 24 &&
+                date.getDay() >= 1 &&
+                date.getDay() <= 4;
+
+            return key === dateKey(dayAfterThanksgiving) || isChristmasEve;
+        }
+
+        function getMarketSession(now = new Date()) {
+            const easternTime = new Date(now.toLocaleString('en-US', {
+                timeZone: 'America/New_York'
+            }));
+            const dayOfWeek = easternTime.getDay();
+            const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+            const isHoliday = isNyseHoliday(easternTime);
+            const isEarlyClose = isNyseEarlyClose(easternTime);
+            const currentMinutes = easternTime.getHours() * 60 + easternTime.getMinutes();
+            const openMinutes = 9 * 60 + 30;
+            const closeMinutes = isEarlyClose ? 13 * 60 : 16 * 60;
+            const isTradingDay = !isWeekend && !isHoliday;
+            const isOpen = isTradingDay &&
+                currentMinutes >= openMinutes &&
+                currentMinutes < closeMinutes;
+
+            return {
+                isOpen,
+                isTradingDay,
+                isEarlyClose,
+                minutesUntilClose: isOpen ? closeMinutes - currentMinutes : 0
+            };
+        }
+
         function setupRefresh() {
-            // refreshInterval = setInterval(() => { fetchData(); fetchTopStats(); }, 60000); // enable both if you turn on auto-refresh
+            refreshInterval = setInterval(() => {
+                if (getMarketSession().isOpen) {
+                    fetchData();
+                }
+            }, 60000);
+
             if (refreshButton) {
                 refreshButton.addEventListener('click', () => {
+                    trackDashboardEvent('dashboard_refresh', 'refresh');
                     fetchData();
                     burstPhysicsEmojis(refreshButton);
                 });
@@ -633,6 +1040,9 @@
                 });
                 event.target.classList.add('active');
                 currentPadding = selectedPadding;
+                trackDashboardEvent('dashboard_density_change', 'densityChange', {
+                    selected_density: currentPadding
+                });
                 const table = document.querySelector('#data-container table');
                 if (table) {
                     const cells = table.querySelectorAll('th, td');
@@ -644,27 +1054,10 @@
         }
 
         function updateMarketStatus() {
-            const now = new Date();
-            const pstTime = new Date(now.toLocaleString('en-US', {
-                timeZone: 'America/Los_Angeles'
-            }));
-            const hour = pstTime.getHours();
-            const minute = pstTime.getMinutes();
-            const marketOpenHour = 6;
-            const marketOpenMinute = 30;
-            const marketCloseHour = 13;
-            const marketCloseMinute = 0;
-            let marketStatusText = '';
-            if (hour < marketOpenHour || (hour === marketOpenHour && minute < marketOpenMinute) || hour > marketCloseHour || (hour === marketCloseHour && minute >= marketCloseMinute)) {
-                marketStatusText = 'Market Closed';
-            } else {
-                let minutesUntilClose = (marketCloseHour - hour) * 60 + (marketCloseMinute - minute);
-                if (minutesUntilClose < 0) {
-                    minutesUntilClose = 0;
-                }
-                marketStatusText = `${minutesUntilClose} min until market close`;
-            }
-            marketStatusLabel.textContent = marketStatusText;
+            const session = getMarketSession();
+            marketStatusLabel.textContent = session.isOpen
+                ? `${session.minutesUntilClose} min until market close`
+                : 'Market Closed';
         }
 
         function updateCurrentDate() {
@@ -793,8 +1186,9 @@
                 const hour = pstTime.getHours();
                 const minute = pstTime.getMinutes();
                 if (dayOfWeek >= 1 && dayOfWeek <= 5 && hour === 12 && minute === 45) {
-                    console.log("Sending automatic alert at 12:45pm PST");
-                    sendAlertToDiscord();
+                    // temporarily disabled on July 25
+                    // console.log("Sending automatic alert at 12:45pm PST");
+                    // sendAlertToDiscord();
                 }
             }
             setInterval(checkAndSendAlert, 60000);
@@ -836,10 +1230,23 @@
                 dataContainer.style.opacity = opacityValue;
                 currentOpacity = opacityValue;
             });
+            opacitySlider.addEventListener('change', function () {
+                trackDashboardEvent('dashboard_opacity_change', 'opacityChange', {
+                    selected_opacity: Math.round(currentOpacity * 100)
+                });
+            });
             if (sendAlertButton) {
-                sendAlertButton.addEventListener('click', sendAlertToDiscord);
+                // temporarily disabled on July 25
+                // sendAlertButton.addEventListener('click', sendAlertToDiscord);
+                sendAlertButton.addEventListener('click', () => {
+                    trackDashboardEvent('dashboard_send_alert', 'sendAlert');
+                    alert("This function is temporarily disabled on July 25th, 2026.");
+                });
             }
+            setupPortfolioDropdown();
             scheduleAutomaticAlerts();
+            window.addEventListener('pagehide', trackDashboardSessionSummary);
+            saveAnalyticsSession();
             console.log(`Next automatic alert scheduled for: ${getNextAlertTime().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' })} PST`);
         }
         window.onload = init;
@@ -1509,6 +1916,138 @@
         min-width: calc(3.5rem * var(--scale));
     }
 
+    .portfolio-select-control {
+        height: calc(3.5rem * var(--scale) + 4px);
+        position: relative;
+        width: 10.5rem;
+    }
+
+    #portfolio-select {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        padding: 0 48px 0 12px;
+        background-color: var(--panelOnPanel);
+        color: var(--text-primary);
+        border: 2px solid var(--border);
+        border-radius: var(--radius-sm);
+        font-family: var(--font-stack);
+        font-size: calc(1.1rem * var(--scale));
+        font-weight: 600;
+        line-height: 1.2;
+        cursor: pointer;
+        text-align: left;
+    }
+
+    #portfolio-select-label {
+        width: 6rem;
+        min-width: 6rem;
+    }
+
+    .portfolio-select-icon {
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        width: 24px;
+        height: 24px;
+        color: #ffffff;
+        font-size: 24px;
+        line-height: 24px;
+        font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24;
+        pointer-events: none;
+        transform: translateY(-50%);
+    }
+
+    #portfolio-menu {
+        position: absolute;
+        top: calc(100% + 4px);
+        right: 0;
+        z-index: 20;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 0;
+        background-color: var(--bg);
+        border: 2px solid var(--border);
+        border-radius: var(--radius-sm);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+        overflow: hidden;
+    }
+
+    #portfolio-menu[hidden] {
+        display: none;
+    }
+
+    .portfolio-option {
+        position: relative;
+        width: 100%;
+        height: calc(3.5rem * var(--scale) + 4px);
+        box-sizing: border-box;
+        padding: 0 48px 0 calc(1rem * var(--scale));
+        background-color: var(--bg);
+        color: var(--text-primary);
+        border: 0;
+        border-radius: 0;
+        font-family: var(--font-stack);
+        font-size: calc(1.1rem * var(--scale));
+        font-weight: 600;
+        line-height: 1.2;
+        text-align: left;
+        white-space: nowrap;
+        cursor: pointer;
+    }
+
+    .portfolio-option:hover,
+    .portfolio-option:focus-visible {
+        background-color: var(--accent-hover-bg);
+        outline: none;
+    }
+
+    .portfolio-option[aria-selected="true"] {
+        background-color: var(--bg);
+        color: var(--text-primary);
+    }
+
+    .portfolio-option[aria-selected="true"]:hover,
+    .portfolio-option[aria-selected="true"]:focus-visible {
+        background-color: var(--accent-hover-bg);
+    }
+
+    .portfolio-check-icon {
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        width: 24px;
+        height: 24px;
+        color: var(--accent);
+        font-size: 24px;
+        line-height: 24px;
+        font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24;
+        pointer-events: none;
+        transform: translateY(-50%);
+        visibility: hidden;
+    }
+
+    .portfolio-option[aria-selected="true"] .portfolio-check-icon {
+        visibility: visible;
+    }
+
+    #portfolio-select:hover,
+    #portfolio-select:focus-visible {
+        border-color: var(--accent);
+        outline: none;
+    }
+
     /* === Generic pill control tile (Send / Refresh / Opacity) === */
 
     .control-tile {
@@ -1758,6 +2297,22 @@
         background: var(--benchmark-bg-color) !important;
     }
 
+    .portfolio-summary-spacer td {
+        height: 24px;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+    }
+
+    .portfolio-summary-row td {
+        font-weight: 700;
+        border-top: 2px solid var(--border);
+    }
+
+    .portfolio-summary-row .portfolio-summary-label {
+        color: var(--accent);
+    }
+
     /* #opacity-slider-container {
   display: flex;
   align-items: center;
@@ -1851,6 +2406,7 @@
         /* Every control fills its grid cell */
         #send-alert-button,
         #refresh-button,
+        .portfolio-select-control,
         .padding-segment {
             width: 100%;
             min-width: 0;
@@ -1863,6 +2419,10 @@
             display: flex;
             /* keep it a single pill */
             overflow: hidden;
+        }
+
+        #portfolio-select {
+            width: 100%;
         }
 
         .padding-segment .padding-option {
@@ -1894,6 +2454,12 @@
             width: auto;
             /* let flex control it */
             max-width: 100%;
+        }
+    }
+
+    @media (max-width: 600px) {
+        #controls-container {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
         }
     }
 </style>
