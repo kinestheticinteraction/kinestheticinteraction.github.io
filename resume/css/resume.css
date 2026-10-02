@@ -15,11 +15,6 @@ p > b > a:link {
     color: #111;
 }
 
-/*
-h4 is #222
-b text has way smaller font size, so use #111 to make them more visually balanced.
-*/
-
 p a:hover,
 p > b > a:hover {
     color: #F51488;
@@ -30,14 +25,12 @@ p > b > a:hover {
     color: #F51488;
 }
 
-
 @keyframes pinterestOmbre {
     0% {
         color: #F51488;
     }
 
     100% {
-
         color: #bb54f2;
     }
 }
@@ -61,26 +54,16 @@ p > b > a:hover {
     color: #EBB70E;
 }
 
-
 #indicator-dot {
     background-color: #555;
 }
-
-/*purple #961176*/
 
 #navBand {
     background-color: #FbFbFb;
 }
 
-span.course,
-    {
-    //padding-bottom: 10px;
-    border-bottom: 1px solid rgba(150, 17, 118, .75);
-}
+/* Body text */
 
-span.course::after {}
-
-/*body text*/
 p {
     left: 0;
     margin: 0;
@@ -88,7 +71,6 @@ p {
     font-size: 15px;
     color: #4D4D4D;
     line-height: 1.3;
-    //width: 510px; /*added on 0729*/
 }
 
 p + p {
@@ -112,6 +94,8 @@ h4 + p {
     padding-left: 10px;
 }
 
+/* Name and contact information */
+
 h1,
 h2 {
     font-family: "DINPRO-REGULAR";
@@ -126,7 +110,6 @@ h2 {
     margin-bottom: 10px;
 }
 
-
 #titleInfo > h2,
 #titleInfo a {
     margin-top: -5px;
@@ -135,13 +118,12 @@ h2 {
     color: #222;
 }
 
-
 p + h4 {
     margin-top: 5px;
 }
 
+/* Role titles and dates */
 
-/*responsibility title*/
 .responsibilityTitle {
     font-family: "DINPRO-REGULAR", sans-serif;
     font-size: 20px;
@@ -163,7 +145,7 @@ h3 + h5.duration {
 }
 
 .location {
-    padding-top: 0px;
+    padding-top: 0;
     margin-top: -5px;
     color: #aaa;
     font-family: "DINPRO-regular", sans-serif;
@@ -179,11 +161,11 @@ h4 > a:hover {
     color: #F51488;
 }
 
+/* Resume columns */
 
 .section {
     float: left;
     margin-left: 50px;
-
 }
 
 #education,
@@ -191,10 +173,6 @@ h4 > a:hover {
 #projects {
     float: left;
 }
-
-
-/*shift everything right to align with title*/
-
 
 .section,
 .section > p,
@@ -207,19 +185,16 @@ h4 > a:hover {
 #talk,
 #talk > p {
     width: 350px;
-    //background-color: ghostwhite;
 }
 
-
-/* if projects are after education, then add spacing
-*/
 #education + #projects,
 #projects + #proficiency,
 #ai-first-apps + #education {
     margin-top: 50px;
 }
 
-/*section title*/
+/* Section headings */
+
 .section > h3 {
     margin-bottom: 5px;
     font-family: "DINPRO-REGULAR", sans-serif;
@@ -227,18 +202,15 @@ h4 > a:hover {
     color: #999999;
 }
 
-/*institute name*/
 .section > h4 {
     font-family: "DINPRO-BOLD", sans-serif;
-    letter-spacing: -.4px;
+    letter-spacing: -0.4px;
     font-size: 20px;
     color: #292929;
-
 }
 
+/* Resume panel */
 
-
-/*----------------Resume----------------*/
 #resume-panel {
     position: relative;
     margin-top: 70px;
@@ -247,45 +219,36 @@ h4 > a:hover {
     left: 50%;
     width: 800px;
     min-height: 1200px;
-    //background-color: ghostwhite;
 }
 
 #titleInfo {
     width: 100%;
-    //margin-left: 0px;
     margin: 20px 0;
 }
-
 
 #resume-panel,
 #pdf {
     font-size: 15px;
 }
 
+/* Mobile */
 
-
-/*--------------Media Query starts-----------------*/
-/* for 680px or less */
 @media screen and (max-width: 480px) {
     #link-resume {
-        text-decoration: underline
+        text-decoration: underline;
     }
 
-    /* for resume.css only*/
     #product-panel > div {
         padding: 0;
     }
 
     #resume-panel {
-        width: 100%;
         width: auto;
-        /*0121 for padding*/
         height: auto;
         left: 0;
         margin-left: 0;
         margin-right: 0;
         padding: 0 15px;
-        /*0121*/
         overflow: hidden;
     }
 
@@ -303,59 +266,9 @@ h4 > a:hover {
         left: 0;
         margin-left: 0;
     }
-
-    /*
-	#resume-panel>div{
-		margin-left:10px;
-	}
-*/
-
-    /*
-	#resume-panel>div>*{
-		margin-right: 12px;
-	}
-*/
-
-
-    /* for resume.css only*/
-
 }
 
-
-
-/*
-@media screen and (max-width: 550px){
-	h4>span{
-		display: block;
-	}
-    
-    p+h4{
-        height: 40px;
-    }
-    
-    p, #projects p{
-		width: auto;
-    }
-
-}
-*/
-
-
-/*
-@media screen and (max-width: 480px){
-    
-    h4+h4{
-        margin-top: 10px;
-    }
-    
-}
-*/
-
-
-/* for 415px or less */
-/* exception: adjust size of name*/
 @media screen and (max-width: 430px) {
-
     p,
     #projects p {
         width: auto;
@@ -381,11 +294,6 @@ h4 > a:hover {
         margin-top: 30px;
     }
 
-    .duration,
-    .location {
-        //display: none;
-    }
-
     .section > h4 {
         line-height: 1.1;
     }
@@ -398,19 +306,15 @@ h4 > a:hover {
         height: auto;
     }
 
-    #resume-panel > div > * {
-        //margin-right: 6px;
-    }
-
     p,
     #projects p {
         max-width: 430px;
     }
 }
 
+/* Print */
 
 @media print {
-
     header,
     footer,
     #objective {
@@ -436,7 +340,78 @@ h4 > a:hover {
     #experience {
         margin-left: 30px;
     }
+}
 
+/* Highlights: year column + text column */
 
+#projects .highlight-row {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr);
+    column-gap: 10px;
+    align-items: start;
 
+    position: static;
+    float: none;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#projects .highlight-row + .highlight-row {
+    margin-top: 10px;
+}
+
+#projects .highlight-year {
+    display: block;
+    position: static;
+    float: none;
+    margin: 0;
+    padding: 0;
+
+    font-family: "DINPRO-REGULAR", sans-serif;
+    font-size: 14px;
+    line-height: 1.4;
+    letter-spacing: -0.5px;
+    color: #999999;
+    white-space: nowrap;
+}
+
+#projects .highlight-copy {
+    display: block;
+    position: static;
+    float: none;
+    width: auto;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    overflow-wrap: break-word;
+}
+
+#projects .highlight-copy > p {
+    display: block;
+    position: static;
+    float: none;
+    left: auto;
+    top: auto;
+    width: auto;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+
+    font-family: "DINPRO-REGULAR", sans-serif;
+    font-size: 15px;
+    line-height: 1.3;
+    color: #4D4D4D;
+}
+
+#projects .highlight-copy > p + p {
+    margin-top: 6px;
+}
+
+@media screen and (max-width: 480px) {
+    #projects {
+        width: 100%;
+        max-width: 350px;
+    }
 }
