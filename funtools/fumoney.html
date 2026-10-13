@@ -2854,11 +2854,18 @@
   --panel-scale: var(--scale);
 }
 
+html {
+  background-color: var(--bg);
+}
+
 body {
   background-color: var(--bg);
   color: var(--text-primary);
   font-family: var(--font-stack);
   line-height: 1.4;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
   padding: calc(2rem * var(--scale)) 16px;
   display: flex;
   flex-direction: column;
